@@ -1,0 +1,13 @@
+[package]
+name = "lethe"
+edition = "2024"
+license = "MIT"
+authors = ["Lethe (Sui Overflow 2026)"]
+
+# Sui, MoveStdlib and system packages are auto-resolved by the Sui CLI
+# (1.72+) to match the environment you publish to (testnet). No explicit
+# framework dependency needed — see `sui move build` notes.
+[dependencies]
+
+[addresses]
+lethe = "0x0"

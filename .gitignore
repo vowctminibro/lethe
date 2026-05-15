@@ -1,0 +1,43 @@
+node_modules/
+.env
+.env.local
+*.log
+.DS_Store
+
+# Sui Move build artifacts
+contracts/build/
+contracts/lethe/build/
+
+# memory-service build
+memory-service/dist/
+
+# Unity build artifacts
+game-a/Library/
+game-a/Temp/
+game-a/Obj/
+game-a/Logs/
+game-a/UserSettings/
+game-a/MemoryCaptures/
+game-b/Library/
+game-b/Temp/
+game-b/Obj/
+game-b/Logs/
+game-b/UserSettings/
+game-b/MemoryCaptures/
+
+# Unity-generated solution files
+*.csproj
+*.csproj.user
+*.sln
+*.unityproj
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db

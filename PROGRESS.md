@@ -1,0 +1,60 @@
+# Lethe — Progress Log
+
+## Day 1 — May 15, 2026
+
+### Installed
+- [x] Rust — cargo 1.95.0 (already present)
+- [x] Sui CLI — sui 1.72.1-homebrew (installed via Homebrew)
+- [x] Walrus CLI — walrus 1.48.1 (installed to ~/.local/bin; the docs
+      install script 404'd, binary pulled directly from the Mysten GCS
+      bucket)
+- [x] Git LFS — git-lfs 3.7.1 (installed via Homebrew, `git lfs install` run)
+
+Already present and verified: node v24.14.1, pnpm 10.33.0, Homebrew 5.1.11.
+
+### Testnet wallet
+- Alias: lethe-dev
+- Address: 0x4bf22d697cacb24e23037e804157896ddfaaf7a3d86940df777c1ad31a868077
+- Network: Sui testnet (active env, RPC https://fullnode.testnet.sui.io:443)
+- Faucet status: FAILED — faucet endpoint returns HTTP 429 (rate limited).
+  Balance: 0 SUI. See BLOCKERS.md B1.
+  (Recovery phrases for both generated addresses are stored only in the
+  local Sui keystore at ~/.sui/sui_config/ — never committed.)
+
+### Sui Move package
+- contracts/lethe/ created via `sui move new lethe`
+- Move.toml: edition 2024, framework auto-resolved by Sui CLI 1.72
+  (no explicit Sui dep — per CLI recommendation), `lethe = "0x0"`
+- `sui move build` — PASSES clean
+
+### memory-service
+- Node.js + TypeScript Express sidecar
+- Deps: @mysten/sui, @mysten/walrus, @mysten/seal, express, dotenv
+- Dev deps: typescript, @types/node, @types/express, tsx
+- tsconfig.json: ES2022 / NodeNext / strict
+- localhost:3001 verified: YES — `GET /health` → 200
+  `{"status":"ok","service":"lethe-memory"}`
+- MemWal SDK NOT installed — package name unconfirmed (BLOCKERS.md B2)
+
+### Next step
+- Vow installs Unity Hub manually
+- Vow reads OnlyFins source code
+- Vow resolves faucet (web UI) + confirms MemWal SDK package name
+- Day 2: write first NPC Move contract
+
+### Day 1 summary
+
+Day 1 setup complete. Toolchain is fully in place: cargo 1.95.0,
+sui 1.72.1, walrus 1.48.1, git-lfs 3.7.1, node v24.14.1, pnpm 10.33.0.
+Project scaffold created under ~/Projects/lethe/ (contracts, memory-service,
+game-a, game-b, docs, research) with the hero flow frozen at 90 seconds in
+docs/HERO_FLOW.md and the stack documented in docs/ARCHITECTURE.md. The Sui
+Move package `lethe` builds clean against the testnet framework. The
+Node.js memory-service runs and serves a healthy /health endpoint on
+localhost:3001. A testnet wallet `lethe-dev` was generated
+(0x4bf22d697cacb24e23037e804157896ddfaaf7a3d86940df777c1ad31a868077) but
+the faucet is rate-limited (HTTP 429) so it holds 0 SUI — non-blocking for
+Day 1 since no contract is published today; tracked as BLOCKERS.md B1. The
+MemWal SDK was not installed because its npm package name is not stated on
+the public docs landing page — tracked as B2. Next: Vow installs Unity Hub
+manually and reads the OnlyFins source.
