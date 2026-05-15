@@ -1,27 +1,32 @@
-HERO FLOW — Lethe demo, 90 seconds
+HERO FLOW — Lethe SDK demo, 90 seconds
 
-0:00  Open Game A (cyberpunk vibe) → tutorial: "wake up in Neo-Bangkok"
-0:10  Meet NPC "Khun Tum" → dialogue → Vow chooses to steal his data → NPC reacts hostile
-0:30  Close Game A. Walrus dashboard shown: memory blob hash visible
-0:40  Open Game B (fantasy vibe) → tutorial: "village square in Ayutthaya kingdom"
-0:50  Same NPC "Khun Tum" approaches → recognizes Vow's wallet → "เจอแกอีกแล้ว ขโมย!"
-1:05  Dialogue references specific event from Game A ("you stole from me 3 days ago")
-1:20  Show backend: Walrus blob persisted, accessible via MemWal SDK
-1:30  END — "AI NPCs ที่จำคุณได้ตลอด. Owned by Sui. Stored on Walrus. Forever."
+0:00  VS Code on screen — new Sui game project, empty
+0:08  Terminal: pnpm add @lethe/sdk (install completes fast)
+0:18  Show 3 lines of code being written:
+
+        const lethe = new Lethe({ network: 'sui-testnet' });
+        const npc = lethe.npc('khun-tum');
+        await npc.remember(playerWallet, { event: 'stole 100 gold' });
+
+0:35  Switch to Unity Editor — demo game running
+0:45  Player approaches NPC "Khun Tum" → NPC: "เจอแกอีกแล้ว ขโมย!"
+1:00  Dialogue references the exact event from the SDK call
+1:10  Switch to Walrus dashboard — show blob hash + Sui object
+1:20  Cut to docs.lethe.app landing → API reference, pricing, install snippet
+1:30  END — "Memory layer every Sui game needs. 3 lines. Walrus-native."
 
 FEATURES IN HERO FLOW (must be bulletproof):
-- NPC dialogue with persistent state (Game A → Game B)
-- Wallet-based identity (player owns persona via Sui object)
-- Walrus blob storage of NPC memory
-- MemWal-style recall (NPC asks AI: "what do I know about wallet 0x...?")
-- 2 Unity games with different visual vibes
+- @lethe/sdk npm package installable and working
+- 3-line API surface (constructor + npc() + remember())
+- 1 Unity reference game with Lethe SDK integrated
+- Persistent NPC memory survives game close/reopen
+- docs.lethe.app live with at least install + quickstart pages
 
 FEATURES NOT IN HERO FLOW (skip — no exceptions):
+- Second Unity game (was Game B — delete)
 - Multiplayer
-- Marketplace for NPCs
-- Combat systems
-- Inventory
+- Combat / inventory systems
 - Voice acting
-- Mobile build
+- Mobile builds
 - Multiple NPCs (start with ONE — Khun Tum)
-- Multiple memories per NPC initially (start: 1 memorable event)
+- Complex memory schemas (start with simple event strings)

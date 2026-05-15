@@ -1,41 +1,40 @@
-# Lethe — AI NPC Memory on Walrus
+# Lethe
 
-AI NPCs that remember you across games. NPC memory is owned on Sui and
-stored on Walrus, so the same NPC can recognize your wallet in a
-completely different game.
+**Persistent memory SDK for Sui games. 3 lines of code.**
 
-Built for **Sui Overflow 2026** — Walrus track. Deadline: June 21, 2026.
+The river of memory in Greek mythology. The opposite for AI NPCs in your
+game.
 
-## Hero demo
+## Quick install
 
-The NPC "Khun Tum" remembers Vow's wallet across two separate Unity
-games with different visual vibes. See [docs/HERO_FLOW.md](docs/HERO_FLOW.md).
-
-## Architecture
-
-```
-[Unity Game A]   [Unity Game B]
-        \            /
-     C# (OpenDive Sui SDK)
-        ↓            ↓
-       [Sui Testnet]  ← NPC objects, player wallet
-            ↑ HTTP REST
-   [Node.js memory-service]  (localhost:3001)
-            ↓
-   [Walrus]  [MemWal]  [Seal]
+```bash
+pnpm add @lethe/sdk
 ```
 
-Full detail: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+```typescript
+const lethe = new Lethe({ network: 'sui-testnet' });
+const npc = lethe.npc('khun-tum');
+await npc.remember(playerWallet, { event: 'stole 100 gold' });
+```
+
+## Stack
+
+- **@mysten/sui** — identity + object coordination
+- **@mysten/walrus** — blob storage for NPC memory
+- **@mysten/seal** — encryption + access control
+- **MemWal** — memory recall API
+
+Built for **Sui Overflow 2026**, Walrus track.
 
 ## Layout
 
+- `sdk/` — `@lethe/sdk` TypeScript package + `Lethe.unitypackage`
 - `contracts/` — Sui Move package (NPC objects + Seal access control)
-- `memory-service/` — Node.js + TypeScript sidecar (Walrus / MemWal / Seal)
-- `game-a/`, `game-b/` — Unity desktop projects (added manually via Unity Hub)
+- `memory-service/` — Node.js + TypeScript service layer (Walrus / MemWal / Seal)
+- `demo-game/` — Unity reference game proving the SDK works
 - `docs/` — hero flow, architecture, audit log
 - `research/` — recon and verification notes
 
 ## Status
 
-Day 1 setup complete — see [PROGRESS.md](PROGRESS.md) and
-[BLOCKERS.md](BLOCKERS.md).
+See [PROGRESS.md](PROGRESS.md) and [BLOCKERS.md](BLOCKERS.md).

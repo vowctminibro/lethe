@@ -58,3 +58,29 @@ Day 1 since no contract is published today; tracked as BLOCKERS.md B1. The
 MemWal SDK was not installed because its npm package name is not stated on
 the public docs landing page — tracked as B2. Next: Vow installs Unity Hub
 manually and reads the OnlyFins source.
+
+### Day 1 reframe — May 15, 2026 (evening)
+
+Pivoted from consumer NPC product → developer SDK after an honest review:
+
+- Original: "AI NPCs that remember you across 2 games" → niche RWA score.
+- Reframed: "Memory SDK for Sui game devs" → ecosystem-wide need + Walrus
+  track Pattern D (blessed).
+- 2 games scope → 1 reference game (saves ~7 days).
+- Target user = Sui game devs (validated TAM via Suiplay + Sui Foundation
+  gaming push).
+- Day 1 toolchain + scaffold REUSED — only positioning changed.
+
+Docs/scaffold touched by the reframe: HERO_FLOW.md, ARCHITECTURE.md and
+README.md rewritten; public SDK API surface defined (`Lethe`, `npc()`,
+`remember()`, `recall()`, `forget()`); `sdk/` directory added; `game-a/`
+and `game-b/` removed, replaced by a single `demo-game/` reference-game
+folder. Toolchain, wallet, Move package and memory-service from Day 1 are
+unaffected.
+
+### Day 2 plan — May 16, 2026
+
+- Define SDK public API surface (TypeScript types).
+- Write first Move contract: NPC + memory objects.
+- Decide hosted vs sidecar service model.
+- NO Unity work yet — SDK core first.

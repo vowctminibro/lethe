@@ -4,26 +4,24 @@ node_modules/
 *.log
 .DS_Store
 
+# Agent coordination signals (Hermes mailbox flags) — ephemeral, not project content
+*.flag
+
 # Sui Move build artifacts
 contracts/build/
 contracts/lethe/build/
 
-# memory-service build
+# memory-service / sdk build
 memory-service/dist/
+sdk/dist/
 
 # Unity build artifacts
-game-a/Library/
-game-a/Temp/
-game-a/Obj/
-game-a/Logs/
-game-a/UserSettings/
-game-a/MemoryCaptures/
-game-b/Library/
-game-b/Temp/
-game-b/Obj/
-game-b/Logs/
-game-b/UserSettings/
-game-b/MemoryCaptures/
+demo-game/Library/
+demo-game/Temp/
+demo-game/Obj/
+demo-game/Logs/
+demo-game/UserSettings/
+demo-game/MemoryCaptures/
 
 # Unity-generated solution files
 *.csproj
