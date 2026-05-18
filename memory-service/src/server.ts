@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import { SuiJsonRpcClient } from '@mysten/sui/jsonRpc';
 import { Ed25519Keypair } from '@mysten/sui/keypairs/ed25519';
 import { Transaction } from '@mysten/sui/transactions';
+import { storeBlob, fetchBlob } from './walrus.js';
 
 dotenv.config();
 
@@ -57,8 +58,8 @@ app.get('/health', (_req, res) => {
 /**
  * POST /npc/:id/remember
  * Body: { playerWallet: "0x...", event: { event: "...", metadata?: {...} } }
- * For Day 3: stub blob_id = "stub-${Date.now()}"
- * Real Walrus integration = Day 4
+ * 1. Store event content in Walrus
+ * 2. Record blob_id on Sui via add_memory moveCall
  */
 app.post('/npc/:id/remember', async (req, res) => {
   try {
@@ -72,11 +73,31 @@ app.post('/npc/:id/remember', async (req, res) => {
       return;
     }
 
-    // Stub blob_id (Day 3 — Walrus Day 4)
-    const blobId = `stub-${Date.now()}`;
-    const blobIdBytes = Array.from(new TextEncoder().encode(blobId));
+    // Step 1: Store content in Walrus
+    const blobContent = {
+      v: 1,
+      npcId,
+      playerWallet,
+      event: event.event,
+      metadata: event.metadata,
+      timestamp: Date.now(),
+    };
 
-    // Build programmable transaction
+    let blobId: string;
+    let walrusObjectId: string | undefined;
+    try {
+      const stored = await storeBlob(blobContent);
+      blobId = stored.blobId;
+      walrusObjectId = stored.suiObjectId;
+      console.log(`[${npcId}] Walrus store: blobId=${blobId}, alreadyCertified=${stored.alreadyCertified}`);
+    } catch (err) {
+      console.error('Walrus store failed:', err);
+      res.status(502).json({ error: 'walrus_publisher_failed', details: String(err) });
+      return;
+    }
+
+    // Step 2: Record blob_id on Sui (atomic — only if Walrus succeeded)
+    const blobIdBytes = Array.from(new TextEncoder().encode(blobId));
     const tx = new Transaction();
     tx.moveCall({
       target: `${LETHE_PACKAGE_ID}::npc::add_memory`,
@@ -87,7 +108,6 @@ app.post('/npc/:id/remember', async (req, res) => {
       ],
     });
 
-    // Sign and submit
     const result = await client.signAndExecuteTransaction({
       transaction: tx,
       signer: keypair,
@@ -98,13 +118,14 @@ app.post('/npc/:id/remember', async (req, res) => {
     const status = result.effects?.status?.status ?? 'unknown';
 
     if (status !== 'success') {
-      console.error('Tx failed:', JSON.stringify(result.effects));
+      console.error('Sui tx failed:', JSON.stringify(result.effects));
+      // Walrus blob already stored — log but still report failure
       res.status(500).json({ error: 'Transaction failed on-chain', details: result.effects });
       return;
     }
 
     console.log(`[${npcId}] add_memory by ${playerWallet}: tx=${digest}`);
-    res.json({ ok: true, blobId, txDigest: digest, suiObjectId: KHUN_TUM_NPC_ID });
+    res.json({ ok: true, blobId, txDigest: digest, walrusObjectId });
   } catch (err) {
     console.error('remember error:', err);
     res.status(500).json({ error: String(err) });
@@ -113,12 +134,13 @@ app.post('/npc/:id/remember', async (req, res) => {
 
 /**
  * GET /npc/:id/recall/:wallet
- * Reads the shared NPC object's memory vector on-chain.
+ * Reads NPC memories from Sui, enriches with full blob content from Walrus.
  */
 app.get('/npc/:id/recall/:wallet', async (req, res) => {
   try {
     const { wallet } = req.params;
 
+    // Step 1: Read memories from Sui
     const obj = await client.getObject({
       id: KHUN_TUM_NPC_ID,
       options: { showContent: true },
@@ -130,27 +152,43 @@ app.get('/npc/:id/recall/:wallet', async (req, res) => {
       return;
     }
 
-    // Parse memories vector from on-chain data
     const fields = content.fields as Record<string, unknown> | undefined;
     const memoriesRaw = fields?.memories as unknown[] | undefined;
-    const memories: Array<{ player_address: string; blob_id: string; timestamp_ms: number }> =
-      (memoriesRaw ?? []).map((m: unknown) => {
-        const entry = m as Record<string, unknown>;
-        const addrField = entry.fields as Record<string, unknown> | undefined;
-        return {
-          player_address: String(addrField?.player_address ?? entry.player_address ?? ''),
-          blob_id: String(addrField?.blob_id ?? entry.blob_id ?? ''),
-          timestamp_ms: Number(addrField?.timestamp_ms ?? entry.timestamp_ms ?? 0),
-        };
-      });
-
-    // Normalize wallet addresses (lowercase compare)
     const normalizedWallet = wallet.toLowerCase();
-    const filtered = memories.filter(
-      (m) => m.player_address.toLowerCase() === normalizedWallet,
+
+    const entries = (memoriesRaw ?? []).map((m: unknown) => {
+      const entry = m as Record<string, unknown>;
+      const addrField = entry.fields as Record<string, unknown> | undefined;
+      return {
+        player_address: String(addrField?.player_address ?? entry.player_address ?? ''),
+        blob_id: String(addrField?.blob_id ?? entry.blob_id ?? ''),
+        timestamp_ms: Number(addrField?.timestamp_ms ?? entry.timestamp_ms ?? 0),
+      };
+    }).filter((m) => m.player_address.toLowerCase() === normalizedWallet);
+
+    // Step 2: Enrich with Walrus content in parallel
+    const enriched = await Promise.all(
+      entries.map(async (entry) => {
+        try {
+          const content = await fetchBlob(entry.blob_id);
+          return {
+            blobId: entry.blob_id,
+            timestampMs: entry.timestamp_ms,
+            content,
+            error: null as null,
+          };
+        } catch {
+          return {
+            blobId: entry.blob_id,
+            timestampMs: entry.timestamp_ms,
+            content: null,
+            error: 'blob_fetch_failed',
+          };
+        }
+      }),
     );
 
-    res.json({ events: filtered, blobId: 'stub', suiObjectId: KHUN_TUM_NPC_ID });
+    res.json({ events: enriched, count: enriched.length, suiObjectId: KHUN_TUM_NPC_ID });
   } catch (err) {
     console.error('recall error:', err);
     res.status(500).json({ error: String(err) });

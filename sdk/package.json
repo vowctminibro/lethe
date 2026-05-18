@@ -8,6 +8,7 @@
     "clean": "rm -rf dist"
   },
   "devDependencies": {
+    "tsx": "^4.22.1",
     "typescript": "^5.6"
   }
 }
