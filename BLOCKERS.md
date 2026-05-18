@@ -22,21 +22,13 @@ Resolution options for Vow:
 - Or use the Sui Discord `#testnet-faucet` channel.
 
 ## B2 — MemWal SDK package name not yet confirmed
-Status: OPEN
-Discovered: Day 1, 2026-05-15
+Status: CLOSED
+Resolved: Day 2, 2026-05-18
 
-https://docs.memwal.ai loads (not 404, no login wall on the landing
-page), but the public landing page does not state the npm package name.
-It references a "TypeScript SDK" and an SDK Quick Start page
-(`/sdk/quick-start`) that needs to be opened directly.
-
-MemWal SDK was **NOT installed** (per Day 1 rule: do not install if the
-package name is unconfirmed). memory-service currently has
-`@mysten/sui`, `@mysten/walrus`, `@mysten/seal` installed — Walrus + Seal
-cover storage and encryption; MemWal is the recall layer to add later.
-Action for Vow: open https://docs.memwal.ai/sdk/quick-start (register if
-prompted) and confirm the exact `pnpm add` package name. Then add it to
-memory-service.
+Package: `@mysten-incubation/memwal`
+Install: `npm install @mysten-incubation/memwal @mysten/sui @mysten/seal @mysten/walrus`
+Also requires: `ai zod` for withMemWal
+File: research/memwal-verified.md
 
 ## B3 — lethesdk subdomain not yet delegated
 Status: CLOSED

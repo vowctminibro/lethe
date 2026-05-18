@@ -1,0 +1,4 @@
+# Environment — private keys and secrets
+.env
+.env.local
+.env.*.local
