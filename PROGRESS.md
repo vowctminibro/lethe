@@ -84,3 +84,50 @@ unaffected.
 - Write first Move contract: NPC + memory objects.
 - Decide hosted vs sidecar service model.
 - NO Unity work yet — SDK core first.
+
+## Day 2 — May 18, 2026
+
+### SDK public API surface
+- Created `sdk/` as standalone TypeScript package.
+- Files: `package.json`, `tsconfig.json`, `src/types.ts`, `src/lethe.ts`,
+  `src/npc.ts`, `src/index.ts`
+- `LetheConfig`, `MemoryEvent`, `RecallResult` types exported.
+- `Lethe` class: `npc(id)` returns `NPC` instance.
+- `NPC` class: `remember(playerWallet, event)`, `recall(playerWallet)`,
+  `forget(playerWallet)` — all throw on non-2xx.
+- Build: `pnpm install && pnpm tsc` — PASSES clean.
+
+### Move contract — NPC shared object
+- Deleted boilerplate `lethe.move`.
+- Created `contracts/lethe/sources/npc.move` — SHARED NPC object
+  (`transfer::share_object`).
+- `NPC` struct: key { id, name, memories }
+- `MemoryEntry` struct: store, copy, drop { player_address, blob_id,
+  timestamp_ms }
+- `create_npc(name, ctx)`, `add_memory(npc, blob_id, clock, ctx)`,
+  `get_memories_for(npc, player)` — all `public`.
+- `sui move build` — PASSES with lint warnings (non-fatal).
+
+### memory-service stub routes
+- Added `cors` + `@types/cors` deps.
+- In-memory `Map<string, MemoryEvent[]>` keyed `${npcId}:${playerWallet}`.
+- `POST /npc/:id/remember` → `{ok: true, blobId: "stub-TIMESTAMP"}`
+- `GET /npc/:id/recall/:wallet` → `{events, blobId: "stub", suiObjectId: "stub"}`
+- `DELETE /npc/:id/forget/:wallet` → `{ok: true}`
+- Server verified on `:3001` — all 3 endpoints curl-tested, PASS.
+
+### Wallet cleanup
+- `hopeful-agates` alias renamed to `pensive-avanturine` (no `sui keytool remove`
+  command available).
+- Active wallet remains `lethe-dev` (0x4bf22d697cacb24e23037e804157896ddfaaf7a3d86940df777c1ad31a868077).
+
+### Commits
+- Commit: `66d2f81` — "Day 2: SDK API surface + Move NPC contract + memory-service stubs"
+- Pushed to `origin/main`.
+
+### Day 2 summary
+
+SDK package, Move NPC contract, and memory-service stubs all built and
+verified. `sdk/` compiles TypeScript clean. `npc.move` builds with only
+lint warnings. memory-service endpoints respond correctly to curl.
+Git state pushed. Docs updated.

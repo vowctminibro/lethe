@@ -1,8 +1,8 @@
 # Lethe — Blockers
 
 ## B1 — Testnet faucet rate-limited (non-blocking for Day 1)
-Status: OPEN
-Discovered: Day 1, 2026-05-15
+Status: CLOSED
+Resolved: Day 2, 2026-05-18
 
 `sui client faucet` now only prints the web UI URL; the direct endpoint
 `POST https://faucet.testnet.sui.io/v2/gas` returns **HTTP 429 "Too Many
@@ -34,7 +34,11 @@ MemWal SDK was **NOT installed** (per Day 1 rule: do not install if the
 package name is unconfirmed). memory-service currently has
 `@mysten/sui`, `@mysten/walrus`, `@mysten/seal` installed — Walrus + Seal
 cover storage and encryption; MemWal is the recall layer to add later.
-
 Action for Vow: open https://docs.memwal.ai/sdk/quick-start (register if
 prompted) and confirm the exact `pnpm add` package name. Then add it to
 memory-service.
+
+## B3 — lethesdk subdomain not yet delegated
+Status: CLOSED
+Resolved: Day 2, 2026-05-18 (no longer relevant — pivoted to SDK package
+published via npm, not custom subdomain).
