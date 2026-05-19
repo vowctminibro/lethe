@@ -1,0 +1,15 @@
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+/[Mm]emory/
+*.unityproj
+*.unityproj.backup
+*.asset
+*.meta.bak
+*.log
+.DS_Store
+Thumbs.db

@@ -131,3 +131,76 @@ SDK package, Move NPC contract, and memory-service stubs all built and
 verified. `sdk/` compiles TypeScript clean. `npc.move` builds with only
 lint warnings. memory-service endpoints respond correctly to curl.
 Git state pushed. Docs updated.
+
+## Day 4 — May 19, 2026
+
+### Walrus Integration (HTTP publisher/aggregator — no SDK)
+
+**Endpoints:**
+- Publisher (PUT): `https://publisher.walrus-testnet.walrus.space/v1/blobs?epochs=20`
+- Aggregator (GET): `https://aggregator.walrus-testnet.walrus.space/v1/blobs/:id`
+
+**Epoch math:** 20 epochs × ~2 days/epoch = ~40 days coverage through Jun 21 deadline + buffer.
+
+**Smoke test:** PASSED ✅
+- Stored `{ test: "lethe-day4", ts: 1779096309108 }`
+- BlobId: `PcTZQfuYU1JLJwMwsgXTAhUI4oyvSRD3EzHAG43mnKo`
+- SuiObjectId: `0x9496010d34072663ffa6ab1747b8d31775366b25c3f0ed9d3d9d811a21174e0b`
+- Round-trip: ✅ content matched
+
+### API changes
+
+**`POST /npc/:id/remember`** — now atomic:
+1. Store content in Walrus → blobId
+2. If Walrus fails → 502 `{ error: "walrus_publisher_failed", details: ... }`
+3. If success → Sui `add_memory` moveCall with real blobId
+
+**`GET /npc/:id/recall/:wallet`** — now enriched:
+Returns full blob content embedded from Walrus aggregator (parallel fetch via Promise.allSettled).
+
+### 3 Events stored end-to-end
+
+| # | Event | blobId | txDigest |
+|---|-------|--------|----------|
+| 1 | "stole 100 gold from the merchant" | `U16MlYB1XaJjFxBwwhG_WnI6lc3L_ONRvN3La8UoBiw` | `FitEVdMr7d5Bqief6L4SSpk4Rny67yU9R6QfZ9CWaQqE` |
+| 2 | "killed the village chicken" + metadata | `cDH8g1NFO4OZ-OOct_71ZrvC70IeRIRXcSsft0WZlWo` | `EmR9cAGorCZkt8qTTE282J9w4KopppPtKF2DHvBScRbq` |
+| 3 | "SDK e2e test event 1779104135534" | `4rlJ6lleJ1K_AJPh8qcZVSSyvF5MXAhp9Lyxf5k1KjU` | `iVxnPsAuVyeVFVR6F3qNbBaQD4C7GNpPcKUftRLMuLY` |
+
+All 3 verifiable at:
+- Suiscan testnet: https://testnet.suiscan.xyz/txblock/{txDigest}
+- Walrus aggregator: https://aggregator.walrus-testnet.walrus.space/v1/blobs/{blobId}
+
+### SDK e2e — PASSED ✅
+
+```
+Storing event via SDK...
+✓ remembered: {"ok":true,"blobId":"4rlJ6lleJ1K_AJPh8qcZVSSyvF5MXAhp9Lyxf5k1KjU","txDigest":"iVxnPsAuVyeVFVR6F3qNbBaQD4C7GNpPcKUftRLMuLY","walrusObjectId":"0x842edd79..."}
+
+Recalling memories...
+✓ recalled: 4 events
+Latest: { blobId: "4rlJ6...", content: { v:1, npcId:"khun-tum", event:"SDK e2e test event 1779104135534", ... } }
+✅ SDK e2e PASSED — hero flow verified end-to-end
+```
+
+### Files created/modified
+
+| File | Change |
+|------|--------|
+| `memory-service/src/walrus.ts` | New — storeBlob() + fetchBlob() |
+| `memory-service/src/server.ts` | Refactored to use real Walrus blobs |
+| `memory-service/scripts/walrus-smoke.ts` | New — smoke test |
+| `sdk/scripts/e2e.ts` | New — SDK e2e test |
+| `sdk/package.json` | Added tsx dev dep |
+| `memory-service/.env` | Added WALRUS_PUBLISHER, AGGREGATOR, EPOCHS |
+
+### Day 4 summary
+
+Hero flow is now **fully functional end-to-end**:
+1. Dev calls `npc.remember(wallet, { event })` → SDK POSTs to memory-service
+2. Memory-service stores content in **Walrus** (blob_id returned)
+3. Memory-service records blob_id on **Sui** via Move `add_memory`
+4. Dev calls `npc.recall(wallet)` → SDK GETs from memory-service
+5. Memory-service reads NPC memories from Sui, fetches blob content from Walrus
+6. Full blob content returned — not just blob_ids
+
+Total commits: 7. All major blockers closed (B1, B2, B3). B5 (Walrus no SLA) and B6 (N+1 recall) documented. Deferred to v0.2.

@@ -34,3 +34,29 @@ File: research/memwal-verified.md
 Status: CLOSED
 Resolved: Day 2, 2026-05-18 (no longer relevant — pivoted to SDK package
 published via npm, not custom subdomain).
+
+## B5 — Walrus public publisher has no SLA
+Status: OPEN
+Severity: Hackathon demo risk
+
+The free public Walrus publisher/aggregator endpoints have no uptime SLA.
+If the publisher is rate-limited, returns 5xx, or the aggregator is down,
+the Lethe demo breaks. Sui on-chain blob_ids still work but blob content
+is inaccessible.
+
+Mitigations:
+- Cache aggregator content client-side (planned for v0.2)
+- Failover publisher list from awesome-walrus repo
+- Consider self-hosted publisher pre-submission for high-stakes demos
+- Monitor: GET https://publisher.walrus-testnet.walrus.space/v1/system
+
+## B6 — Blob fetch on recall is N HTTP calls
+Status: OPEN (acknowledged, not blocking v0.1)
+Severity: Low for demo, high for production
+
+GET /recall makes one Sui RPC call + N parallel Walrus aggregator calls
+(one per memory entry). Fine for demo (1-5 memories per player). Will not
+scale for players with 100+ memories.
+
+Planned: batch blob fetches via Walrus aggregator's batch endpoint
+(or cache layer) — target v0.2.
