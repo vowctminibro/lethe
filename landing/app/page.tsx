@@ -37,9 +37,8 @@ function Hero() {
   return (
     <section className="max-w-6xl mx-auto px-6 pt-20 pb-32">
       <div className="inline-flex items-center gap-2 text-xs text-accent-soft mb-6">
-        {/* TODO(Vow): verify track number with Sui Overflow handbook before submit */}
         <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
-        Walrus Track · Pattern D · Live on Sui testnet
+        Walrus Track · Live on Sui testnet
       </div>
       <h1 className="text-5xl md:text-7xl font-bold tracking-tight leading-tight mb-6">
         Persistent memory<br />
