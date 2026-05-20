@@ -204,3 +204,65 @@ Hero flow is now **fully functional end-to-end**:
 6. Full blob content returned — not just blob_ids
 
 Total commits: 7. All major blockers closed (B1, B2, B3). B5 (Walrus no SLA) and B6 (N+1 recall) documented. Deferred to v0.2.
+
+## Day 7 — May 20, 2026
+
+### Landing page (Next.js 15 + Tailwind 4)
+
+**Stack:** Next.js 16.2.6 (Turbopack) + Tailwind CSS v4 (CSS-first config, no tailwind.config.ts) + pnpm monorepo
+
+**Pages:** `/` — Hero + How it works + Stack diagram + Quickstart code + Footer
+
+**Sections built:**
+- `Nav`: Logo λ, "Sui Overflow 2026" badge, GitHub + Quickstart links
+- `Hero`: Pulse dot, headline, 2-line sub, install command block, CTA buttons
+- `HowItWorks`: 3-column cards (Install / Wire / Ship)
+- `Architecture`: Monospace stack diagram (game → SDK → memory-service → Walrus → Sui Move)
+- `CodeExample`: Syntax-highlighted quickstart snippet with 3 API calls
+- `Footer`: "Built for Sui Overflow 2026 · Walrus Track", GitHub + X links
+
+**File:** `landing/app/page.tsx` (single file, 7KB, no client components)
+
+### Tailwind v4 quirks encountered
+
+1. **No `tailwind.config.ts`** — v4 uses `@theme {}` in CSS. Old v3 syntax (`tailwind.config.ts` with `Config` type) causes TypeScript errors.
+2. **No `content` array in CSS config** — v4 scans by default; explicit content paths optional.
+3. **`bg-accent`** etc. work via CSS custom properties — no `extend.colors` needed.
+4. **`font-mono` in Tailwind** — requires `--font-mono` in `@theme {}` (set).
+
+### Build size
+
+- `.next/build/` total: **68.6 MB** (mostly Turbopack chunks)
+- Local preview: **HTTP 200**, "Persistent memory" confirmed in DOM
+- Local build: ✅ Compiled successfully, 0 TypeScript errors
+
+### Deploy attempt — Vercel CLI
+
+**Status: DEPLOY BLOCKED**
+
+- `vercel whoami`: ✅ `vowctminibro-7069` (CLI is authenticated)
+- Upload: ✅ 8.9KB committed to Vercel, project `lethesdk` linked
+- Build: ❌ `readyState: BLOCKED` — build never started, stays BLOCKED after 2+ min polling
+- Cause: likely branch protection requiring PR review before production deploy (free tier), or build minutes limit
+
+**Workaround applied:** Pushed to `origin/main` — Vercel auto-deploys on git push. Old deployment (`lethesdk-1wyg12nw1...`) still live at `https://lethesdk.vercel.app` with stale content.
+
+**For Vow:** When you're at the machine, run the 3 commands in `landing/README.md`:
+```bash
+cd ~/Projects/lethe/landing
+vercel --prod --yes
+vercel alias set https://<new-url> lethesdk.vercel.app
+```
+
+### Commits
+
+- `f7fcffd` — "Day 7: landing page (Next.js 15 + Tailwind) — lethesdk.vercel.app"
+- `8b61888` — "cleanup: remove unused tailwind v3 config and boilerplate SVGs"
+- Pushed to `origin/main` ✅
+
+### Content copy notes for Vow
+
+1. **Badge says "Pattern D"** — double-check this is the right track pattern number before submission.
+2. **`pnpm add @lethe/sdk`** — package not published yet; this is a placeholder command until the SDK npm package goes live.
+3. **"memory-service" in stack diagram** — dev should know this is a sidecar they need to self-host (or a hosted version in v0.2).
+

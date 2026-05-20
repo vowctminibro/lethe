@@ -30,10 +30,29 @@ Install: `npm install @mysten-incubation/memwal @mysten/sui @mysten/seal @mysten
 Also requires: `ai zod` for withMemWal
 File: research/memwal-verified.md
 
-## B3 — lethesdk subdomain not yet delegated
+## B3 — lethesdk.vercel.app squatted
 Status: CLOSED
 Resolved: Day 2, 2026-05-18 (no longer relevant — pivoted to SDK package
 published via npm, not custom subdomain).
+
+## B7 — Landing page production deploy blocked
+Status: OPEN
+Severity: Hackathon submission risk (landing page not live at lethesdk.vercel.app)
+
+Vercel CLI is authenticated as `vowctminibro-7069` but `vercel --prod` upload
+succeeds but build stays `BLOCKED` indefinitely (2+ min of polling). Likely
+causes:
+1. Branch protection on `main` requiring PR review (free Vercel tier)
+2. Build minutes limit exhausted on account
+
+Workaround: `vercel --prod --skip-domain --yes` from `landing/` directory OR
+manual redeploy from Vercel dashboard at:
+https://vercel.com/vowctminibro-7069s-projects/lethesdk/deployments
+
+Temporary: old deployment still live at https://lethesdk.vercel.app (stale content).
+
+**Vow action required:** Run the 3 commands in `landing/README.md` when at
+the machine.
 
 ## B5 — Walrus public publisher has no SLA
 Status: OPEN
