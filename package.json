@@ -1,0 +1,10 @@
+{
+  "name": "lethe",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": ["landing"],
+  "scripts": {
+    "build": "pnpm --filter landing build",
+    "vercel-build": "pnpm --filter landing build"
+  }
+}

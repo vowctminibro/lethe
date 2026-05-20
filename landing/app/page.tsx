@@ -37,6 +37,7 @@ function Hero() {
   return (
     <section className="max-w-6xl mx-auto px-6 pt-20 pb-32">
       <div className="inline-flex items-center gap-2 text-xs text-accent-soft mb-6">
+        {/* TODO(Vow): verify track number with Sui Overflow handbook before submit */}
         <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
         Walrus Track · Pattern D · Live on Sui testnet
       </div>
@@ -51,6 +52,7 @@ function Hero() {
       <div className="font-mono text-sm bg-panel border border-border rounded-lg p-4 max-w-xl mb-4">
         <span className="text-inkdim">$</span> <span className="text-ok">pnpm add</span>{" "}
         <span className="text-accent-soft">@lethe/sdk</span>
+        <span className="text-inkdim text-xs ml-3">// npm package — coming soon · github.com/vowctminibro/lethe</span>
       </div>
       <div className="flex gap-3 text-sm">
         <a
@@ -116,6 +118,7 @@ function Architecture() {
         <div className="text-accent">[ @lethe/sdk ]</div>
         <div className="text-inkdim pl-4">↓ HTTP</div>
         <div className="text-accent">[ memory-service ]</div>
+        <div className="text-inkdim text-xs pl-4">Run as sidecar today. Hosted endpoint in v0.2.</div>
         <div className="text-inkdim pl-4">↓ blobs</div>
         <div className="text-accent-soft">[ Walrus ] ← decentralized blob storage</div>
         <div className="text-inkdim pl-4">↓ refs</div>
