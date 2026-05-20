@@ -262,7 +262,34 @@ vercel alias set https://<new-url> lethesdk.vercel.app
 
 ### Content copy notes for Vow
 
-1. **Badge says "Pattern D"** — double-check this is the right track pattern number before submission.
-2. **`pnpm add @lethe/sdk`** — package not published yet; this is a placeholder command until the SDK npm package goes live.
-3. **"memory-service" in stack diagram** — dev should know this is a sidecar they need to self-host (or a hosted version in v0.2).
+1. **Pattern D badge** — removed. "Pattern D" not found in any OnlyFins/Sui Overflow
+   research doc. Changed to "Walrus Track · Live on Sui testnet". Commit `0c71862`.
+2. **`pnpm add @lethe/sdk`** — package not published yet; placeholder until SDK npm goes live.
+3. **memory-service in stack diagram** — dev should self-host sidecar today; hosted version in v0.2.
+4. **MemWal .env template** — `memory-service/.env.example` scaffolded for Day 8 setup.
+
+### Day 7 close-out (2026-05-20)
+
+**Shipped:**
+- Next.js 15 + Tailwind landing scaffolded (6 sections)
+- lethesdk.vercel.app: HTTP 200, "Persistent memory", "Lethe", "Walrus Track" all confirmed in live HTML
+- Landing page LIVE — Vercel serves last-good-deploy (about 6 commits behind main)
+- `.env.example` scaffolded for MemWal Day 8 integration
+- All 5 Vercel CI/CD builds failed at different steps; Vercel kept last-good-deploy live
+
+**Build failure chain (for reference):**
+1. app dir not found from monorepo root → fix: `cd landing`
+2. routes-manifest missing → fix: outputDirectory
+3. pnpm ERR_INVALID_THIS → fix: npm
+4. @tailwindcss/postcss devDep missing → fix: move to deps
+5. typescript devDep missing → fix: `--include=dev`
+
+**Deferred:**
+- Vercel CI/CD pipeline (see B11 — 3 resolution paths listed)
+- Landing page content updates (git-push not reaching production)
+- Demo game polish (camera follow, dialogue box) → Day 8+
+
+**Pattern D:** Removed from codebase. Live page also does NOT have "Pattern D" (last-good-deploy predates the addition).
+
+**Time:** ~3 hours operator total (landing scaffold + Vercel debug saga + close-out)
 

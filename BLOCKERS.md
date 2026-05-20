@@ -36,23 +36,13 @@ Resolved: Day 2, 2026-05-18 (no longer relevant — pivoted to SDK package
 published via npm, not custom subdomain).
 
 ## B7 — Landing page production deploy blocked
-Status: OPEN
-Severity: Hackathon submission risk (landing page not live at lethesdk.vercel.app)
+Status: CLOSED (Day 7 — live via last-good-deploy fallback)
 
-Vercel CLI is authenticated as `vowctminibro-7069` but `vercel --prod` upload
-succeeds but build stays `BLOCKED` indefinitely (2+ min of polling). Likely
-causes:
-1. Branch protection on `main` requiring PR review (free Vercel tier)
-2. Build minutes limit exhausted on account
-
-Workaround: `vercel --prod --skip-domain --yes` from `landing/` directory OR
-manual redeploy from Vercel dashboard at:
-https://vercel.com/vowctminibro-7069s-projects/lethesdk/deployments
-
-Temporary: old deployment still live at https://lethesdk.vercel.app (stale content).
-
-**Vow action required:** Run the 3 commands in `landing/README.md` when at
-the machine.
+lethesdk.vercel.app is LIVE and serving traffic. Every CI/CD build since the
+initial working deploy has failed (5 errors in succession), but Vercel keeps
+the last-good-deploy live. The page is ~6 commits behind main, not ideal, but
+live and functional. Landing page content verified: "Persistent memory", "Lethe",
+"Walrus Track" all present in HTML. No Vow action needed.
 
 ## B5 — Walrus public publisher has no SLA
 Status: OPEN
@@ -79,3 +69,24 @@ scale for players with 100+ memories.
 
 Planned: batch blob fetches via Walrus aggregator's batch endpoint
 (or cache layer) — target v0.2.
+
+## B11 — Vercel monorepo deploy stuck (Day 7, deferred)
+
+Status: OPEN (not blocking submission — current live page is sufficient)
+
+lethesdk.vercel.app is LIVE serving last-good-deploy (~6 commits behind main).
+Every git-push-based CI/CD build since then errors at build step.
+Vercel falls back to the last working deployment, keeping the page live.
+
+Root cause: Vercel build cannot compile from monorepo root with custom
+vercel.json pointing to `landing/` subdirectory. 5 errors hit in succession:
+  1. app dir not found from repo root
+  2. routes-manifest.json missing (wrong outputDirectory)
+  3. pnpm ERR_INVALID_THIS on build machine
+  4. @tailwindcss/postcss in devDeps not installed
+  5. typescript in devDeps not installed
+
+Resolution paths (for when content update is urgent):
+  A) Static export: `output: 'export'` in next.config → upload landing/out/ plain
+  B) Re-link landing/ as standalone Vercel project (separate from monorepo)
+  C) Move landing/ to its own repo
