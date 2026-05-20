@@ -1,40 +1,85 @@
-# Lethe
+# Lethe — Persistent memory for Sui games
 
-**Persistent memory SDK for Sui games. 3 lines of code.**
+> NPCs that remember every player across sessions.  
+> Three lines of code. Backed by Walrus.
 
-The river of memory in Greek mythology. The opposite for AI NPCs in your
-game.
+Built for [Sui Overflow 2026](https://overflow.sui.io) · Walrus Track
 
-## Quick install
+- Landing: https://lethesdk.vercel.app
+- Live on: Sui testnet (package `0x8dafbfaeb5d8b8c8c8859981ed40c4a316e93ce3972e9e6114f7c3332b2069d1`)
+- License: Apache 2.0 (sdk) · Apache 2.0 (contract)
+
+---
+
+## What it does
+
+AI NPCs in Web3 games can't remember players across sessions today.
+Each NPC interaction starts from zero. Memories vanish when the game studio shuts down.
+
+Lethe stores NPC memories as encrypted blobs on Walrus, indexed by player wallet via Sui shared objects. NPCs recall the player's history in any game that uses the same NPC ID — cross-session, cross-game, cross-device.
+
+## Quickstart
 
 ```bash
-pnpm add @lethe/sdk
+# Install the SDK
+npm install @lethe/sdk   # coming to npm — github.com/vowctminibro/lethe for now
+
+# Or use the memory-service directly
+cd memory-service && cp .env.example .env && pnpm dev
 ```
 
-```typescript
-const lethe = new Lethe({ network: 'sui-testnet' });
-const npc = lethe.npc('khun-tum');
-await npc.remember(playerWallet, { event: 'stole 100 gold' });
+## Architecture
+
+```
+Player → SDK/Memory-Service → Walrus (store blob)
+                          ↓
+                    Sui (index by wallet + NPC ID)
+
+Any game client → recall(player_wallet) → encrypted memory history
 ```
 
-## Stack
+## Key components
 
-- **@mysten/sui** — identity + object coordination
-- **@mysten/walrus** — blob storage for NPC memory
-- **@mysten/seal** — encryption + access control
-- **MemWal** — memory recall API
+| Component | Description |
+|---|---|
+| `contracts/lethe` | Sui Move contract — shared NPC objects, event emission |
+| `memory-service` | REST API — handles Walrus storage + Sui indexing |
+| `sdk` | Game client SDK — `remember()` / `recall()` |
+| `landing` | Public landing page |
 
-Built for **Sui Overflow 2026**, Walrus track.
+## Contract events (v1+)
 
-## Layout
+| Event | When |
+|---|---|
+| `NPCCreated` | New NPC shared object deployed |
+| `MemoryAdded` | Player stores a new memory on an NPC |
+| `MemoryForgotten` | Player wipes their own memories from an NPC |
 
-- `sdk/` — `@lethe/sdk` TypeScript package + `Lethe.unitypackage`
-- `contracts/` — Sui Move package (NPC objects + Seal access control)
-- `memory-service/` — Node.js + TypeScript service layer (Walrus / MemWal / Seal)
-- `demo-game/` — Unity reference game proving the SDK works
-- `docs/` — hero flow, architecture, audit log
-- `research/` — recon and verification notes
+## Smart contract
 
-## Status
+```move
+// Deploy NPC (once)
+sui client call --package 0x8dafbfaeb... --module npc --function create_npc --args '["npc-name"]' 0x6 --gas-budget 50000000
 
-See [PROGRESS.md](PROGRESS.md) and [BLOCKERS.md](BLOCKERS.md).
+// Add memory (player action)
+sui client call --package 0x8dafbfaeb... --module npc --function add_memory --args <NPC_ID> <blob_id_bytes> 0x6 --gas-budget 50000000
+
+// Read memories (any client)
+let memories = npc::get_memories_for(npc, player_wallet);
+```
+
+## Running locally
+
+```bash
+# Memory service
+cd memory-service && pnpm install && pnpm dev
+
+# Contract build
+cd contracts/lethe && sui move build
+```
+
+## Related
+
+- [Walrus](https://www.walrus.xyz/) — decentralized blob storage
+- [Sui](https://sui.io/) — programmable objects blockchain
+- [Story Protocol](https://story.foundation/) — IP ownership layer (future integration)
