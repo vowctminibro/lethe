@@ -1,5 +1,5 @@
 {
-  "git": {
-    "deploymentIsolation": "single"
-  }
+  "buildCommand": "cd landing && pnpm build",
+  "outputDirectory": "landing/.next",
+  "installCommand": "cd landing && pnpm install"
 }

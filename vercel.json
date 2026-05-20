@@ -1,0 +1,5 @@
+{
+  "buildCommand": "cd landing && pnpm install && pnpm run build",
+  "outputDirectory": "landing/.next",
+  "framework": "nextjs"
+}
