@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@theme {
+  --color-bg: #0a0a0f;
+  --color-panel: #13131c;
+  --color-border: #26263a;
+  --color-ink: #e8e8f0;
+  --color-inkdim: #8a8aa0;
+  --color-accent: #8b5cf6;
+  --color-accent-soft: #a78bfa;
+  --color-ok: #34d399;
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", Menlo, monospace;
+}
+
+:root { color-scheme: dark; }
+html, body { background: #0a0a0f; color: #e8e8f0; }
+body { font-family: "Inter", system-ui, sans-serif; }
+::selection { background: #8b5cf6; color: #fff; }
