@@ -197,10 +197,71 @@ app.get('/npc/:id/recall/:wallet', async (req, res) => {
 
 /**
  * DELETE /npc/:id/forget/:wallet
- * Stub — requires Move contract update for on-chain deletion.
+ * Calls forget_player Move function — player deletes all their own memories.
  */
-app.delete('/npc/:id/forget/:wallet', (_req, res) => {
-  res.json({ ok: true, note: 'forget not implemented on-chain yet — needs Move contract update' });
+app.delete('/npc/:id/forget/:wallet', async (req, res) => {
+  try {
+    const { id: npcId, wallet } = req.params;
+    if (!wallet) {
+      res.status(400).json({ error: 'Missing wallet address' });
+      return;
+    }
+
+    // Normalize: accept_checksum or no-checksum
+    let playerAddress = wallet.startsWith('0x') ? wallet : `0x${wallet}`;
+    if (playerAddress.length === 66) {
+      playerAddress = playerAddress.toLowerCase();
+    }
+
+    const tx = new Transaction();
+    tx.moveCall({
+      target: `${LETHE_PACKAGE_ID}::npc::forget_player`,
+      arguments: [
+        tx.object(KHUN_TUM_NPC_ID),
+        tx.pure.address(playerAddress),
+        tx.object('0x6'), // Sui system Clock
+      ],
+    });
+
+    const result = await client.signAndExecuteTransaction({
+      transaction: tx,
+      signer: keypair,
+      options: { showEffects: true, showObjectChanges: true },
+    });
+
+    const digest = result.digest;
+    const status = result.effects?.status?.status ?? 'unknown';
+    const error = result.effects?.status?.error;
+
+    if (status !== 'success') {
+      // ENotAuthorized string OR abort code 1 = unauthorized forget attempt
+      const isAuthError =
+        error?.includes('ENotAuthorized') ||
+        error?.includes('quarantine') ||
+        (error?.includes('abort code: 1') && error?.includes('forget_player'));
+      res.status(isAuthError ? 403 : 500).json({
+        error: isAuthError ? 'not_authorized' : 'forget_failed',
+        details: error,
+        txDigest: digest,
+      });
+      return;
+    }
+
+    // Count memories removed from Sui object changes
+    const deleted = (result.objectChanges ?? []).filter(
+      (c) => c.type === 'deleted' && c.objectType?.includes('MemoryEntry'),
+    ).length;
+
+    console.log(`[${npcId}] forget_player by ${playerAddress}: tx=${digest}, removed=${deleted}`);
+    res.json({ ok: true, txDigest: digest, memoriesRemoved: deleted });
+  } catch (err) {
+    const msg = String(err);
+    const isAuthError = msg.includes('ENotAuthorized') ||
+      msg.includes('abort code: 1') ||
+      msg.includes('quarantine');
+    console.error(`[${req.params.id}] forget error: ${isAuthError ? 'AUTH' : 'OTHER'}: ${msg}`);
+    res.status(isAuthError ? 403 : 500).json({ error: msg });
+  }
 });
 
 app.listen(Number(PORT), () => {
