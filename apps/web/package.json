@@ -14,6 +14,7 @@
     "@mysten/enoki": "^1.0.8",
     "@mysten/sui": "^2.17.0",
     "@mysten/walrus": "^1.1.7",
+    "@mysten-incubation/memwal": "^0.0.5",
     "@tailwindcss/postcss": "^4",
     "@tanstack/react-query": "^5.100.14",
     "lucide-react": "^1.17.0",
