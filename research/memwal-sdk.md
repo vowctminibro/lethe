@@ -1,151 +1,150 @@
-# MemWal SDK Research — 2026-05-28T12:51:14Z
+# MemWal SDK Research — 2026-05-28T21:05+07:00
+
+> Blocked B2 confirmed unblocked via npm + GitHub. Docs site (docs.memwal.ai) unreachable from this Mac Mini — using npm + GitHub as primary sources.
+
+---
 
 ## Package name (confirmed)
-- npm: `@mysten-incubation/memwal`
-- Install: `pnpm add @mysten-incubation/memwal`
-- Current version: **0.0.5** (published May 25, 2026 — 2 days ago at time of research)
-- Weekly downloads: ~1.0K
-- Total versions published: 29
-- First published: Mar 25, 2026
-- License: Apache-2.0
-- Source: https://www.npmjs.com/package/@mysten-incubation/memwal
 
-## Peer Dependencies (install separately)
+| Field | Value |
+|---|---|
+| **npm package** | `@mysten-incubation/memwal` |
+| **Install command** | `pnpm add @mysten-incubation/memwal` |
+| **Current version** | `0.0.5` |
+| **Published** | May 25, 2026 (29 total versions, first published Mar 25, 2026) |
+| **Unpacked size** | 214.1 KB (46 files) |
+| **Weekly downloads** | ~1,000 |
+| **License** | Apache-2.0 |
+| **Primary source** | [npm](https://www.npmjs.com/package/@mysten-incubation/memwal) |
+
+**DO NOT confuse with** `@mysten-incubation/oc-memwal` (v0.0.2) — that's the OpenClaw plugin, not this SDK.
+
+---
+
+## Peer dependencies (required alongside the main package)
+
 ```bash
-pnpm add @mysten/sui @mysten/seal @mysten/walrus ai zod
+pnpm add @mysten-incubation/memwal @mysten/sui @mysten/seal @mysten/walrus ai zod
 ```
 
-## Quickstart code from docs
+- `@mysten/sui` >=2.5.0
+- `@mysten/seal` >=1.1.0
+- `@mysten/walrus` >=1.0.3
+- `ai` >=4.0.0
+- `zod` ^3.23.0
+
+---
+
+## Quickstart code from npm README
 
 ```ts
 import { MemWal } from "@mysten-incubation/memwal";
 
 const memwal = MemWal.create({
-  key: "<your-ed25519-private-key>",         // Ed25519 delegate key hex
-  accountId: "<your-memwal-account-id>",      // MemWalAccount object ID on Sui
-  serverUrl: "https://relayer.staging.memwal.ai", // testnet relayer
+  key: process.env.MEMWAL_PRIVATE_KEY!,
+  accountId: process.env.MEMWAL_ACCOUNT_ID!,
+  serverUrl: process.env.MEMWAL_SERVER_URL ?? "https://relayer.memwal.ai",
   namespace: "demo",
 });
 
-// Health check
-await memwal.health();
-
-// Store a memory
-await memwal.remember("User prefers dark mode and works in TypeScript.");
-
-// Store + wait for completion
-const result = await memwal.rememberAndWait(
-  "User prefers dark mode.",
+await memwal.rememberAndWait(
+  "User prefers dark mode and uses TypeScript.",
   undefined,
-  { timeoutMs: 30_000 }
+  { timeoutMs: 30_000 },
 );
-// Returns: { id, job_id, blob_id, owner, namespace }
-
-// Recall by natural language
-const memories = await memwal.recall("What do we know about this user?", {
+const memories = await memwal.recall("What are the user's preferences?", {
   topK: 10,
   maxDistance: 0.7,
 });
-// Returns: { results: [{ blob_id, text, distance }], total }
+await memwal.restore("demo");
 ```
 
-## Env vars needed
-```env
-MEMWAL_PRIVATE_KEY=<ed25519-hex-key>
-MEMWAL_ACCOUNT_ID=<MemWalAccount-object-id>
-MEMWAL_SERVER_URL=https://relayer.staging.memwal.ai  # testnet
-# For mainnet:
-# MEMWAL_SERVER_URL=https://relayer.memwal.ai
-```
+**Note:** npm README uses `MEMWAL_PRIVATE_KEY` env var name. GitHub README uses `your-delegate-key-hex` and `key` param. The key is the Ed25519 delegate private key as hex string.
 
-## Account creation (how to get accountId + key)
-1. Go to **memwal.ai** or **memwal.wal.app** (Walrus-hosted Playground)
-2. Connect Sui wallet
-3. Create account → generates Ed25519 delegate key + MemWalAccount object ID
-4. OR self-host: deploy contract + generate delegate key manually
+---
 
-⚠️ **For testnet**: use staging endpoint `https://staging.memwal.ai` or `https://relayer.staging.memwal.ai`
+## API surface (top methods)
 
-## Sui Testnet Contract IDs
-```
-SUI_NETWORK=testnet
-MEMWAL_PACKAGE_ID=0xcf6ad755a1cdff7217865c796778fabe5aa399cb0cf2eba986f4b582047229c6
-MEMWAL_REGISTRY_ID=0xe80f2feec1c139616a86c9f71210152e2a7ca552b20841f2e192f99f75864437
-```
+From npm exports + GitHub README:
 
-## API surface (top 8 methods)
+1. **`MemWal.create(config)`** — Static factory. Config: `key` (hex string), `accountId` (0x...), `serverUrl` (relayer URL), `namespace` (string)
+2. **`rememberAndWait(text, metadata?, options?)`** — Store a memory synchronously. Returns when Walrus upload confirmed. `timeoutMs` option (default: relayer timeout)
+3. **`recall(query, options?)`** — Semantic search. Options: `topK` (default 10), `maxDistance` (default 0.7 cosine distance threshold). Returns plaintext memories
+4. **`restore(namespace)`** — Rebuild missing indexed entries for one namespace (incremental recovery)
+5. **`remember(text, metadata?)`** — Async fire-and-forget variant of `rememberAndWait`
 
-1. `MemWal.create(config)` — Initialize client with key + accountId + serverUrl + namespace
-2. `memwal.remember(text, namespace?)` — Submit one memory async (returns job_id immediately)
-3. `memwal.rememberAndWait(text, namespace?, opts?)` — Submit + poll until done (returns blob_id)
-4. `memwal.rememberBulk(items)` — Submit up to 20 memories in one request
-5. `memwal.recall(query, limit?, namespace?)` — Semantic search, returns decrypted plaintext results
-6. `memwal.analyze(text, namespace?)` — LLM extracts facts from text → stores each as separate memory
-7. `memwal.restore(namespace, limit?)` — Rebuild missing indexed entries from Walrus (incremental)
-8. `memwal.health()` — Relayer health check (no auth required)
+### Entry points (three exports)
 
-## Three entry points
-
-| Entry | Import | Use case |
+| Entry | Client | Who handles embedding/encryption |
 |---|---|---|
-| `MemWal` | `@mysten-incubation/memwal` | Default — relayer handles embedding + SEAL + Walrus |
-| `MemWalManual` | `@mysten-incubation/memwal/manual` | Client-side embedding + local SEAL encryption |
-| `withMemWal` | `@mysten-incubation/memwal/ai` | Vercel AI SDK middleware — auto recall/save |
+| `@mysten-incubation/memwal` | `MemWal` (default) | Relayer |
+| `@mysten-incubation/memwal/manual` | `MemWalManual` | You (local SEAL + embedding) |
+| `@mysten-incubation/memwal/ai` | Vercel AI SDK middleware | Relayer |
+
+---
 
 ## Source links
-- Docs: https://docs.memwal.ai
-- GitHub: https://github.com/MystenLabs/MemWal
+
 - npm: https://www.npmjs.com/package/@mysten-incubation/memwal
-- Twitter/X: No confirmed @memwal account found (no active Twitter presence in search)
+- GitHub: https://github.com/MystenLabs/MemWal (stars: 13, forks: 4, last push: Apr 30 2026)
+- Docs: https://docs.memwal.ai (unreachable from this Mac Mini — confirmed via CDP attempt)
+- LLM-friendly docs: https://docs.memwal.ai/llms.txt (structured overview)
+- Twitter/X: none confirmed — no @memwal handle found in search
+
+---
 
 ## Health check
-- docs.memwal.ai accessible: **YES** ✅
-- Package on npm: **YES** ✅ (@mysten-incubation/memwal v0.0.5)
-- Last commit on GitHub: **2026-04-30** (28 days ago — active)
-- TypeScript first-class: **YES** ✅ (primary language, 83.3% of repo)
-- Testnet relayer live: **YES** ✅ (https://relayer.staging.memwal.ai confirmed)
-- GitHub stars: 13 | Forks: 4 | Contributors: 9
 
-## How to run MemWal locally (dev mode)
-```bash
-git clone https://github.com/MystenLabs/MemWal
-cd MemWal
-pnpm install
-pnpm build:sdk
-pnpm dev:app      # Playground dashboard
-pnpm dev:noter    # Note-taking example
-pnpm dev:chatbot  # Chat example
-pnpm dev:researcher  # Research assistant example
-```
+| Check | Status | Notes |
+|---|---|---|
+| docs.memwal.ai accessible | **NO** | Times out from Mac Mini. Chrome can reach it (tab confirmed at https://memwal.ai/). Likely Mac Mini network routing issue. |
+| Package on npm | **YES** | v0.0.5, published May 25 2026 |
+| GitHub activity | **YES** | Last push: Apr 30 2026, 9 contributors, active |
+| Last npm publish | **3 days ago** | Fresh (May 25 2026) |
+| TypeScript first-class | **YES** | Main entry: index.js with TypeScript types; 46 files; peer dep on ai+zod |
+| OpenClaw plugin separate | **YES** | `@mysten-incubation/oc-memwal` v0.0.2 — different package |
 
-## Lethe integration path
+---
 
-Based on Lethe's app structure, integration should use the existing stub at:
-`~/Projects/lethe/apps/web/src/lib/memwal.ts`
+## How it works (from GitHub README)
 
-Steps for Day 3:
-1. `pnpm add @mysten-incubation/memwal @mysten/sui @mysten/seal @mysten/walrus ai zod`
-2. Replace stub content with actual MemWal SDK code
-3. Create MemWal account at memwal.ai (testnet) → get key + accountId
-4. Set env vars: `MEMWAL_PRIVATE_KEY`, `MEMWAL_ACCOUNT_ID`, `MEMWAL_SERVER_URL`
-5. Integrate `memwal.remember()` after `walrus.storeChapterBlob()` succeeds
-6. Integrate `memwal.recall()` on app load to restore story context
+1. **Scope** — Each memory op runs inside an `owner + namespace` boundary
+2. **Store** — Relayer embeds text → encrypts → uploads to Walrus → stores vector metadata in PostgreSQL
+3. **Recall** — Searches by owner + namespace → resolves matching blobs → returns plaintext
+4. **Restore** — Incrementally rebuilds missing indexed entries for one namespace
+
+**Relayer** = `https://relayer.memwal.ai` (default). You can self-host the relayer (docs at `/relayer/self-hosting.md`).
+
+---
 
 ## Concerns / blockers
 
-| Issue | Severity | Detail |
-|---|---|---|
-| Beta status | ⚠️ MEDIUM | MemWal is beta — API may change. Version 0.0.5 with 29 releases in 2 months = rapid iteration. Pin exact version in package.json |
-| SPOF on hosted relayer | ⚠️ MEDIUM | Using hosted relayer at staging.memwal.ai = single relayer operator. v2 self-host planned per earlier audit |
-| WAL cost unclear | ⚠️ LOW | Storage deposits cost WAL — need to check actual cost per blob/memory operation. 0.5 SUI exchanged but WAL balance not captured |
-| GitHub small (13 stars) | ℹ️ INFO | Very early-stage project. Last push 28 days ago — still active |
-| No active Twitter | ℹ️ INFO | No @memwal Twitter found. Community is GitHub-based. Unknown community size |
-| Ed25519 key management | 🔴 ACTION NEEDED | Need to generate delegate key and store securely. Key = secret. Cannot be committed to repo |
-| Account creation flow | 🔴 ACTION NEEDED | Must use memwal.ai playground OR self-host contract deploy to get accountId. No CLI `memwal deploy` found in docs |
+**Blocker B2 status: UNBLOCKED** — package name confirmed, install command confirmed, API surface confirmed.
 
-## Action items before Day 3 integration
-1. [ ] Visit memwal.ai → create testnet account → capture key + accountId
-2. [ ] Add env vars to `.env.local`: `MEMWAL_PRIVATE_KEY`, `MEMWAL_ACCOUNT_ID`, `MEMWAL_SERVER_URL=https://relayer.staging.memwal.ai`
-3. [ ] Update memwal.ts stub with real SDK code
-4. [ ] Test `memwal.health()` to verify relayer connectivity
-5. [ ] Pin `@mysten-incubation/memwal@0.0.5` in package.json (don't use ^ latest)
+### ⚠️ Red flags
+
+1. **Docs site unreachable from Mac Mini** — `docs.memwal.ai` times out via curl/urllib. Chrome on the same machine CAN reach it (tab confirmed). CDP navigation to it also times out. This is a known Mac Mini routing issue for CDN-backed doc sites. **Workaround:** use `docs.memwal.ai/llms.txt` (plain text, may be reachable) or use npm README as primary reference until Mac Mini network issue is resolved.
+
+2. **v0.0.5 — very early stage** — No major version yet. Beta label in README. API may change between minor versions. `rememberAndWait` vs `remember` (async) distinction matters — only use the `*AndWait` variant for reliable store confirmation.
+
+3. **~1,000 weekly downloads** — Low adoption. Community size unknown. Support channels unclear.
+
+4. **Key param name inconsistency** — npm README uses `MEMWAL_PRIVATE_KEY` env var. GitHub quickstart uses `key` param with hex string. Our `.env.example` uses `MEMWAL_DELEGATE_KEY`. Standardize on `MEMWAL_DELEGATE_KEY` matching our existing naming, but note the actual key is Ed25519 private key in hex format.
+
+5. **No delegate key creation flow in SDK** — MemWal account creation requires `memwal.ai` web UI (Sui wallet connect → create account → capture Ed25519 delegate key + object ID). Vow must do this manually. This was listed as Action 1 in Day 3 prep. No CLI/API for account creation yet.
+
+6. **Sui testnet only** — MemWal currently only supports Sui testnet. No mainnet mentioned.
+
+---
+
+## Next action for Vow
+
+To complete MemWal setup (Action 1 from Day 3 prep):
+
+1. Open `https://memwal.ai` in Chrome (not Hermes CDP — docs site is unreachable from Mac Mini shell but works in browser)
+2. Click "Connect Wallet" → connect with `lethe-dev` wallet (0x4bf22d...)
+3. Create MemWal account
+4. Capture: `MEMWAL_ACCOUNT_ID` (0x... object ID) + `MEMWAL_DELEGATE_KEY` (Ed25519 private key hex)
+5. Add to `~/Projects/lethe/apps/web/.env.local`
+
+Then update `src/lib/memwal.ts` with actual key names (`MEMWAL_DELEGATE_KEY`, `MEMWAL_ACCOUNT_ID`, `NEXT_PUBLIC_MEMWAL_RELAYER_URL`).
