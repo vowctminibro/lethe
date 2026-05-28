@@ -7,21 +7,27 @@ node_modules/
 # Agent coordination signals (Hermes mailbox flags) — ephemeral, not project content
 *.flag
 
+# Next.js
+apps/web/.next/
+apps/web/out/
+
 # Sui Move build artifacts
 contracts/build/
 contracts/lethe/build/
 
-# memory-service / sdk build
-memory-service/dist/
-sdk/dist/
+# Node build output
+apps/memory-service/dist/
+packages/sdk/dist/
+packages/shared/dist/
 
-# Unity build artifacts
-demo-game/Library/
-demo-game/Temp/
-demo-game/Obj/
-demo-game/Logs/
-demo-game/UserSettings/
-demo-game/MemoryCaptures/
+# Archived legacy (research/legacy) build artifacts
+research/legacy/sdk/dist/
+research/legacy/demo-game/Library/
+research/legacy/demo-game/Temp/
+research/legacy/demo-game/Obj/
+research/legacy/demo-game/Logs/
+research/legacy/demo-game/UserSettings/
+research/legacy/demo-game/MemoryCaptures/
 
 # Unity-generated solution files
 *.csproj

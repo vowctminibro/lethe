@@ -293,3 +293,41 @@ vercel alias set https://<new-url> lethesdk.vercel.app
 
 **Time:** ~3 hours operator total (landing scaffold + Vercel debug saga + close-out)
 
+---
+
+## Day 2 (Storytelling pivot) — May 28, 2026
+
+Pivoted direction: from the NPC-memory dev SDK to **Lethe = persistent AI
+storytelling on Sui** (Walrus storage + Sui Story NFT + zkLogin). Target stays
+the Walrus track, Sui Overflow 2026.
+
+### Repo restructured (monorepo)
+- `landing/` → `apps/web/` (kept the deployed Next.js app + its `.vercel` link; renamed package `landing` → `web`).
+- `memory-service/` → `apps/memory-service/`.
+- Archived the dev-SDK direction into `research/legacy/`: old `sdk/` (`@lethe/sdk` npc API), `demo-game/` (Unity), `contracts/lethe/sources/npc.move` + its test. Nothing deleted — recoverable.
+- New `packages/shared` (`@lethe/shared` domain types: WorldTemplate, Story, Chapter, StoryMemory + WORLD_TEMPLATES) and `packages/sdk` (`@lethe/sdk` story-ops surface, stubs for Day 3).
+- Workspace config updated: root `package.json` (`apps/*` + `packages/*`), `pnpm-workspace.yaml`, `vercel.json` → `apps/web`, single root lockfile, `.gitignore` paths.
+
+### New Story domain
+- `contracts/lethe/sources/story.move` — `Story` NFT (owned) with appended `Chapter`s; each chapter holds `text_blob_id` + `image_blob_id` (Walrus) + `summary`. Events: `StoryCreated`, `ChapterAdded`. `sui move build` PASSES.
+
+### apps/web scaffolded
+- Pages: `/` (landing + "Sign in with Google"), `/play` (5-world picker, imports `@lethe/shared`), `/library` (story list placeholder).
+- Deps added: `@mysten/sui`, `@mysten/dapp-kit`, `@mysten/enoki` (zkLogin path — NOT deprecated `@mysten/zklogin`), `@mysten/walrus`, `@tanstack/react-query`, `openai`, `zod`, `lucide-react`, `@lethe/shared`.
+- **Build verified GREEN** — `pnpm --filter web build` passes (all routes). Fixed a Next 16.2.6 footgun: the Hermes shell exports `NODE_ENV=development`, which broke the production build; build script now pins `NODE_ENV=production`. Added `not-found.tsx` + `global-error.tsx`.
+
+### Research
+- Fresh audit appended to `research/audit-v2.md` (MemWal, Walrus+Seal, zkLogin/Enoki, wallet, MiniMax). Complexity (chosen arch): ~6/10.
+
+### Scope (frozen)
+- `HERO_FLOW.md` (root) — the single 90-sec demo path. Decision rule: ship only what's visible in the flow AND bulletproof.
+
+### Created NOT committed-pushed
+- This is a local commit only (no push) pending Vow review of the new tree.
+
+### Next (Day 3)
+- Wire Enoki provider tree (`'use client'` providers.tsx) + Google sign-in.
+- memory-service: refactor NPC routes → story routes (create/add-chapter/get) + Walrus upload/read.
+- Publish `story.move` to testnet; thread package id into the service.
+- MiniMax: confirm allowed text/image models (token-plan), wire chapter text + scene image generation.
+

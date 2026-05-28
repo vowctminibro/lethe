@@ -1,4 +1,7 @@
 packages:
-  - "sdk"
-  - "memory-service"
-  - "landing"
+  - "apps/*"
+  - "packages/*"
+
+ignoredBuiltDependencies:
+  - sharp
+  - unrs-resolver

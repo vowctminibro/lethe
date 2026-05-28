@@ -2,9 +2,11 @@
   "name": "lethe",
   "version": "0.1.0",
   "private": true,
-  "workspaces": ["landing"],
+  "workspaces": ["apps/*", "packages/*"],
   "scripts": {
-    "build": "pnpm --filter landing build",
-    "vercel-build": "pnpm --filter landing build"
+    "build": "pnpm --filter web build",
+    "vercel-build": "pnpm --filter web build",
+    "dev:web": "pnpm --filter web dev",
+    "dev:service": "pnpm --filter memory-service dev"
   }
 }

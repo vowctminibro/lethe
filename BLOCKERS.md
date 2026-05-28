@@ -90,3 +90,53 @@ Resolution paths (for when content update is urgent):
   A) Static export: `output: 'export'` in next.config → upload landing/out/ plain
   B) Re-link landing/ as standalone Vercel project (separate from monorepo)
   C) Move landing/ to its own repo
+
+---
+
+# Day 2 — Storytelling pivot blockers (2026-05-28)
+
+> The user's brief named these "B2 (MemWal integration)" + "B3 (Walrus
+> wallet funding)" — renumbered B12+ since the old B2/B3 are closed.
+
+## B12 — $WAL testnet funding needed (Hermes/Vow task)
+Status: OPEN — blocks any Walrus upload test.
+
+Wallet `lethe-dev` holds **1.96 SUI but 0 WAL**. The walrus CLI (1.48.1) is
+installed but has **no config file** — `walrus get-wal` fails with "could not
+find a valid Walrus configuration file". Fix: set up the testnet
+`~/.config/walrus/client_config.yaml`, then `walrus get-wal` (swaps SUI→WAL
+1:1). SUI balance is sufficient to swap. (Did not auto-fetch the config to
+avoid guessing URLs.)
+
+## B13 — MemWal SDK integration pending
+Status: OPEN (decision + setup).
+
+Package confirmed `@mysten-incubation/memwal` (active, commit 2026-05-28).
+Still need: (a) decide MemWal vs Walrus-direct for the memory layer — MemWal
+gives encrypted storage + semantic recall but does NOT mint NFTs; Walrus-direct
++ our `story.move` gives the NFT + full control; (b) if MemWal: generate an
+Ed25519 delegate key + register a MemWal account, set `MEMWAL_*` env. See
+research/audit-v2.md.
+
+## B14 — MiniMax token-plan model access
+Status: OPEN — verify before wiring generation.
+
+EP key is valid (HTTP 200) but the token plan rejects `MiniMax-Text-01`
+(`2061: token plan not support model`). Confirm which text + image models the
+plan allows (EP successfully used `image-01` + `speech-2.8-hd`); top up / adjust
+plan if Lethe's needed text model isn't covered. No credit-balance API — check
+the platform dashboard.
+
+## B15 — Enoki not provisioned
+Status: OPEN — blocks zkLogin.
+
+zkLogin via Enoki (recommended, complexity 3) needs an Enoki API key + a Google
+OAuth client ID from the Enoki Portal. Not yet created. Without it, "Sign in with
+Google" can't work.
+
+## B11 update — Vercel deploy
+The monorepo restructure moved `landing/` → `apps/web/`; root `vercel.json` now
+builds `apps/web`. Also fixed the real local-build footgun: the shell's
+`NODE_ENV=development` broke `next build` (the "useContext null" error) — the
+build script now pins `NODE_ENV=production`. Whether the Vercel queue itself is
+healthy is untested this session (no push performed).
