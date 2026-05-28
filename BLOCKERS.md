@@ -140,3 +140,69 @@ builds `apps/web`. Also fixed the real local-build footgun: the shell's
 `NODE_ENV=development` broke `next build` (the "useContext null" error) — the
 build script now pins `NODE_ENV=production`. Whether the Vercel queue itself is
 healthy is untested this session (no push performed).
+
+## B2 — MemWal SDK package unknown
+Status: CLOSED (2026-05-28)
+
+Confirmed by Hermes research:
+- Package: `@mysten-incubation/memwal` v0.0.5
+- npm:  https://www.npmjs.com/package/@mysten-incubation/memwal
+- GitHub: https://github.com/MystenLabs/MemWal
+- Install: `pnpm add @mysten-incubation/memwal`
+- ⚠ Relayer at https://relayer.memwal.ai is a managed service (SPOF).
+  v2 roadmap: self-host relayer.
+
+## B3 — WAL testnet tokens
+Status: CLOSED (2026-05-28)
+
+Confirmed by Hermes research:
+- Command: `walrus get-wal --context testnet`
+- Exchange rate: 0.5 SUI → 0.5 WAL
+- Requires SUI testnet balance (currently ~1.96 SUI ✓)
+- ⚠ SUI testnet wallet address: `0x4bf22d697cacb24e23037e804157896ddfaaf7a3d86940df777c1ad31a868077`
+
+## B6 — Enoki not provisioned
+Status: OPEN — blocks zkLogin / "Sign in with Google"
+
+Vow needs to:
+1. Sign up at https://portal.enoki.mystenlabs.com
+2. Create an API key (NEXT_PUBLIC_ENOKI_API_KEY + ENOKI_SECRET_KEY)
+3. Create Google OAuth client at https://console.cloud.google.com
+   - Authorized redirect URI: `https://api.enoki.mystenlabs.com/v1/auth/callback/google`
+   - Set GOOGLE_CLIENT_ID + GOOGLE_CLIENT_SECRET in .env.local
+
+Without this, "Sign in with Google" CTA on landing page is a dead link.
+
+## B7 — MiniMax credits blocked (API error 2061)
+Status: OPEN — blocks AI generation
+
+Checked 2026-05-28:
+- API key `sk-cp-QSN6AR...` authenticated (HTTP 200 on /v1/me) ✓
+- But all model calls returned: `{"error_code":2061,"status_msg":"token plan not support model"}`
+- Models tested and failed: `abab6.5s-chat`, `MiniMax-Text-01`
+- Action: Vow must log in to https://platform.minimax.io and top up credits
+  or upgrade plan to support these models
+- After credits restored: wire `generateChapterText()` + `generateChapterImage()`
+  in `src/lib/minimax.ts`
+
+## B8 — MemWalAccount not deployed on testnet
+Status: OPEN — MemWal reads/writes will fail without deployed account
+
+Before any MemWal call, Vow needs to:
+1. Run `pnpm add @mysten-incubation/memwal` in apps/web
+2. Deploy MemWalAccount contract on Sui testnet
+3. Set `MEMWAL_ACCOUNT_ID` + `NEXT_PUBLIC_MEMWAL_RELAYER_URL` in .env.local
+4. Wire `createMemWalAccount()` in auth flow (Day 3)
+
+## B15 — Enoki provider not wired in Next.js app
+Status: OPEN — software blocker, can do today
+
+EnokiProvider needs to wrap the Next.js app tree in a `'use client'` providers component.
+After B6 is resolved (Enoki keys in hand), wire:
+```
+// apps/web/src/components/providers.tsx
+<EnokiProvider apiKey={NEXT_PUBLIC_ENOKI_API_KEY}>
+  {children}
+</EnokiProvider>
+```
+Then add `import './providers'` to layout.tsx before {children}.

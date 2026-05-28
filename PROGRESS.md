@@ -331,3 +331,75 @@ the Walrus track, Sui Overflow 2026.
 - Publish `story.move` to testnet; thread package id into the service.
 - MiniMax: confirm allowed text/image models (token-plan), wire chapter text + scene image generation.
 
+---
+
+## Day 2 (2026-05-28) — Build Sprint
+
+### Pivot locked
+- Direction: NPC SDK → AI storytelling on Sui
+- Target hackathon: Sui Overflow 2026 — Walrus Specialize track
+- Hero flow: 90-second demo (landing → world picker → AI chapter → NFT mint)
+
+### Architecture decisions (Day 2 locked)
+| Decision | Choice | Rationale |
+|---|---|---|
+| zkLogin provider | Enoki ($69/mo or free tier) | Sponsored tx = no wallet popup |
+| Encryption layer | Skip Seal v1 | Sui NFT ownership = access proof |
+| Memory layer | MemWal v0.0.5 | Acknowledge SPOF; v2 self-host |
+| Blob storage | Walrus (no Seal) | Cost-effective, Sui-native |
+| AI generation | MiniMax (pending credits) | Budget constraint |
+
+### Brand system (locked)
+- Monogram: lowercase lambda λ
+- Dual-mode palette (light default / dark)
+  - Light: ink `#1A3A4A` / mist `#5A8A9E` / coral `#E8B894` / fog `#EFF5F4`
+  - Dark: midnight `#0A1628` / parchment `#E8DFD0` / moonlight `#6B9BD1` / candle `#D4A574`
+- Typography: Fraunces (display, serif) + Inter (body) + JetBrains Mono (code)
+- All 5 brand assets staged: ~/Projects/lethe/brand-assets/
+
+### Repo restructured (Day 2)
+```
+apps/
+  web/                  Next.js 16.2.6 + Tailwind v4
+  memory-service/        (existing)
+packages/
+  sdk/                 stub package
+  shared/               stub package
+contracts/             Sui Move (Story NFT)
+research/              audit-v2.md, memwal-sdk.md
+brand-assets/          Lethe brand SVGs
+```
+
+### apps/web scaffolded
+- Next.js 16.2.6, React 19.2.4, Tailwind CSS v4
+- Pages: `/` (landing), `/library` (stub), `/play` (stub)
+- Deps: `@mysten/sui` ^2.17.0, `@mysten/enoki` ^1.0.8, `@mysten/walrus` ^1.1.7, `@mysten/dapp-kit` ^1.0.6, `@tanstack/react-query` ^5, `openai`, `zod`, `lucide-react`
+- Confirmed NOT installed (intentional): `@mysten-incubation/memwal` — manually added in Step 5
+- `src/lib/` stubs created: sui.ts, enoki.ts, walrus.ts, memwal.ts, minimax.ts, memory.ts, story.ts
+- `.env.example` created with all required keys documented
+
+### Packages confirmed from research
+| Package | Version | Source |
+|---|---|---|
+| `@mysten/sui` | ^2.17.0 | Already installed |
+| `@mysten/enoki` | ^1.0.8 | Already installed |
+| `@mysten/walrus` | ^1.1.7 | Already installed |
+| `@mysten/dapp-kit` | ^1.0.6 | Already installed |
+| `@mysten-incubation/memwal` | ^0.0.5 | research/memwal-sdk.md |
+| `openai` | ^6.39.0 | Already installed |
+| `zod` | ^4.4.3 | Already installed |
+| `lucide-react` | ^1.17.0 | Already installed |
+
+### Blockers closed
+- B2: MemWal SDK — confirmed `@mysten-incubation/memwal` v0.0.5 (npm + GitHub)
+- B3: WAL faucet — confirmed `walrus get-wal --context testnet` (0.5 SUI → 0.5 WAL)
+
+### Open blockers (Day 3)
+| ID | Blocker | Owner |
+|---|---|---|
+| B6 | Enoki API key + Google OAuth client | Vow |
+| B7 | MiniMax credits (error 2061 = plan expired) | Vow |
+| B8 | MemWalAccount deployment on testnet | Vow |
+| B15 | Enoki provider wiring in Next.js tree | Hermes |
+
+---

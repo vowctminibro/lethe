@@ -1,65 +1,56 @@
-# LETHE HERO FLOW — 90 seconds
+# Lethe Hero Flow — 90 seconds
 
-The single demo path. Everything in scope serves this flow; everything
-else is cut. See the decision rule at the bottom.
+## 0:00–0:15  Landing
+User opens lethesdk.vercel.app
+Click "Sign in with Google" → Enoki zkLogin generates Sui address
+No wallet popup, no seed phrase
 
----
+## 0:15–0:30  Pick your world
+5 templates: Fantasy / Sci-fi / Romance / Slice-of-life / Custom (later)
+Click Fantasy
 
-## Timeline
+## 0:30–1:00  Chapter 1 auto-generates
+Opening paragraph + AI image
+Loads <30 sec
+User reads, types: "I look around the chamber"
 
-**0:00–0:15 — Landing → "Sign in with Google"**
-- zkLogin generates a Sui address (invisible)
-- No wallet popup, no seed phrase
+## 1:00–1:30  Chapter 2 generates
+AI extends story + new image
+MemWal memory layer extracts characters/locations/decisions
+Walrus stores chapter blob (invisible to user)
+Sui Object NFT minted for story (sponsored gas via Enoki, invisible)
 
-**0:15–0:30 — "Pick your world"**
-- 5 starter templates: Fantasy / Sci-fi / Romance / Mystery / Slice-of-life
-- User clicks Fantasy
+## 1:30–1:45  Story timeline
+Visual tree: 2 chapters growing
+"Continue Chapter 3?" CTA
 
-**0:30–0:60 — Chapter 1 auto-generates**
-- Opening paragraph + scene image + narration audio
-- Loads in <30 sec
+## Architecture decisions (Day 2 locked)
+- zkLogin via Enoki ($69/mo, sponsored tx included)
+- Memory via MemWal + Vercel AI SDK middleware
+- Storage: Walrus blobs (no Seal encryption v1 — NFT ownership = access proof)
+- Generation: MiniMax (image-01 + text)
+- Identity/Ownership: Sui Object NFT
 
-**0:60–1:15 — User types "I look around the chamber"**
-- AI generates next paragraph + new image
-- Memory: character names extracted, location noted
-- Chapter saved to Walrus (invisible)
-- Sui Object NFT minted (invisible)
-
-**1:15–1:30 — Story timeline (2 chapters, growing tree)**
-- "Continue Chapter 3?" call to action
-- Demonstrates persistence
-
----
-
-## Features IN the hero flow (must ship bulletproof)
-
-1. zkLogin Google sign-in
-2. Story template selection
-3. AI text generation (MiniMax)
+## Features IN hero flow (ship bulletproof)
+1. Enoki Google sign-in
+2. Template selection (5 worlds)
+3. AI text generation (MiniMax + MemWal context)
 4. AI image generation (MiniMax)
-5. Walrus blob upload + retrieval
-6. Sui Object NFT mint
-7. Story timeline visualization
+5. Walrus blob upload + retrieve
+6. Sui Object NFT mint (Enoki sponsored)
+7. Story timeline UI
 8. Resume after close + reopen
 
----
-
-## Features NOT in the hero flow (skip)
-
-1. Voice narration (nice-to-have, Day 15+)
-2. Multi-user collaboration (cut)
-3. Mobile native app (web only)
-4. Token economy (skip)
-5. Marketplace / browse others (cut)
-6. Custom world creation (use templates)
-7. Edit previous chapters (cut for v1)
-8. Story sharing / export (Day 18+ if time)
-
----
+## Features NOT in hero flow (skip)
+- Voice narration (Day 18+)
+- Seal encryption (v2 roadmap)
+- Self-hosted MemWal relayer (v2 roadmap)
+- Multi-user collab (cut)
+- Mobile native (web only)
+- Marketplace (cut)
+- Edit previous chapters (cut v1)
 
 ## Decision rule
-
-For every "should I add feature X?" question:
-- Visible in 90-sec flow + bulletproof? → ship
-- Visible but risky? → don't ship
-- Not visible? → don't ship
+Visible in 90 sec + bulletproof? → ship
+Visible but risky? → don't ship
+Not visible? → don't ship

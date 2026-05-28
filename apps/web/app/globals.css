@@ -1,21 +1,49 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 @theme {
-  --color-bg: #0a0a0f;
-  --color-panel: #13131c;
-  --color-border: #26263a;
-  --color-ink: #e8e8f0;
-  --color-inkdim: #8a8aa0;
-  --color-accent: #8b5cf6;
-  --color-accent-soft: #a78bfa;
-  --color-ok: #34d399;
-  --font-sans: "Inter", system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", Menlo, monospace;
+  /* ── Brand tokens ── */
+  --color-ink:        #1A3A4A;
+  --color-mist:       #5A8A9E;
+  --color-coral:      #E8B894;
+  --color-fog:        #EFF5F4;
+  --color-midnight:   #0A1628;
+  --color-parchment:  #E8DFD0;
+  --color-moonlight:  #6B9BD1;
+  --color-candle:     #D4A574;
+  --color-border:     #C8D8DC;
+
+  /* ── Font families ── */
+  --font-display: var(--font-fraunces), Georgia, serif;
+  --font-sans:    var(--font-inter), system-ui, sans-serif;
+  --font-mono:    var(--font-jetbrains), monospace;
 }
 
-:root { color-scheme: dark; }
-html, body { background: #0a0a0f; color: #e8e8f0; }
-body { font-family: "Inter", system-ui, sans-serif; }
-::selection { background: #8b5cf6; color: #fff; }
+/* ── Light mode (default) ── */
+:root {
+  color-scheme: light;
+  --bg:         #EFF5F4;
+  --bg-panel:   #FFFFFF;
+  --text:       #1A3A4A;
+  --text-dim:   #5A8A9E;
+  --accent:     #E8B894;
+  --accent-h:   #C4946E;
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+}
+
+/* ── Dark mode ── */
+.dark {
+  color-scheme: dark;
+  --bg:         #0A1628;
+  --bg-panel:   #12243A;
+  --text:       #E8DFD0;
+  --text-dim:   #6B9BD1;
+  --accent:     #D4A574;
+  --accent-h:   #C4946E;
+}
+
+::selection { background: #E8B894; color: #0A1628; }

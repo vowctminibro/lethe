@@ -1,0 +1,6 @@
+<svg width="32" height="32" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Lethe">
+  <title>Lethe</title>
+  <circle cx="50" cy="50" r="46" fill="#1A3A4A"/>
+  <text x="50" y="63" font-family="Georgia, 'Times New Roman', serif" font-size="48" fill="#EFF5F4" text-anchor="middle" font-style="italic" font-weight="400">L</text>
+  <circle cx="76" cy="58" r="5" fill="#E8B894"/>
+</svg>

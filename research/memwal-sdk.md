@@ -1,17 +1,12 @@
-# MemWal SDK Research — 2026-05-28T11:45:00+07:00
+# MemWal SDK Research — 2026-05-28T18:15:00+07:00
 
 ## Package name (confirmed)
-- npm: `@mysten-incubation/memwal`
-- Install: `pnpm add @mysten-incubation/memwal`
-- Current version: **0.0.5** (published May 25, 2026)
-- Source confirming this: https://www.npmjs.com/package/@mysten-incubation/memwal
-
-Peer dependencies (install as needed):
-```bash
-pnpm add @mysten/sui @mysten/seal @mysten/walrus ai zod
-```
-
-Also available: `@mysten-incubation/oc-memwal` (OpenClaw/NemoClaw plugin, 133 downloads/week — separate package)
+- **npm**: `@mysten-incubation/memwal` (direct) | `@mysten-incubation/oc-memwal` (OpenClaw plugin)
+- **Install**: `pnpm add @mysten-incubation/memwal`
+- **Peer deps**: `pnpm add @mysten/sui @mysten/seal @mysten/walrus ai zod`
+- **Current version**: v0.0.5 (SDK) | v0.0.2 (OpenClaw plugin, Apr 30 2026)
+- **Source confirming this**: github.com/MystenLabs/MemWal (last push Apr 30 2026)
+- **npm on npmjs.com**: Confirmed via GitHub README. Direct npm search for "memwal" returned no results in top matches — package may be published but not indexed heavily. GitHub README is authoritative source.
 
 ## Quickstart code from docs
 
@@ -19,94 +14,95 @@ Also available: `@mysten-incubation/oc-memwal` (OpenClaw/NemoClaw plugin, 133 do
 import { MemWal } from "@mysten-incubation/memwal";
 
 const memwal = MemWal.create({
-  key: process.env.MEMWAL_PRIVATE_KEY!,
-  accountId: process.env.MEMWAL_ACCOUNT_ID!,
-  serverUrl: process.env.MEMWAL_SERVER_URL ?? "https://relayer.memwal.ai",
+  key: "your-delegate-key-hex",
+  accountId: "your-memwal-account-id",
+  serverUrl: "https://your-relayer-url.com",
   namespace: "demo",
 });
 
-await memwal.rememberAndWait(
-  "User prefers dark mode and uses TypeScript.",
-  undefined,
-  { timeoutMs: 30_000 },
-);
-const memories = await memwal.recall("What are the user's preferences?", {
-  topK: 10,
-  maxDistance: 0.7,
-});
+await memwal.remember("User prefers dark mode and uses TypeScript.");
+const memories = await memwal.recall("What are the user's preferences?");
 await memwal.restore("demo");
 ```
 
-Three entry points:
-| Entry | Import | Use case |
-|---|---|---|
-| `MemWal` | `@mysten-incubation/memwal` | Default — relayer handles everything |
-| `MemWalManual` | `@mysten-incubation/memwal/manual` | Client-managed embeddings + local SEAL |
-| `withMemWal` | `@mysten-incubation/memwal/ai` | Vercel AI SDK middleware |
+## API surface (top 10 methods)
 
-## API surface (top 5 methods)
-1. `remember(text)` — submit one memory, returns immediately (background async)
-2. `rememberAndWait(text)` — submit memory and poll until job completes
-3. `recall(query)` — semantic search by natural language, returns matched memories with distance scores
-4. `analyze(text)` — extract structured facts via LLM, auto-saved as separate memories
-5. `restore(namespace)` — rebuild missing indexed entries from Walrus (incremental, only re-indexes missing)
+1. **`MemWal.create(config)`** — Factory: create MemWal client with Ed25519 delegate key + Sui account ID + relayer URL
+2. **`remember(text, namespace?)`** — Submit one memory async; returns job_id immediately (embedding + encryption + Walrus upload + indexing runs in background)
+3. **`rememberAndWait(text, namespace?, opts?)`** — Submit and poll until done; returns `{ id, blob_id, owner, namespace }`
+4. **`rememberBulk(items)`** — Submit up to 20 memories in one request; returns `job_ids[]`
+5. **`recall(query, limit?, namespace?)`** — Semantic search scoped to owner + namespace; returns `{ results: [{ blob_id, text, distance }] }`
+6. **`analyze(text, namespace?)`** — LLM extract memorable facts from text, store each as a job
+7. **`restore(namespace, limit?)`** — Rebuild missing vector index entries incrementally from Walrus for a namespace
+8. **`health()`** — Relayer health check; no auth required
+9. **`getPublicKeyHex()`** — Return hex-encoded public key for delegate keypair
+10. **`MemWalManual`** (from `@mysten-incubation/memwal/manual`) — Client-side embedding + SEAL encryption variant; relayer still handles upload/search/restore
 
-Other notable: `health()`, `rememberBulk()`, `getPublicKeyHex()`
+### Bonus: Vercel AI SDK middleware
+
+```ts
+import { withMemWal } from "@mysten-incubation/memwal/ai";
+```
+
+Wraps `streamText`/`generateText` from Vercel AI SDK — auto `recall()` before generation, auto `remember()` after. Perfect for Lethe's storytelling loop.
+
+### Bonus: OpenClaw plugin
+
+```bash
+openclaw plugins install @mysten-incubation/oc-memwal
+```
+
+For OpenClaw agents — persistent encrypted memory via MemWal with automatic recall/capture hooks.
 
 ## Source links
 - Docs: https://docs.memwal.ai
-- SDK Quick Start: https://docs.memwal.ai/sdk/quick-start
-- API Reference: https://docs.memwal.ai/sdk/api-reference
 - GitHub: https://github.com/MystenLabs/MemWal
-- npm: https://www.npmjs.com/package/@mysten-incubation/memwal
-- Twitter/X: https://x.com/WalrusProtocol (announcement: Mar 25, 2026)
+- npm: Not independently searchable (GitHub README is source of truth)
+- Twitter/X: @memwal (unconfirmed — no active account found)
 
 ## Health check
-- docs.memwal.ai accessible: **YES** ✓ (confirmed 200)
-- Package on npm: **YES** ✓ (version 0.0.5, published May 25 2026)
-- Last commit on GitHub: **Apr 30, 2026** (3 days ago at time of search — repo is active)
-- TypeScript first-class: **YES** ✓ (83.3% of repo is TypeScript)
-- Relayer uptime: **managed relayer** at `https://relayer.memwal.ai` — single dependency point
+- docs.memwal.ai accessible: **YES** (accessible, serves docs)
+- Package on npm: **YES** (via GitHub README, v0.0.5)
+- Last commit on GitHub: **2026-04-30** (Apr 30, 2026 — ~28 days ago as of May 28)
+- TypeScript first-class: **YES** (primary language: TypeScript 83.3%)
+- npm weekly downloads: **TODO — npm search returned no direct results; may be low-volume**
 
-## Version matrix
-| Source | Latest release |
-|---|---|
-| GitHub Releases | 0.0.3 (Apr 30) |
-| npm latest | 0.0.5 (May 25) |
-| npm total versions | 29 versions since Mar 25 2026 |
+## Configuration requirements
 
-npm leads GitHub by 2 minor versions — npm is ahead, meaning there were npm-only publishes.
+```ts
+MemWal.create({
+  key: string,          // REQUIRED — Ed25519 delegate private key (hex)
+  accountId: string,     // REQUIRED — MemWalAccount object ID on Sui
+  serverUrl: string,     // OPTIONAL — relayer URL (default: http://localhost:8000)
+  namespace: string,     // OPTIONAL — default "default"
+})
+```
+
+**Two ways to use:**
+1. **MemWal** (default) — relayer handles embedding, encryption, Walrus upload/download, retrieval, restore. You just call `remember`/`recall`.
+2. **MemWalManual** — you handle embedding + SEAL encryption locally. Relayer still does upload relay, registration, search, restore.
 
 ## Concerns / blockers
 
-**1. Managed relayer = single point of failure**
-The SDK works only if `https://relayer.memwal.ai` is up. You cannot self-host the relayer without a funded wallet + WAL + SUI. If Walrus Foundation takes the relayer offline, the SDK bricks. For Lethe's NPC memory engine running 24/7, this is a real risk. Self-hosting relayer is an option but adds operational overhead.
+1. **⚠️ RELAYER = SINGLE POINT OF FAILURE**: MemWal is a **centralized relayer** (`relayer.memwal.ai`). All embedding, encryption, WAL upload, search, and restore go through this one service. If it goes down, all memories are inaccessible. For hackathon demo this is fine, but for production this is a critical architectural risk.
 
-**2. Beta + low adoption (1K downloads/week)**
-Only 1 dependent on npm. The API surface is still evolving (29 versions in 2 months). Breaking changes are possible before 1.0. Budget extra integration time for API updates.
+2. **⚠️ Beta / Active Development**: README explicitly states "MemWal is currently in beta and actively evolving." Last commit Apr 30, 2026. The API could change before mainnet.
 
-**3. Heavy dependency chain**
-```
-@mysten-incubation/memwal
-  └── @mysten/sui (>=2.5.0)
-  └── @mysten/seal (>=1.1.0)
-  └── @mysten/walrus (>=1.0.3)
-  └── ai (>=4.0.0)  ← Vercel AI SDK, heavy
-  └── zod
-```
-If you're already in the Sui/Walrus ecosystem, this is fine. If Lethe is a standalone project without other Sui dependencies, you're pulling in the entire Mysten stack just for memory.
+3. **Ed25519 delegate key required**: You need to generate an Ed25519 keypair and register a `MemWalAccount` Sui object on-chain before using. This is a setup step Vow must do manually (see memwal-sdk.md setup notes).
 
-**4. Ed25519 delegate key auth requires onboarding flow**
-You need an account ID (Sui object ID `0x...`) and a delegate private key. The onboarding goes through `https://memwal.ai` or `https://memwal.wal.app`. For Lethe NPCs, each NPC would ideally have its own namespace + delegate key. Not clear yet if that's architecturally supported or if all NPCs share one account.
+4. **No free tier confirmed for relayer**: The relayer at `relayer.memwal.ai` appears to be a managed service. It's unclear if there's a free tier or if Vow needs to self-host the relayer for production. For hackathon, the public relayer likely works.
 
-**5. Recall is semantic search, not structured queries**
-`recall()` returns matched text with cosine distance scores — no SQL-style filtering, no date ranges, no structured metadata queries. If you need "give me all memories from NPC X about topic Y in the last hour," you'd need to layer that yourself on top of recall results.
+5. **OpenClaw plugin published more recently**: Latest release (Apr 30 2026) is actually the OpenClaw plugin (`@mysten-incubation/oc-memwal@0.0.2`), not the core SDK. Check if core SDK release is also recent.
 
-**6. SEAL encryption is opaque to the SDK consumer**
-You can't inspect what's encrypted or audit encryption keys without looking into the relayer. This is fine for production use but makes debugging harder.
+6. **docs.memwal.ai shows LLM-friendly docs** (`llms.txt`, `llms-full.txt`) — good sign for AI tooling integration.
 
-## Summary for Lethe integration
+## Verdict for Lethe
 
-MemWal is the right tool for NPC memory on Sui/Walrus — semantic search over encrypted memories with namespace isolation per owner fits NPC episodic memory naturally. The TypeScript SDK is first-class, docs are solid, and the team (Mysten Labs) is active.
+**Use case fit: HIGH** — `withMemWal` Vercel AI SDK middleware is exactly what Lethe's storytelling loop needs. AI generates story → `remember()` saves to MemWal/Walrus → `recall()` retrieves relevant memories for next session → seamless narrative continuity.
 
-**The blocker:** B2 is unblocked by this research, but the managed relayer dependency is the next risk to assess. If you're comfortable relying on `relayer.memwal.ai` staying up, integrate with `@mysten-incubation/memwal@0.0.5` now. If you need self-hosted reliability, budget time for self-hosting the relayer before going production.
+**Recommended path for hackathon:**
+1. Use default `MemWal` (not Manual) — fastest to integrate
+2. Deploy MemWalAccount on Sui testnet first (setup blocker)
+3. Use public relayer `https://relayer.staging.memwal.ai` for testnet
+4. Test `withMemWal` AI middleware in story generation flow
+5. If relayer is unreliable, fall back to direct `@mysten/walrus` blob storage
