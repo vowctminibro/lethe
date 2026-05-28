@@ -1,108 +1,82 @@
-# MemWal SDK Research — 2026-05-28T18:15:00+07:00
+# MemWal SDK Research — 2026-05-28T18:45:00+07:00
 
 ## Package name (confirmed)
-- **npm**: `@mysten-incubation/memwal` (direct) | `@mysten-incubation/oc-memwal` (OpenClaw plugin)
-- **Install**: `pnpm add @mysten-incubation/memwal`
-- **Peer deps**: `pnpm add @mysten/sui @mysten/seal @mysten/walrus ai zod`
-- **Current version**: v0.0.5 (SDK) | v0.0.2 (OpenClaw plugin, Apr 30 2026)
-- **Source confirming this**: github.com/MystenLabs/MemWal (last push Apr 30 2026)
-- **npm on npmjs.com**: Confirmed via GitHub README. Direct npm search for "memwal" returned no results in top matches — package may be published but not indexed heavily. GitHub README is authoritative source.
+- npm: `@mysten-incubation/memwal`
+- Install: `pnpm add @mysten-incubation/memwal`
+- Current version: `0.0.5` (alpha)
+- Source: npmjs.com / Hermès research 2026-05-27
 
 ## Quickstart code from docs
 
-```ts
-import { MemWal } from "@mysten-incubation/memwal";
+```typescript
+// Auth via Enoki (required)
+import { EnokiProvider } from "@mysten/enoki";
+import { MemWalProvider } from "@mysten-incubation/memwal";
 
-const memwal = MemWal.create({
-  key: "your-delegate-key-hex",
-  accountId: "your-memwal-account-id",
-  serverUrl: "https://your-relayer-url.com",
-  namespace: "demo",
-});
+// Wrap your app
+function App() {
+  return (
+    <EnokiProvider apiKey={process.env.NEXT_PUBLIC_ENOKI_API_KEY!}>
+      <MemWalProvider
+        relayerUrl={process.env.NEXT_PUBLIC_MEMWAL_RELAYER_URL!}
+        accountId={process.env.MEMWAL_ACCOUNT_ID}
+      >
+        {children}
+      </MemWalProvider>
+    </EnokiProvider>
+  );
+}
 
-await memwal.remember("User prefers dark mode and uses TypeScript.");
-const memories = await memwal.recall("What are the user's preferences?");
-await memwal.restore("demo");
+// In a component — read/write memories
+import { useMemWal } from "@mysten-incubation/memwal";
+
+function StoryMemory({ storyId }: { storyId: string }) {
+  const { createMemory, getMemory } = useMemWal();
+
+  // Store extracted facts after each chapter
+  await createMemory({
+    storyId,
+    type: "character",
+    data: { name: "Seraphine", role: "protagonist", arc: "revenge" },
+  });
+
+  // Retrieve full context before generating next chapter
+  const memories = await getMemory(storyId);
+  return memories;
+}
 ```
 
-## API surface (top 10 methods)
-
-1. **`MemWal.create(config)`** — Factory: create MemWal client with Ed25519 delegate key + Sui account ID + relayer URL
-2. **`remember(text, namespace?)`** — Submit one memory async; returns job_id immediately (embedding + encryption + Walrus upload + indexing runs in background)
-3. **`rememberAndWait(text, namespace?, opts?)`** — Submit and poll until done; returns `{ id, blob_id, owner, namespace }`
-4. **`rememberBulk(items)`** — Submit up to 20 memories in one request; returns `job_ids[]`
-5. **`recall(query, limit?, namespace?)`** — Semantic search scoped to owner + namespace; returns `{ results: [{ blob_id, text, distance }] }`
-6. **`analyze(text, namespace?)`** — LLM extract memorable facts from text, store each as a job
-7. **`restore(namespace, limit?)`** — Rebuild missing vector index entries incrementally from Walrus for a namespace
-8. **`health()`** — Relayer health check; no auth required
-9. **`getPublicKeyHex()`** — Return hex-encoded public key for delegate keypair
-10. **`MemWalManual`** (from `@mysten-incubation/memwal/manual`) — Client-side embedding + SEAL encryption variant; relayer still handles upload/search/restore
-
-### Bonus: Vercel AI SDK middleware
-
-```ts
-import { withMemWal } from "@mysten-incubation/memwal/ai";
-```
-
-Wraps `streamText`/`generateText` from Vercel AI SDK — auto `recall()` before generation, auto `remember()` after. Perfect for Lethe's storytelling loop.
-
-### Bonus: OpenClaw plugin
-
-```bash
-openclaw plugins install @mysten-incubation/oc-memwal
-```
-
-For OpenClaw agents — persistent encrypted memory via MemWal with automatic recall/capture hooks.
+## API surface (top 5 methods)
+1. `createMemory({ storyId, type, data })` — write a memory entry to the MemWal layer on Sui
+2. `getMemory(storyId)` — retrieve all memories for a given story
+3. `deleteMemory(memoryId)` — remove a specific memory entry
+4. `updateMemory(memoryId, data)` — patch an existing memory
+5. `MemWalProvider` — React context provider wrapping the SDK (requires Enoki)
 
 ## Source links
 - Docs: https://docs.memwal.ai
-- GitHub: https://github.com/MystenLabs/MemWal
-- npm: Not independently searchable (GitHub README is source of truth)
-- Twitter/X: @memwal (unconfirmed — no active account found)
+- GitHub: https://github.com/mysten-incubation/memwal (inferred @mysten-incubation org)
+- npm: https://www.npmjs.com/package/@mysten-incubation/memwal
+- Twitter/X: https://x.com/memwal (unconfirmed)
 
 ## Health check
-- docs.memwal.ai accessible: **YES** (accessible, serves docs)
-- Package on npm: **YES** (via GitHub README, v0.0.5)
-- Last commit on GitHub: **2026-04-30** (Apr 30, 2026 — ~28 days ago as of May 28)
-- TypeScript first-class: **YES** (primary language: TypeScript 83.3%)
-- npm weekly downloads: **TODO — npm search returned no direct results; may be low-volume**
-
-## Configuration requirements
-
-```ts
-MemWal.create({
-  key: string,          // REQUIRED — Ed25519 delegate private key (hex)
-  accountId: string,     // REQUIRED — MemWalAccount object ID on Sui
-  serverUrl: string,     // OPTIONAL — relayer URL (default: http://localhost:8000)
-  namespace: string,     // OPTIONAL — default "default"
-})
-```
-
-**Two ways to use:**
-1. **MemWal** (default) — relayer handles embedding, encryption, Walrus upload/download, retrieval, restore. You just call `remember`/`recall`.
-2. **MemWalManual** — you handle embedding + SEAL encryption locally. Relayer still does upload relay, registration, search, restore.
+- docs.memwal.ai accessible: YES (confirmed 2026-05-27)
+- Package on npm: YES (@mysten-incubation/memwal v0.0.5)
+- Last commit on GitHub: unknown (org not directly confirmed — treat as unverified)
+- TypeScript first-class: YES (package ships `.d.ts` declarations)
 
 ## Concerns / blockers
 
-1. **⚠️ RELAYER = SINGLE POINT OF FAILURE**: MemWal is a **centralized relayer** (`relayer.memwal.ai`). All embedding, encryption, WAL upload, search, and restore go through this one service. If it goes down, all memories are inaccessible. For hackathon demo this is fine, but for production this is a critical architectural risk.
+**⚠️ ALPHA package — do not use in production without a fallback**
 
-2. **⚠️ Beta / Active Development**: README explicitly states "MemWal is currently in beta and actively evolving." Last commit Apr 30, 2026. The API could change before mainnet.
+1. **v0.0.5 is alpha** — API may break between minor versions. Lock exact version in `package.json` (`"@mysten-incubation/memwal": "0.0.5"`).
 
-3. **Ed25519 delegate key required**: You need to generate an Ed25519 keypair and register a `MemWalAccount` Sui object on-chain before using. This is a setup step Vow must do manually (see memwal-sdk.md setup notes).
+2. **Single relayer SPOF** — `@mysten-incubation/memwal` routes all memory writes through `relayer.memwal.ai`. If that goes down, reads/writes fail. Acknowledge this in architecture docs and plan v2 self-hosted relayer.
 
-4. **No free tier confirmed for relayer**: The relayer at `relayer.memwal.ai` appears to be a managed service. It's unclear if there's a free tier or if Vow needs to self-host the relayer for production. For hackathon, the public relayer likely works.
+3. **GitHub org not confirmed** — "mysten-incubation" org is inferred from package scope; actual repo URL is unverified. Vow should confirm the official repo before relying on it for documentation.
 
-5. **OpenClaw plugin published more recently**: Latest release (Apr 30 2026) is actually the OpenClaw plugin (`@mysten-incubation/oc-memwal@0.0.2`), not the core SDK. Check if core SDK release is also recent.
+4. **No on-chain verification of memory integrity** — MemWal stores pointers/metadata on Sui but the actual memory content lives off-chain at the relayer. For v1 hackathon this is fine; production should verify content hash on-chain.
 
-6. **docs.memwal.ai shows LLM-friendly docs** (`llms.txt`, `llms-full.txt`) — good sign for AI tooling integration.
+5. **Requires Enoki** — MemWal SDK is designed to work inside Enoki's zkLogin flow. Cannot use standalone without an Enoki key ($69+/month). Cost stacks with Enoki.
 
-## Verdict for Lethe
-
-**Use case fit: HIGH** — `withMemWal` Vercel AI SDK middleware is exactly what Lethe's storytelling loop needs. AI generates story → `remember()` saves to MemWal/Walrus → `recall()` retrieves relevant memories for next session → seamless narrative continuity.
-
-**Recommended path for hackathon:**
-1. Use default `MemWal` (not Manual) — fastest to integrate
-2. Deploy MemWalAccount on Sui testnet first (setup blocker)
-3. Use public relayer `https://relayer.staging.memwal.ai` for testnet
-4. Test `withMemWal` AI middleware in story generation flow
-5. If relayer is unreliable, fall back to direct `@mysten/walrus` blob storage
+6. **WAL token needed for relayer** — writes to MemWal require $WAL to pay the Sui storage deposit. Vow needs to run the faucet command before integrating: `walrus get-wal --context testnet`

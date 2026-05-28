@@ -1,45 +1,26 @@
 /**
- * Walrus blob storage via @mysten/walrus.
- * Docs: https://sdk.mystenlabs.com/walrus
- * NPM:  https://www.npmjs.com/package/@mysten/walrus
- *
- * Usage:
- *   import { uploadChapterBlob, retrieveChapterBlob } from "@/lib/walrus";
+ * Walrus — decentralized blob storage for story chapters
+ * Endpoints from .env (testnet publisher + aggregator)
+ * Reference: research/audit-v2.md TASK 2
  */
 
-const PUBLISHER_URL =
-  process.env.NEXT_PUBLIC_WALRUS_PUBLISHER_URL
-  ?? "https://publisher.walrus-testnet.walrus.space";
-const AGGREGATOR_URL =
-  process.env.NEXT_PUBLIC_WALRUS_AGGREGATOR_URL
-  ?? "https://aggregator.walrus-testnet.walrus.space";
+const PUBLISHER_URL = process.env.NEXT_PUBLIC_WALRUS_PUBLISHER_URL
+const AGGREGATOR_URL = process.env.NEXT_PUBLIC_WALRUS_AGGREGATOR_URL
 
-/**
- * Upload a story chapter (as UTF-8 text) to Walrus.
- * Returns the blob ID for later retrieval.
- *
- * TODO (Day 3): wire SuiClient signer for gas + WAL payment
- * TODO (Day 3): confirm writeFees are paid in SUI or WAL on testnet
- */
-export async function uploadChapterBlob(
-  content: string,
-  _epochs = 3,
-  _deletable = true,
-): Promise<{ blobId: string }> {
-  // ── placeholder — replace with @mysten/walrus writeFiles ──
-  if (!content.trim()) throw new Error("Content cannot be empty");
-  const blobId = `placeholder_blob_${Date.now()}`;
-  console.info(`[Walrus] would upload to ${PUBLISHER_URL} → blobId=${blobId}`);
-  return { blobId };
+export interface ChapterBlob {
+  blobId: string
+  size: number
+  uploadedAt: number
 }
 
-/**
- * Retrieve a chapter's content from Walrus by blob ID.
- */
-export async function retrieveChapterBlob(
-  blobId: string,
-): Promise<string> {
-  // ── placeholder — replace with @mysten/walrus getBlob / getFiles ──
-  console.info(`[Walrus] would retrieve from ${AGGREGATOR_URL}/v1/blobs/${blobId}`);
-  return "[Chapter content would be loaded from Walrus here]";
+export async function uploadChapterBlob(content: string): Promise<ChapterBlob> {
+  if (!PUBLISHER_URL) throw new Error('Missing NEXT_PUBLIC_WALRUS_PUBLISHER_URL')
+  // TODO Day 3: HTTP PUT to publisher with content body
+  throw new Error('TODO: implement uploadChapterBlob')
+}
+
+export async function retrieveChapterBlob(blobId: string): Promise<string> {
+  if (!AGGREGATOR_URL) throw new Error('Missing NEXT_PUBLIC_WALRUS_AGGREGATOR_URL')
+  // TODO Day 3: HTTP GET from aggregator
+  throw new Error('TODO: implement retrieveChapterBlob')
 }
