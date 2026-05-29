@@ -17,15 +17,29 @@ import {
   type TraitSelection,
 } from "@/src/lib/traits";
 import { useMintArtwork } from "@/src/lib/mint";
+import house from "@/src/data/house-artworks.json";
 
 const NETWORK = process.env.NEXT_PUBLIC_SUI_NETWORK ?? "testnet";
+const AGG = process.env.NEXT_PUBLIC_WALRUS_AGGREGATOR_URL;
 const txUrl = (d: string) => `https://suiscan.xyz/${NETWORK}/tx/${d}`;
 const short = (a: string) => `${a.slice(0, 6)}…${a.slice(-4)}`;
 const MAX_REGENS = 2;
 
+interface HousePiece {
+  id: string;
+  label: string;
+  traits: TraitSelection;
+  prompt: string;
+  rarity: Rarity;
+  blobId: string;
+}
+const SAMPLES = (house as { artworks: HousePiece[] }).artworks;
+
 interface Preview {
-  base64: string;
-  mime: string;
+  /** data: URL (live gen) or /api/img/<blobId> (pre-baked sample). */
+  src: string;
+  /** present for live gen — used for the Walrus upload on mint. */
+  base64?: string;
   prompt: string;
   rarity: Rarity;
 }
@@ -80,6 +94,22 @@ export default function CreatePage() {
   const [digest, setDigest] = useState<string | null>(null);
   const [regens, setRegens] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [sampleIdx, setSampleIdx] = useState(0);
+
+  /** Load a pre-baked house piece (already on Walrus) so the OWN step is
+   *  reachable instantly — the safe demo path if live gen is slow/flaky. */
+  function loadSample() {
+    if (SAMPLES.length === 0) return;
+    const s = SAMPLES[sampleIdx % SAMPLES.length];
+    setSampleIdx((i) => i + 1);
+    setSelection(s.traits);
+    setPreview({ src: `/api/img/${s.blobId}`, prompt: s.prompt, rarity: s.rarity });
+    setBlob({ blobId: s.blobId, aggregatorUrl: `${AGG}/v1/blobs/${s.blobId}` });
+    setDigest(null);
+    setRegens(0);
+    setError(null);
+    setStatus("preview");
+  }
 
   function pick(catId: string, optId: string) {
     setSelection((s) => ({ ...s, [catId]: optId }));
@@ -102,13 +132,19 @@ export default function CreatePage() {
       });
       const j = await res.json();
       if (!res.ok) throw new Error(j.error ?? "generation failed");
-      setPreview({ base64: j.imageBase64, mime: j.mime, prompt: j.prompt, rarity: j.rarity });
+      setPreview({
+        src: `data:${j.mime};base64,${j.imageBase64}`,
+        base64: j.imageBase64,
+        prompt: j.prompt,
+        rarity: j.rarity,
+      });
       setBlob(null);
       setDigest(null);
       if (isRegen) setRegens((n) => n + 1);
       setStatus("preview");
     } catch (e) {
-      setError(e instanceof Error ? e.message : "generation failed");
+      const msg = e instanceof Error ? e.message : "unknown error";
+      setError(`Generation failed — ${msg}. Please try again.`);
       setStatus("idle");
     }
   }
@@ -117,29 +153,38 @@ export default function CreatePage() {
     if (!preview) return;
     setError(null);
     setStatus("storing");
+    let stored = false;
     try {
-      // Phase D — image goes to Walrus first (load-bearing)
-      const sres = await fetch("/api/store", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ imageBase64: preview.base64 }),
-      });
-      const sj = await sres.json();
-      if (!sres.ok) throw new Error(sj.error ?? "Walrus store failed");
-      setBlob({ blobId: sj.blobId, aggregatorUrl: sj.aggregatorUrl });
+      // Phase D — image goes to Walrus first (load-bearing). Reuse an existing
+      // blob if this image was already uploaded (e.g. retry after a mint error).
+      let current = blob;
+      if (!current) {
+        if (!preview.base64) throw new Error("no image data to upload");
+        const sres = await fetch("/api/store", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ imageBase64: preview.base64 }),
+        });
+        const sj = await sres.json();
+        if (!sres.ok) throw new Error(sj.error ?? "upload rejected");
+        current = { blobId: sj.blobId, aggregatorUrl: sj.aggregatorUrl };
+        setBlob(current);
+      }
+      stored = true;
 
       // Phase E — gasless sponsored mint
       setStatus("minting");
       const { digest: d } = await mint({
-        blobId: sj.blobId,
+        blobId: current.blobId,
         prompt: preview.prompt,
         traits: traitsToString(selection),
       });
       setDigest(d);
       setStatus("done");
     } catch (e) {
+      const msg = e instanceof Error ? e.message : "unknown error";
       // Walrus may have succeeded even if mint is blocked — keep blob visible.
-      setError(e instanceof Error ? e.message : "mint failed");
+      setError(stored ? `Mint failed — ${msg}` : `Walrus upload failed — ${msg}. Try again.`);
       setStatus("preview");
     }
   }
@@ -209,6 +254,17 @@ export default function CreatePage() {
               </button>
             )}
           </div>
+
+          {SAMPLES.length > 0 && (
+            <button
+              onClick={loadSample}
+              disabled={busy}
+              className="text-xs underline disabled:opacity-40"
+              style={{ color: "var(--text-dim)" }}
+            >
+              or try a sample piece (instant) →
+            </button>
+          )}
         </div>
 
         {/* ── Preview / mint ── */}
@@ -220,7 +276,7 @@ export default function CreatePage() {
             {preview ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
-                src={`data:${preview.mime};base64,${preview.base64}`}
+                src={preview.src}
                 alt="generated collectible"
                 className="w-full h-full object-cover"
               />

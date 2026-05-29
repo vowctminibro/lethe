@@ -7,7 +7,10 @@ import { getOwnedArtworks, type OwnedArtwork } from "@/src/lib/sui";
 import { parseTraits, computeRarity, selectionLabels } from "@/src/lib/traits";
 
 const AGG = process.env.NEXT_PUBLIC_WALRUS_AGGREGATOR_URL;
-const blobUrl = (id: string) => `${AGG}/v1/blobs/${id}`;
+// Render through our proxy (sets a correct image MIME); keep the raw aggregator
+// url for an explicit "verify on Walrus" link.
+const blobUrl = (id: string) => `/api/img/${encodeURIComponent(id)}`;
+const aggregatorUrl = (id: string) => `${AGG}/v1/blobs/${id}`;
 
 function rarityLabel(traits: string): string {
   try {
@@ -23,6 +26,7 @@ export default function MePage() {
   const client = useSuiClient();
   const [items, setItems] = useState<OwnedArtwork[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [nonce, setNonce] = useState(0);
 
   useEffect(() => {
     if (!account) {
@@ -34,11 +38,11 @@ export default function MePage() {
     setError(null);
     getOwnedArtworks(client, account.address)
       .then((list) => !cancelled && setItems(list))
-      .catch((e) => !cancelled && setError(e instanceof Error ? e.message : "failed to load"));
+      .catch((e) => !cancelled && setError(e instanceof Error ? e.message : "Couldn't load your collection."));
     return () => {
       cancelled = true;
     };
-  }, [account, client]);
+  }, [account, client, nonce]);
 
   return (
     <main className="min-h-screen max-w-5xl mx-auto px-6 py-8" style={{ color: "var(--text)" }}>
@@ -64,7 +68,10 @@ export default function MePage() {
         )}
 
         {error && (
-          <div className="text-sm p-3 rounded-md border" style={{ borderColor: "var(--accent-h)" }}>{error}</div>
+          <div className="text-sm p-4 rounded-md border flex items-center justify-between gap-4" style={{ borderColor: "var(--accent-h)" }}>
+            <span>{error}</span>
+            <button onClick={() => setNonce((n) => n + 1)} className="underline shrink-0">Retry</button>
+          </div>
         )}
 
         {account && items && items.length === 0 && (
@@ -84,7 +91,9 @@ export default function MePage() {
                 <div className="p-3 text-xs" style={{ color: "var(--text-dim)" }}>
                   <div className="font-semibold" style={{ color: "var(--text)" }}>{selectionLabels(parseTraits(a.traits)).join(" · ")}</div>
                   <div className="mt-1">{rarityLabel(a.traits)}</div>
-                  <div className="mt-1 break-all opacity-70">blob {a.blobId.slice(0, 10)}…</div>
+                  <a href={aggregatorUrl(a.blobId)} target="_blank" rel="noreferrer" className="mt-1 inline-block break-all opacity-70 underline">
+                    blob {a.blobId.slice(0, 10)}… ↗
+                  </a>
                 </div>
               </div>
             ))}
