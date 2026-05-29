@@ -22,9 +22,9 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Lethe — Stories that remember.",
+  title: "Lethe — Create. Own. Collect.",
   description:
-    "AI storytelling on Sui. Sign in with Google, write a sentence, watch your story grow. Chapters stored on Walrus; each story is a Sui NFT you own.",
+    "AI art collectibles on Sui. Pick traits, generate in one consistent style, and own each piece as a Sui NFT — images stored on Walrus, gasless mint via Google sign-in.",
   icons: {
     icon: "/favicon.svg",
   },

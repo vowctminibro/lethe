@@ -1,56 +1,54 @@
-# Lethe Hero Flow — 90 seconds
+# Lethe Hero Flow — ~80 seconds
 
-## 0:00–0:15  Landing
-User opens lethesdk.vercel.app
-Click "Sign in with Google" → Enoki zkLogin generates Sui address
-No wallet popup, no seed phrase
+Concept: **create → own** an AI art collectible. Curated traits → one locked
+style → MiniMax generates → stored on Walrus → minted as a Sui NFT, gasless.
+(Battle/leaderboard is a separate, later phase — teased only.)
 
-## 0:15–0:30  Pick your world
-5 templates: Fantasy / Sci-fi / Romance / Slice-of-life / Custom (later)
-Click Fantasy
+## 0:00–0:15  Sign in
+User opens the app and clicks **Sign in with Google**.
+Enoki zkLogin generates their Sui address — no wallet, no seed phrase, no popup.
 
-## 0:30–1:00  Chapter 1 auto-generates
-Opening paragraph + AI image
-Loads <30 sec
-User reads, types: "I look around the chamber"
+## 0:15–0:40  Pick traits + Generate
+No prompt box. User picks from a curated menu — Species / Color / Accessory /
+Background. The app assembles a LOCKED prompt (one fixed base style + the chosen
+fragments) and MiniMax returns a collectible in seconds, in the collection's
+consistent style. Up to 2 regenerates with the same traits if a result looks off.
+Rarity (derived from trait weights) is shown.
 
-## 1:00–1:30  Chapter 2 generates
-AI extends story + new image
-MemWal memory layer extracts characters/locations/decisions
-Walrus stores chapter blob (invisible to user)
-Sui Object NFT minted for story (sponsored gas via Enoki, invisible)
+## 0:40–1:00  Mint & own (gasless)
+User clicks **Mint & own**:
+1. The image bytes are uploaded to **Walrus** → `blobId` (the image lives on
+   Walrus, not in the app).
+2. A Sui mint tx (`lethe::artwork::mint`) embeds that `blobId` on-chain and is
+   sponsored via **Enoki** — the user pays no gas.
 
-## 1:30–1:45  Story timeline
-Visual tree: 2 chapters growing
-"Continue Chapter 3?" CTA
+## 1:00–1:20  View ownership
+The piece appears in **My collection** (`/me`), its image fetched live from the
+Walrus aggregator by `blobId`. A link opens the object/tx on Sui Explorer, where
+the embedded `blobId` is visible on-chain. Ownership is real and provable.
 
-## Architecture decisions (Day 2 locked)
-- zkLogin via Enoki ($69/mo, sponsored tx included)
-- Memory via MemWal + Vercel AI SDK middleware
-- Storage: Walrus blobs (no Seal encryption v1 — NFT ownership = access proof)
-- Generation: MiniMax (image-01 + text)
-- Identity/Ownership: Sui Object NFT
+## 1:20+  Loop (teaser only)
+"Your collectible is ready to battle." → battle/leaderboard ships next.
 
-## Features IN hero flow (ship bulletproof)
+---
+
+## Architecture (locked)
+- **Identity:** zkLogin via Enoki (Google sign-in, no wallet).
+- **Generation:** MiniMax `image-01`, ONE locked style, traits-only (no free text).
+- **Storage (load-bearing):** Walrus blob — `image_blob_id` embedded in the NFT.
+- **Ownership:** Sui Move NFT `lethe::artwork::Artwork`.
+- **Gasless:** Enoki sponsored transactions (mint target on the sponsorship allowlist).
+
+## IN the hero flow (ship bulletproof)
 1. Enoki Google sign-in
-2. Template selection (5 worlds)
-3. AI text generation (MiniMax + MemWal context)
-4. AI image generation (MiniMax)
-5. Walrus blob upload + retrieve
-6. Sui Object NFT mint (Enoki sponsored)
-7. Story timeline UI
-8. Resume after close + reopen
+2. Curated trait menu (no prompt box) + locked-prompt generation
+3. MiniMax image generation (+ up to 2 regens)
+4. Walrus upload + retrieve (render from aggregator)
+5. Sui NFT mint, gasless via Enoki
+6. My collection view + Sui Explorer link
 
-## Features NOT in hero flow (skip)
-- Voice narration (Day 18+)
-- Seal encryption (v2 roadmap)
-- Self-hosted MemWal relayer (v2 roadmap)
-- Multi-user collab (cut)
-- Mobile native (web only)
-- Marketplace (cut)
-- Edit previous chapters (cut v1)
-
-## Decision rule
-Visible in 90 sec + bulletproof? → ship
-Visible but risky? → don't ship
-Not visible? → don't ship
+## NOT in this phase
+- Battle / leaderboard (next prompt)
+- Marketplace / trading
+- Seal encryption (public collectibles)
+- Storytelling / chapters / memory (removed in the pivot)
