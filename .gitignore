@@ -45,3 +45,6 @@ research/legacy/demo-game/MemoryCaptures/
 *.mdb
 *.opendb
 *.VC.db
+
+# local junk parking (CDP/GCP automation scratch, OAuth screenshots — not for history)
+/trash/
