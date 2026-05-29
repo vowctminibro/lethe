@@ -1,30 +1,59 @@
 /**
- * Enoki — zkLogin + sponsored transactions wrapper
- * Decision (Day 2): paid Enoki over raw zkLogin for hackathon velocity
+ * Enoki — zkLogin (Google) integration for Sui.
+ *
+ * v1.0.8 API note: the old `EnokiFlow` class and `@mysten/enoki/react`
+ * provider are DEPRECATED. The supported path is `registerEnokiWallets`,
+ * which plugs Enoki zkLogin in as a wallet for @mysten/dapp-kit. Once
+ * registered, the signed-in zkLogin identity is just the current wallet
+ * account — read its Sui address via dapp-kit's `useCurrentAccount`.
+ *
+ * Day 3 scope: provider wiring + an address getter only. The Google
+ * sign-in button / OAuth callback UI comes later.
  * Docs: https://docs.enoki.mystenlabs.com
  */
 
-import { EnokiFlow } from '@mysten/enoki'
+import { registerEnokiWallets } from "@mysten/enoki";
+import { useCurrentAccount } from "@mysten/dapp-kit";
+import type { SuiJsonRpcClient } from "@mysten/sui/jsonRpc";
 
-const ENOKI_API_KEY = process.env.NEXT_PUBLIC_ENOKI_API_KEY
-const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
+export type EnokiNetwork = "mainnet" | "testnet" | "devnet";
 
-export function getEnokiFlow() {
-  if (!ENOKI_API_KEY) throw new Error('Missing NEXT_PUBLIC_ENOKI_API_KEY')
-  // TODO Day 3: instantiate EnokiFlow with Google OAuth + Sui testnet
-  // Reference: research/audit-v2.md TASK 3
-  throw new Error('TODO: implement Enoki flow per audit-v2.md')
+export const ENOKI_API_KEY = process.env.NEXT_PUBLIC_ENOKI_API_KEY ?? "";
+export const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? "";
+export const SUI_NETWORK = (process.env.NEXT_PUBLIC_SUI_NETWORK ?? "testnet") as EnokiNetwork;
+
+/** True only when the Enoki API key + Google client id are both present. */
+export function isEnokiConfigured(): boolean {
+  return ENOKI_API_KEY.length > 0 && GOOGLE_CLIENT_ID.length > 0;
 }
 
-export async function signInWithGoogle(): Promise<{ address: string }> {
-  // TODO Day 3: trigger Google OAuth -> Enoki -> Sui address
-  throw new Error('TODO: implement signInWithGoogle')
+/**
+ * Register the Enoki zkLogin wallet(s) against the app's Sui client.
+ * Call once after the dapp-kit providers mount; returns an `unregister`
+ * cleanup. No-op (returns a noop cleanup) if Enoki isn't configured yet,
+ * so the app still renders without the API key set.
+ */
+export function registerLetheEnokiWallets(client: SuiJsonRpcClient): () => void {
+  if (!isEnokiConfigured()) {
+    return () => {};
+  }
+  const { unregister } = registerEnokiWallets({
+    apiKey: ENOKI_API_KEY,
+    client,
+    network: SUI_NETWORK,
+    providers: {
+      google: { clientId: GOOGLE_CLIENT_ID },
+    },
+  });
+  return unregister;
 }
 
-export async function sponsoredMintStoryNFT(
-  ownerAddress: string,
-  storyMetadata: { title: string; chapterBlobIds: string[] }
-): Promise<{ digest: string; objectId: string }> {
-  // TODO Day 3: sponsored tx via Enoki for first-mint UX (gasless)
-  throw new Error('TODO: implement sponsoredMintStoryNFT')
+/**
+ * Getter: the current user's zkLogin Sui address, or null if not signed in.
+ * This is a React hook (the account lives in dapp-kit context) — call it from
+ * a client component. Returns null until a zkLogin session is connected.
+ */
+export function useZkLoginAddress(): string | null {
+  const account = useCurrentAccount();
+  return account?.address ?? null;
 }
