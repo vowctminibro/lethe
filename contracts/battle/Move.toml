@@ -1,0 +1,11 @@
+[package]
+name = "lethe_battle"
+edition = "2024"
+license = "MIT"
+authors = ["Lethe (Sui Overflow 2026)"]
+
+# Sui / MoveStdlib auto-resolved by the Sui CLI to match the publish env (testnet).
+[dependencies]
+
+[addresses]
+lethe_battle = "0x0"
