@@ -403,3 +403,60 @@ brand-assets/          Lethe brand SVGs
 | B15 | Enoki provider wiring in Next.js tree | Hermes |
 
 ---
+
+## 2026-05-30 — Pivot landed: create → own LIVE, Walrus load-bearing, gasless verified
+
+**Concept (locked):** consumer app **create → own → battle**, AI art collectible,
+Walrus track. NOT an SDK. Storytelling layer fully removed.
+
+### create → own — working end-to-end
+- Curated trait menu → ONE locked style (`src/lib/traits.ts`) → MiniMax `image-01`
+  (`/api/generate`) → image stored on **Walrus** (`/api/store`) → **Sui NFT** mint
+  embedding the Walrus blobId on-chain.
+- **Walrus proven load-bearing:** independent aggregator fetch returned byte-identical
+  image (187,678 B). `/me` renders via `/api/img/<blobId>` proxy (sets correct MIME;
+  aggregator serves no Content-Type).
+- **Gasless mint VERIFIED end-to-end** on testnet: Enoki keys in place, `/api/sponsor`
+  returns a sponsored tx, full sponsor→sign→execute ran with gas paid by the Enoki
+  sponsor (`0x0dec…`), not the sender. Browser zkLogin Google redirect is the only step
+  still needing a real browser.
+
+### IDs / artifacts
+| Thing | Value |
+|---|---|
+| Artwork package | `0xea40338dececbdaacf834cbbdd54187cc73ff874944f81e9e815f253b813e1f1` |
+| Mint target (allowlisted) | `…::artwork::mint` |
+| Example Artwork (gasless mint) | `0x9841963e8ad54696ef133ff047768e41d99d65b6556da170d12f048b23db835d` |
+| Example Walrus blob | `WKfWG2P-ZnCbUD-dOw5yzH-0L0BTCfMpYicYXuQ2qvc` |
+| Battle package | `0x34df9a5a764e7c15cbdbd3782a262066cba0002c40a18d4e00f5b48928e10172` |
+| Example Battle object | `0x058620f53212ee70a98fe7d0aa951b1979a036a31f227fe6b7589c3df360ebdb` |
+
+### Demo safe-path
+- 3 pre-baked "house" artworks on Walrus + manifest (`src/data/house-artworks.json`,
+  metadata only, no images). `/create` has "try a sample (instant)" so a judge reaches
+  the OWN step without a live 18–30s gen. blobIds: ember-fox `1ll0Lzltrgnk…`,
+  sage-owl `_Zh-Ga5Xnhqx…`, royal-dragon `Lh-2JNCdPoRx…`.
+
+### Battle — foundation only (no UI/leaderboard yet)
+- Model: **community head-to-head vote** (see `BATTLE_DESIGN.md`). Move module
+  `lethe_battle::battle` (shared `Battle`, `create_battle` + `vote`) published; CLI e2e
+  PASS (votes_a=2, votes_b=1). `/api/battle/{create,vote}` stubs build real txs.
+- **Next: add `…::battle::vote` to the Enoki allowlist** (see `HERMES_HANDOFF.md`).
+
+### Housekeeping note — stray on-chain test object
+- An early CLI mint created Artwork `0xfdf6833bf241b200e59b93d4b0b5fc6d8f1d31cac3890d03b73fdc69c6c524ce`
+  with a placeholder `image_blob_id = "smoke_blob_validation"` (not a real Walrus blob).
+  Owned by dev wallet `0x4bf2…077`; harmless, left on-chain. If that wallet demos `/me`,
+  that one tile won't render — use a freshly minted piece or a fresh zkLogin account.
+
+### Enoki status
+- Keys present in `apps/web/.env.local` (public + secret), gitignored, never committed.
+- Mint target allowlisted + verified. Battle vote target pending allowlist add.
+
+### What's next
+1. Battle UI + flow (pairing, vote button, live tally) on the published module.
+2. Leaderboard (rank by votes / rarity).
+3. Enoki allowlist: add `::battle::vote` (Hermes portal step).
+4. Full browser zkLogin Google sign-in pass (only thing not yet exercised live).
+
+---

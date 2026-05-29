@@ -4,6 +4,12 @@ Concept: **create → own** an AI art collectible. Curated traits → one locked
 style → MiniMax generates → stored on Walrus → minted as a Sui NFT, gasless.
 (Battle/leaderboard is a separate, later phase — teased only.)
 
+> Status (2026-05-30): create→own is live; gasless sponsored mint verified
+> end-to-end on testnet; images proven load-bearing on Walrus. `/create` also
+> offers an instant pre-baked "sample" piece so the OWN step is always reachable
+> in a demo even if live generation is slow. Only the browser zkLogin Google
+> redirect remains to be exercised in a real browser.
+
 ## 0:00–0:15  Sign in
 User opens the app and clicks **Sign in with Google**.
 Enoki zkLogin generates their Sui address — no wallet, no seed phrase, no popup.
