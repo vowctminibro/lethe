@@ -1,13 +1,15 @@
-/// Lethe — community head-to-head battles (foundation).
+/// Lethe — community head-to-head battles.
 ///
 /// A `Battle` is a SHARED object: two artworks face off and anyone can vote
-/// for a side; tallies live on-chain. Kept intentionally minimal for this
-/// phase — no dedup, no close/resolve, no leaderboard (see BATTLE_DESIGN.md).
+/// for a side; tallies live on-chain. One vote per address is enforced on
+/// chain via a `VecSet<address>` of voters (a repeat vote aborts).
 module lethe_battle::battle {
     use sui::event;
+    use sui::vec_set::{Self, VecSet};
 
     const EBattleClosed: u64 = 1;
     const EBadSide: u64 = 2;
+    const EAlreadyVoted: u64 = 3;
 
     const STATUS_OPEN: u8 = 0;
 
@@ -18,6 +20,8 @@ module lethe_battle::battle {
         artwork_b: address,
         votes_a: u64,
         votes_b: u64,
+        /// Addresses that have already voted — enforces one vote per address.
+        voters: VecSet<address>,
         status: u8,
         created_at_ms: u64,
     }
@@ -52,6 +56,7 @@ module lethe_battle::battle {
             artwork_b,
             votes_a: 0,
             votes_b: 0,
+            voters: vec_set::empty(),
             status: STATUS_OPEN,
             created_at_ms,
         };
@@ -59,10 +64,15 @@ module lethe_battle::battle {
         transfer::share_object(battle);
     }
 
-    /// Vote for a side: 0 = artwork_a, 1 = artwork_b.
+    /// Vote for a side: 0 = artwork_a, 1 = artwork_b. One vote per address.
     public entry fun vote(battle: &mut Battle, side: u8, ctx: &mut TxContext) {
         assert!(battle.status == STATUS_OPEN, EBattleClosed);
         assert!(side == 0 || side == 1, EBadSide);
+
+        let voter = ctx.sender();
+        assert!(!vec_set::contains(&battle.voters, &voter), EAlreadyVoted);
+        vec_set::insert(&mut battle.voters, voter);
+
         if (side == 0) {
             battle.votes_a = battle.votes_a + 1;
         } else {
@@ -73,11 +83,14 @@ module lethe_battle::battle {
             side,
             votes_a: battle.votes_a,
             votes_b: battle.votes_b,
-            voter: ctx.sender(),
+            voter,
         });
     }
 
     // ─── Read helpers ───────────────────────────────────────────────────
     public fun votes(battle: &Battle): (u64, u64) { (battle.votes_a, battle.votes_b) }
     public fun status(battle: &Battle): u8 { battle.status }
+    public fun has_voted(battle: &Battle, who: address): bool {
+        vec_set::contains(&battle.voters, &who)
+    }
 }
