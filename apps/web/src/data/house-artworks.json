@@ -1,59 +1,36 @@
 {
-  "note": "Pre-baked demo artworks \u2014 guaranteed-good pieces so the OWN step is reachable even if live gen is slow/flaky. Images live on Walrus (blobId); only metadata is committed.",
+  "note": "Pre-baked demo artworks + seeded battles. Images live on Walrus (blobId); each piece is also minted as an on-chain Artwork (objectId). House battles are real shared Battle objects on testnet so /battle and /leaderboard are never empty.",
   "artworks": [
     {
       "id": "ember-fox",
       "label": "Ember Fox",
-      "traits": {
-        "species": "fox",
-        "color": "coral",
-        "accessory": "scarf",
-        "background": "cream"
-      },
+      "objectId": "0x5473c84288ece2aeb10c6c31a1aeca9db5dfc881cf4fd23cd3699009cf84d634",
+      "traits": { "species": "fox", "color": "coral", "accessory": "scarf", "background": "cream" },
       "prompt": "3D vinyl-toy collectible creature, glossy finish, soft studio lighting, clean solid-color background, centered full-body, a cute round fox character, coral-pink color palette, wearing a cozy knitted scarf, solid warm-cream background",
-      "rarity": {
-        "probability": 0.005839961689851314,
-        "score": 171,
-        "percent": 0.58,
-        "tier": "Rare"
-      },
+      "rarity": { "probability": 0.005839961689851314, "score": 171, "percent": 0.58, "tier": "Rare" },
       "blobId": "1ll0LzltrgnkL2ltiWBBHtztjp-_21UoNDQktYUz0xo"
     },
     {
       "id": "sage-owl",
       "label": "Sage Owl",
-      "traits": {
-        "species": "owl",
-        "color": "lavender",
-        "accessory": "headphones",
-        "background": "blue"
-      },
+      "objectId": "0x0ac6681c91227ee260b5bed1e792dccffa09787488b0e375067ddfc1b1a8a217",
+      "traits": { "species": "owl", "color": "lavender", "accessory": "headphones", "background": "blue" },
       "prompt": "3D vinyl-toy collectible creature, glossy finish, soft studio lighting, clean solid-color background, centered full-body, a cute round owl character, lavender-purple color palette, wearing oversized headphones, solid sky-blue background",
-      "rarity": {
-        "probability": 0.0025028407242219915,
-        "score": 400,
-        "percent": 0.25,
-        "tier": "Rare"
-      },
+      "rarity": { "probability": 0.0025028407242219915, "score": 400, "percent": 0.25, "tier": "Rare" },
       "blobId": "_Zh-Ga5Xnhqxb-NLplZFMQj8ekjBDxkwJdzrcC-DLao"
     },
     {
       "id": "royal-dragon",
       "label": "Royal Dragon",
-      "traits": {
-        "species": "dragon",
-        "color": "gold",
-        "accessory": "wizard",
-        "background": "mintbg"
-      },
+      "objectId": "0xdbb091b39c936ef927f0f3fcb58f4a06a09d932db15f52ae99b3d0d5a9c17784",
+      "traits": { "species": "dragon", "color": "gold", "accessory": "wizard", "background": "mintbg" },
       "prompt": "3D vinyl-toy collectible creature, glossy finish, soft studio lighting, clean solid-color background, centered full-body, a cute round baby dragon character, warm golden-yellow color palette, wearing a pointed wizard hat, solid soft-mint background",
-      "rarity": {
-        "probability": 0.00016685604828146612,
-        "score": 5993,
-        "percent": 0.02,
-        "tier": "Legendary"
-      },
+      "rarity": { "probability": 0.00016685604828146612, "score": 5993, "percent": 0.02, "tier": "Legendary" },
       "blobId": "Lh-2JNCdPoRxzwZrK0i17UxJJubFA4nvKLXcBZcQql0"
     }
+  ],
+  "battles": [
+    { "id": "0x333c3e973d5da7a2f554fc50ebbdb8048227c5d881ee99cec6a5498cd7819a88", "label": "Ember Fox vs Sage Owl", "artworkA": "0x5473c84288ece2aeb10c6c31a1aeca9db5dfc881cf4fd23cd3699009cf84d634", "artworkB": "0x0ac6681c91227ee260b5bed1e792dccffa09787488b0e375067ddfc1b1a8a217" },
+    { "id": "0x209db50176fe7e6dde557ba0b4b9d6c4d4894cd29e23d879b1c2cc82f8724fc7", "label": "Royal Dragon vs Ember Fox", "artworkA": "0xdbb091b39c936ef927f0f3fcb58f4a06a09d932db15f52ae99b3d0d5a9c17784", "artworkB": "0x5473c84288ece2aeb10c6c31a1aeca9db5dfc881cf4fd23cd3699009cf84d634" }
   ]
 }

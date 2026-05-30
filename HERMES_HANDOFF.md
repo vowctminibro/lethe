@@ -11,18 +11,23 @@ Lethe = consumer app **create → own → battle** (art collectible, Walrus trac
   no allowlist/key error. Keys live in `apps/web/.env.local` (gitignored).
 
 ## 🔜 TODO — add the BATTLE VOTE target to the Enoki allowlist (next dispatch)
-For gasless community voting, add this move-call target on the SAME Enoki app
-(testnet, sandbox):
 
-    0x34df9a5a764e7c15cbdbd3782a262066cba0002c40a18d4e00f5b48928e10172::battle::vote
+⚠️ The battle package was REPUBLISHED with per-address vote dedup, so the package
+id changed. Allowlist ONLY the FINAL target below — the old `0x34df9a5a…` package
+is superseded; do NOT allowlist it.
 
-Optionally also allowlist (if you want gasless battle creation too):
+FINAL vote target (testnet, sandbox — same Enoki app as mint):
 
-    0x34df9a5a764e7c15cbdbd3782a262066cba0002c40a18d4e00f5b48928e10172::battle::create_battle
+    0xd44a778db90f4623e3b652098ab5c127e0741575c4193561f3cad97d3ac069c5::battle::vote
 
-Steps in the Enoki portal: Sponsored Transactions → add the target(s) above →
-Save. Same procedure as the mint target. Battle voting code wiring lands next
-session; this only needs the portal allowlist add.
+Optionally also allowlist (for gasless battle creation by users):
+
+    0xd44a778db90f4623e3b652098ab5c127e0741575c4193561f3cad97d3ac069c5::battle::create_battle
+
+Steps: Enoki portal → Sponsored Transactions → add the target(s) → Save. Then in
+`apps/web/.env.local` set `NEXT_PUBLIC_BATTLE_VOTE_ALLOWLISTED=true` and restart.
+Gasless voting then works with NO code change (same path as mint). The vote UI is
+already wired and gated on that flag.
 
 ## Notes
 - Account is in **sandbox** mode (testnet only). Upgrade plan for mainnet + higher limits.

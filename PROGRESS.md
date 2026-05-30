@@ -460,3 +460,49 @@ Walrus track. NOT an SDK. Storytelling layer fully removed.
 4. Full browser zkLogin Google sign-in pass (only thing not yet exercised live).
 
 ---
+
+## 2026-05-30 (cont.) — Battle UI + leaderboard + on-chain vote dedup
+
+### Move — per-address vote dedup (republished)
+- `battle::vote` now enforces one vote per address via `VecSet<address>` (abort
+  `EAlreadyVoted = 3`). Republished → **NEW battle package
+  `0xd44a778db90f4623e3b652098ab5c127e0741575c4193561f3cad97d3ac069c5`** (old
+  `0x34df9a5a…` superseded — do NOT allowlist it).
+- CLI dedup smoke: same address votes twice → 2nd aborts (code 3); two different
+  addresses → both count; tally 1/1. PASS.
+
+### Pages (built on published modules)
+- `/battle`: two artworks side-by-side via the `/api/img/<blobId>` proxy, live
+  on-chain tallies + bar, vote buttons, status, "start a battle" picker.
+- `/leaderboard`: ranks artworks by wins → votes → rarity, read live from chain
+  via `src/lib/indexer.ts` (queries BattleCreated events → battle objects →
+  Artwork objects; merges house battles; aggregates on request).
+- Shared `SiteHeader` nav (Create · Collection · Battle · Leaderboard) on every
+  page → the create→own→battle→leaderboard loop is navigable, no dead ends.
+
+### Seeded demo data (on testnet, never empty)
+- 3 house pieces minted as Artwork objects: ember `0x5473c842…`, sage
+  `0x0ac6681c…`, royal `0xdbb091b3…`.
+- 2 house battles: ember-vs-sage `0x333c3e97…` (2–0), royal-vs-ember
+  `0x209db501…` (2–0). Plus the dedup-smoke battle. Manifest:
+  `src/data/house-artworks.json` (objectIds + battle ids committed).
+
+### Gasless voting — WIRED, gated on one flag
+- `useBattleActions` (vote + createBattle) runs the SAME Enoki sponsor path as
+  mint; `/api/sponsor` now allows the vote + create_battle targets.
+- Gate: **`NEXT_PUBLIC_BATTLE_VOTE_ALLOWLISTED`** (default `false`). UI shows a
+  clean "gasless voting goes live shortly" instead of erroring.
+- Smoke: posting a real vote tx to `/api/sponsor` returns an Enoki 400 (target
+  not allowlisted) — proves the path is wired, failing ONLY at the gate.
+- **To flip ON (no code change):** (1) add
+  `0xd44a778db90f4623e3b652098ab5c127e0741575c4193561f3cad97d3ac069c5::battle::vote`
+  (and optionally `::battle::create_battle`) to the Enoki sponsorship allowlist
+  (see HERMES_HANDOFF.md); (2) set `NEXT_PUBLIC_BATTLE_VOTE_ALLOWLISTED=true` in
+  `apps/web/.env.local`; (3) restart. Voting (and battle creation) then run
+  gasless exactly like mint.
+
+### Still needs a real browser
+- zkLogin Google sign-in redirect (sign-in + per-user gasless vote/create). The
+  mechanism is proven; only the browser OAuth round-trip is unexercised.
+
+---

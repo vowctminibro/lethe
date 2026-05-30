@@ -1,14 +1,15 @@
-# Lethe Hero Flow — ~80 seconds
+# Lethe Hero Flow — ~90 seconds
 
-Concept: **create → own** an AI art collectible. Curated traits → one locked
-style → MiniMax generates → stored on Walrus → minted as a Sui NFT, gasless.
-(Battle/leaderboard is a separate, later phase — teased only.)
+Concept: **create → own → battle** an AI art collectible. Curated traits → one
+locked style → MiniMax generates → stored on Walrus → minted as a Sui NFT, gasless
+→ enter it into community battles → climb the leaderboard → loop.
 
-> Status (2026-05-30): create→own is live; gasless sponsored mint verified
-> end-to-end on testnet; images proven load-bearing on Walrus. `/create` also
-> offers an instant pre-baked "sample" piece so the OWN step is always reachable
-> in a demo even if live generation is slow. Only the browser zkLogin Google
-> redirect remains to be exercised in a real browser.
+> Status (2026-05-30): create→own LIVE (gasless mint verified end-to-end, images
+> load-bearing on Walrus). Battle + leaderboard built on published Move modules
+> with real seeded on-chain battles; per-address vote dedup enforced on chain.
+> Gasless voting is fully wired and one Enoki allow-list flip away
+> (`NEXT_PUBLIC_BATTLE_VOTE_ALLOWLISTED`); tallies shown are live on-chain. Only
+> the browser zkLogin Google redirect remains to be exercised in a real browser.
 
 ## 0:00–0:15  Sign in
 User opens the app and clicks **Sign in with Google**.
@@ -28,13 +29,26 @@ User clicks **Mint & own**:
 2. A Sui mint tx (`lethe::artwork::mint`) embeds that `blobId` on-chain and is
    sponsored via **Enoki** — the user pays no gas.
 
-## 1:00–1:20  View ownership
-The piece appears in **My collection** (`/me`), its image fetched live from the
-Walrus aggregator by `blobId`. A link opens the object/tx on Sui Explorer, where
-the embedded `blobId` is visible on-chain. Ownership is real and provable.
+## 1:00–1:15  View ownership
+The piece appears in **My collection** (`/me`), image fetched live from Walrus by
+`blobId`; a link opens it on Sui Explorer with the `blobId` visible on-chain.
 
-## 1:20+  Loop (teaser only)
-"Your collectible is ready to battle." → battle/leaderboard ships next.
+## 1:15–1:35  Battle
+On **/battle**, two collectibles go head-to-head with a live on-chain vote tally
+(one vote per address, enforced in the Move contract). The user votes for a side
+(gasless, sponsored via Enoki — same path as mint); the bar updates and reconciles
+with chain. They can also pit two of their own pieces into a new battle.
+
+## 1:35–1:50  Leaderboard → loop
+**/leaderboard** ranks collectibles by battle wins (then votes, then rarity) — the
+viral, multi-user surface. Seeing a piece climb pulls the user back to **create**
+another and enter it. create → own → battle → climb → create again.
+
+---
+
+## Loop is navigable
+Shared top-nav (Create · Collection · Battle · Leaderboard) on every page — a
+judge can walk the full create → own → battle → leaderboard loop with no dead ends.
 
 ---
 
