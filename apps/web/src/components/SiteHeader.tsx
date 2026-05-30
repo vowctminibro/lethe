@@ -8,6 +8,7 @@ import {
   useDisconnectWallet,
 } from "@mysten/dapp-kit";
 import { isGoogleWallet } from "@mysten/enoki";
+import { Logo } from "./Logo";
 
 const short = (a: string) => `${a.slice(0, 6)}…${a.slice(-4)}`;
 
@@ -72,9 +73,7 @@ export function SiteHeader({ active }: { active?: string }) {
   return (
     <header className="max-w-5xl mx-auto w-full px-6 py-5 flex items-center justify-between gap-4">
       <div className="flex items-center gap-5">
-        <Link href="/" className="font-display text-xl tracking-tight" style={{ fontFamily: "var(--font-display)" }}>
-          lethe
-        </Link>
+        <Logo />
         <nav className="hidden sm:flex items-center gap-4 text-sm">
           {NAV.map((n) => (
             <Link

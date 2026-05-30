@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Logo } from "@/src/components/Logo";
 
 export default function Home() {
   return (
@@ -6,9 +7,7 @@ export default function Home() {
       {/* ── Nav ── */}
       <nav className="max-w-5xl mx-auto w-full px-6 py-6 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <span className="font-display text-2xl tracking-tight" style={{ fontFamily: "var(--font-display)" }}>
-            lethe
-          </span>
+          <Logo />
           <span className="text-xs px-2 py-0.5 rounded border" style={{ borderColor: "var(--text-dim)", color: "var(--text-dim)" }}>
             Sui Overflow 2026
           </span>
