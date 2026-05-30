@@ -13,7 +13,7 @@ import { useCallback } from "react";
 import { useCurrentAccount, useSignTransaction, useSuiClient } from "@mysten/dapp-kit";
 import { Transaction } from "@mysten/sui/transactions";
 import { toBase64, fromBase64 } from "@mysten/sui/utils";
-import { buildVoteTx, buildCreateBattleTx } from "./battle";
+import { buildVoteTx, buildCreateBattleTx, buildResolveBattleTx } from "./battle";
 
 export const VOTE_ALLOWLISTED = process.env.NEXT_PUBLIC_BATTLE_VOTE_ALLOWLISTED === "true";
 
@@ -73,5 +73,10 @@ export function useBattleActions() {
     [run],
   );
 
-  return { vote, createBattle, address: account?.address ?? null, allowlisted: VOTE_ALLOWLISTED };
+  const resolve = useCallback(
+    (battleId: string) => run(buildResolveBattleTx({ battleId })),
+    [run],
+  );
+
+  return { vote, createBattle, resolve, address: account?.address ?? null, allowlisted: VOTE_ALLOWLISTED };
 }

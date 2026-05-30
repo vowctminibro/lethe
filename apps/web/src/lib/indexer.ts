@@ -41,11 +41,17 @@ export interface ArtworkView {
 
 export interface BattleView {
   battleId: string;
+  creator: string;
   a: ArtworkView;
   b: ArtworkView;
   votesA: number;
   votesB: number;
+  /** 0 = open, 1 = closed. */
   status: number;
+  /** When closed: 0 = A won, 1 = B won, 2 = tie. 255 while open. */
+  winnerSide: number;
+  /** Winning artwork object id; "" on tie/unresolved. */
+  winnerArtwork: string;
 }
 
 function ownerOf(obj: any): string {
@@ -115,13 +121,17 @@ export async function listBattleViews(): Promise<BattleView[]> {
     const f = o?.data?.content?.fields;
     if (!f) continue;
     const [a, b] = await Promise.all([getArtwork(f.artwork_a), getArtwork(f.artwork_b)]);
+    const winnerArtwork = String(f.winner_artwork ?? "");
     views.push({
       battleId: o.data.objectId,
+      creator: String(f.creator ?? ""),
       a,
       b,
       votesA: Number(f.votes_a ?? 0),
       votesB: Number(f.votes_b ?? 0),
       status: Number(f.status ?? 0),
+      winnerSide: Number(f.winner_side ?? 255),
+      winnerArtwork: /^0x0+$/.test(winnerArtwork) ? "" : winnerArtwork,
     });
   }
   return views;
@@ -135,31 +145,33 @@ export interface LeaderRow {
 }
 
 /**
- * Rank artworks across all battles. wins = battles whose side currently leads;
- * tiebreak by total votes received, then rarity score.
+ * Rank artworks by REAL wins: only CLOSED (resolved) battles count, and only the
+ * declared winner gets a win (ties award none, open battles are ignored). Total
+ * votes are tracked for display; ranking is wins → rarity score (rarity is the
+ * tiebreak). See PROGRESS.md for the aggregation approach.
  */
 export async function leaderboard(): Promise<LeaderRow[]> {
   const battles = await listBattleViews();
   const acc = new Map<string, { artwork: ArtworkView; wins: number; votes: number }>();
 
-  const bump = (art: ArtworkView, votes: number, won: boolean) => {
+  const ensure = (art: ArtworkView) => {
     const e = acc.get(art.objectId) ?? { artwork: art, wins: 0, votes: 0 };
-    e.votes += votes;
-    if (won) e.wins += 1;
     acc.set(art.objectId, e);
+    return e;
   };
 
   for (const bt of battles) {
-    bump(bt.a, bt.votesA, bt.votesA > bt.votesB);
-    bump(bt.b, bt.votesB, bt.votesB > bt.votesA);
+    // votes shown regardless of state
+    ensure(bt.a).votes += bt.votesA;
+    ensure(bt.b).votes += bt.votesB;
+    // wins ONLY from resolved battles with a decisive winner (side 0 or 1)
+    if (bt.status === 1 && (bt.winnerSide === 0 || bt.winnerSide === 1)) {
+      const winner = bt.winnerSide === 0 ? bt.a : bt.b;
+      ensure(winner).wins += 1;
+    }
   }
 
   return [...acc.values()]
-    .sort(
-      (x, y) =>
-        y.wins - x.wins ||
-        y.votes - x.votes ||
-        y.artwork.rarityScore - x.artwork.rarityScore,
-    )
+    .sort((x, y) => y.wins - x.wins || y.artwork.rarityScore - x.artwork.rarityScore)
     .map((e, i) => ({ rank: i + 1, artwork: e.artwork, wins: e.wins, votes: e.votes }));
 }

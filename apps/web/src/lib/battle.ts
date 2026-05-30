@@ -14,6 +14,9 @@ export const CREATE_BATTLE_TARGET = BATTLE_PACKAGE_ID
   ? `${BATTLE_PACKAGE_ID}::battle::create_battle`
   : "";
 export const VOTE_TARGET = BATTLE_PACKAGE_ID ? `${BATTLE_PACKAGE_ID}::battle::vote` : "";
+export const RESOLVE_BATTLE_TARGET = BATTLE_PACKAGE_ID
+  ? `${BATTLE_PACKAGE_ID}::battle::resolve_battle`
+  : "";
 
 /** Build a create_battle tx between two Artwork object ids. */
 export function buildCreateBattleTx(args: {
@@ -41,6 +44,17 @@ export function buildVoteTx(args: { battleId: string; side: 0 | 1 }): Transactio
   tx.moveCall({
     target: VOTE_TARGET,
     arguments: [tx.object(args.battleId), tx.pure.u8(args.side)],
+  });
+  return tx;
+}
+
+/** Build a resolve_battle tx (creator-only on chain) to close + declare winner. */
+export function buildResolveBattleTx(args: { battleId: string }): Transaction {
+  if (!BATTLE_PACKAGE_ID) throw new Error("Missing NEXT_PUBLIC_BATTLE_PACKAGE_ID");
+  const tx = new Transaction();
+  tx.moveCall({
+    target: RESOLVE_BATTLE_TARGET,
+    arguments: [tx.object(args.battleId)],
   });
   return tx;
 }
