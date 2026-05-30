@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { EnokiClient } from "@mysten/enoki";
 import { MINT_TARGET } from "@/src/lib/sui";
+import { VOTE_TARGET, CREATE_BATTLE_TARGET } from "@/src/lib/battle";
 
 export const runtime = "nodejs";
 
@@ -40,11 +41,12 @@ export async function POST(req: NextRequest) {
       if (!sender || !transactionKindBytes) {
         return NextResponse.json({ error: "missing sender/transactionKindBytes" }, { status: 400 });
       }
+      const allowed = [MINT_TARGET, VOTE_TARGET, CREATE_BATTLE_TARGET].filter(Boolean);
       const res = await enoki.createSponsoredTransaction({
         network: NETWORK,
         transactionKindBytes,
         sender,
-        allowedMoveCallTargets: MINT_TARGET ? [MINT_TARGET] : undefined,
+        allowedMoveCallTargets: allowed.length ? allowed : undefined,
       });
       return NextResponse.json({ bytes: res.bytes, digest: res.digest });
     }
