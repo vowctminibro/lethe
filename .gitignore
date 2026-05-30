@@ -48,3 +48,6 @@ research/legacy/demo-game/MemoryCaptures/
 
 # local junk parking (CDP/GCP automation scratch, OAuth screenshots — not for history)
 /trash/
+
+# throwaway scratch (Enoki allowlist targets — copy/paste only; canonical in HERMES_HANDOFF.md)
+ALLOWLIST_TARGETS.txt
