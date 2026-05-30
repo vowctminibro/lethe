@@ -17,11 +17,14 @@ interface ArtworkView {
 }
 interface BattleView {
   battleId: string;
+  creator: string;
   a: ArtworkView;
   b: ArtworkView;
   votesA: number;
   votesB: number;
-  status: number;
+  status: number; // 0 open, 1 closed
+  winnerSide: number; // 0=A,1=B,2=tie,255=open
+  winnerArtwork: string;
 }
 
 const img = (blobId: string) => `/api/img/${encodeURIComponent(blobId)}`;
@@ -30,7 +33,7 @@ const NETWORK = process.env.NEXT_PUBLIC_SUI_NETWORK ?? "testnet";
 export default function BattlePage() {
   const account = useCurrentAccount();
   const client = useSuiClient();
-  const { vote, createBattle, allowlisted } = useBattleActions();
+  const { vote, createBattle, resolve, allowlisted } = useBattleActions();
 
   const [battles, setBattles] = useState<BattleView[] | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -83,6 +86,28 @@ export default function BattlePage() {
     }
   }
 
+  async function onResolve(b: BattleView) {
+    setNotice(null);
+    if (!allowlisted) {
+      setNotice("⚡ Closing a battle goes gasless once the resolve target is allow-listed — same one flip as voting.");
+      return;
+    }
+    if (!account) {
+      setNotice("Sign in with Google to close your battle.");
+      return;
+    }
+    setBusy(b.battleId);
+    try {
+      await resolve(b.battleId);
+      await refresh();
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "close failed";
+      setNotice(/ENotCreator|code 4/i.test(msg) ? "Only the battle's creator can close it." : msg);
+    } finally {
+      setBusy(null);
+    }
+  }
+
   return (
     <main className="min-h-screen" style={{ color: "var(--text)" }}>
       <SiteHeader active="battle" />
@@ -112,29 +137,67 @@ export default function BattlePage() {
           {battles?.map((b) => {
             const total = b.votesA + b.votesB;
             const pctA = total ? Math.round((b.votesA / total) * 100) : 50;
+            const closed = b.status === 1;
+            const isCreator = !!account && account.address === b.creator;
+            const winSide = closed ? b.winnerSide : -1; // 0=A 1=B 2=tie
             return (
               <div key={b.battleId} className="rounded-xl border p-4" style={{ borderColor: "var(--border)", background: "var(--bg-panel)" }}>
-                <div className="grid grid-cols-2 gap-4">
-                  {[b.a, b.b].map((art, i) => (
-                    <div key={art.objectId} className="text-center">
-                      <div className="aspect-square rounded-lg overflow-hidden border" style={{ borderColor: "var(--border)" }}>
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={img(art.blobId)} alt={art.label} className="w-full h-full object-cover" />
-                      </div>
-                      <div className="mt-2 text-xs font-semibold truncate">{art.label}</div>
-                      <div className="text-xs" style={{ color: "var(--text-dim)" }}>{art.rarityTier} · {i === 0 ? b.votesA : b.votesB} votes</div>
-                      <button
-                        onClick={() => onVote(b, i === 0 ? 0 : 1)}
-                        disabled={busy === b.battleId}
-                        className="mt-2 w-full h-9 rounded-md text-sm font-semibold disabled:opacity-50"
-                        style={{ background: "var(--accent)", color: "var(--text)" }}
-                      >
-                        {busy === b.battleId ? "…" : allowlisted ? "Vote" : "Vote ⚡"}
-                      </button>
-                    </div>
-                  ))}
+                <div className="flex items-center justify-between mb-3">
+                  <span
+                    className="text-[11px] uppercase tracking-wide px-2 py-0.5 rounded"
+                    style={{
+                      background: closed ? "var(--text)" : "transparent",
+                      color: closed ? "var(--accent)" : "var(--text-dim)",
+                      border: closed ? "none" : "1px solid var(--border)",
+                    }}
+                  >
+                    {closed ? (winSide === 2 ? "Closed · Tie" : "Closed · Winner 🏆") : "Open"}
+                  </span>
+                  {!closed && isCreator && (
+                    <button
+                      onClick={() => onResolve(b)}
+                      disabled={busy === b.battleId}
+                      className="text-xs h-7 px-3 rounded-md font-semibold disabled:opacity-50"
+                      style={{ background: "var(--text)", color: "var(--accent)" }}
+                    >
+                      {busy === b.battleId ? "…" : allowlisted ? "Close & declare winner" : "Close & declare ⚡"}
+                    </button>
+                  )}
+                  {!closed && !isCreator && (
+                    <span className="text-[11px]" style={{ color: "var(--text-dim)" }}>creator closes to crown a winner</span>
+                  )}
                 </div>
-                {/* tally bar */}
+
+                <div className="grid grid-cols-2 gap-4">
+                  {[b.a, b.b].map((art, i) => {
+                    const isWinner = closed && winSide === i;
+                    const dimmed = closed && winSide !== 2 && !isWinner;
+                    return (
+                      <div key={art.objectId} className="text-center rounded-lg p-1" style={{ outline: isWinner ? "2px solid var(--accent)" : "none" }}>
+                        <div className="aspect-square rounded-lg overflow-hidden border relative" style={{ borderColor: isWinner ? "var(--accent)" : "var(--border)" }}>
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={img(art.blobId)} alt={art.label} className="w-full h-full object-cover" style={{ opacity: dimmed ? 0.5 : 1 }} />
+                          {isWinner && (
+                            <div className="absolute top-1 left-1 text-[11px] font-bold px-1.5 py-0.5 rounded" style={{ background: "var(--accent)", color: "var(--text)" }}>Winner 🏆</div>
+                          )}
+                        </div>
+                        <div className="mt-2 text-xs font-semibold truncate">{art.label}</div>
+                        <div className="text-xs" style={{ color: "var(--text-dim)" }}>{art.rarityTier} · {i === 0 ? b.votesA : b.votesB} votes</div>
+                        {!closed && (
+                          <button
+                            onClick={() => onVote(b, i === 0 ? 0 : 1)}
+                            disabled={busy === b.battleId}
+                            className="mt-2 w-full h-9 rounded-md text-sm font-semibold disabled:opacity-50"
+                            style={{ background: "var(--accent)", color: "var(--text)" }}
+                          >
+                            {busy === b.battleId ? "…" : allowlisted ? "Vote" : "Vote ⚡"}
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+
                 <div className="mt-4 h-2 rounded-full overflow-hidden flex" style={{ background: "var(--border)" }}>
                   <div style={{ width: `${pctA}%`, background: "var(--text)" }} />
                   <div style={{ width: `${100 - pctA}%`, background: "var(--accent-h)" }} />

@@ -23,7 +23,8 @@ export default async function LeaderboardPage() {
       <div className="max-w-3xl mx-auto px-6 pb-16">
         <h1 className="mt-4 text-3xl tracking-tight" style={{ fontFamily: "var(--font-display)" }}>Leaderboard</h1>
         <p className="mt-2 text-sm" style={{ color: "var(--text-dim)" }}>
-          Ranked by battle wins, then total votes, then rarity. Live from on-chain battles.
+          Ranked by wins from <strong>resolved</strong> battles (rarity breaks ties).
+          Open battles don&apos;t count until closed. Live from on-chain battles.
           {" "}
           <Link href="/battle" className="underline">Go vote →</Link>
         </p>
