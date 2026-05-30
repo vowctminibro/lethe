@@ -24,6 +24,8 @@ export function SignIn() {
   const { mutate: connect, isPending } = useConnectWallet();
   const { mutate: disconnect } = useDisconnectWallet();
   const google = wallets.find((w) => isGoogleWallet(w));
+  // Slush is auto-detected via wallet-standard (extension) — secondary option.
+  const slush = wallets.find((w) => /slush/i.test(w.name) && !isGoogleWallet(w));
 
   if (account) {
     return (
@@ -33,22 +35,36 @@ export function SignIn() {
       </div>
     );
   }
-  if (!google) {
-    return (
-      <span className="text-xs" style={{ color: "var(--text-dim)" }} title="Set NEXT_PUBLIC_ENOKI_API_KEY">
-        sign-in offline
-      </span>
-    );
-  }
+
   return (
-    <button
-      onClick={() => connect({ wallet: google })}
-      disabled={isPending}
-      className="h-9 px-4 rounded-md text-sm font-semibold disabled:opacity-50"
-      style={{ background: "var(--text)", color: "var(--accent)" }}
-    >
-      {isPending ? "Connecting…" : "Sign in with Google"}
-    </button>
+    <div className="flex items-center gap-3">
+      {google ? (
+        // Primary, hero path: Google zkLogin (no wallet, no gas).
+        <button
+          onClick={() => connect({ wallet: google })}
+          disabled={isPending}
+          className="h-9 px-4 rounded-md text-sm font-semibold disabled:opacity-50"
+          style={{ background: "var(--text)", color: "var(--accent)" }}
+        >
+          {isPending ? "Connecting…" : "Sign in with Google"}
+        </button>
+      ) : (
+        <span className="text-xs" style={{ color: "var(--text-dim)" }} title="Set NEXT_PUBLIC_ENOKI_API_KEY">
+          sign-in offline
+        </span>
+      )}
+      {slush && (
+        // Secondary, subordinate: connect an existing Slush wallet.
+        <button
+          onClick={() => connect({ wallet: slush })}
+          disabled={isPending}
+          className="text-xs underline hover:opacity-70 disabled:opacity-50"
+          style={{ color: "var(--text-dim)" }}
+        >
+          Connect Slush
+        </button>
+      )}
+    </div>
   );
 }
 
