@@ -47,3 +47,44 @@ html, body {
 }
 
 ::selection { background: #E8B894; color: #0A1628; }
+
+/* ── Craft motion (restrained) ── */
+@keyframes lethe-shimmer {
+  0%   { background-position: -180% 0; }
+  100% { background-position: 180% 0; }
+}
+.lethe-shimmer {
+  background-image: linear-gradient(
+    110deg,
+    color-mix(in srgb, var(--text) 4%, var(--bg-panel)) 30%,
+    color-mix(in srgb, var(--text) 9%, var(--bg-panel)) 50%,
+    color-mix(in srgb, var(--text) 4%, var(--bg-panel)) 70%
+  );
+  background-size: 200% 100%;
+  animation: lethe-shimmer 1.9s ease-in-out infinite;
+}
+
+@keyframes lethe-fade-in {
+  from { opacity: 0; transform: scale(0.985); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.lethe-fade-in { animation: lethe-fade-in 0.5s ease-out both; }
+
+@keyframes lethe-reveal {
+  from { opacity: 0; transform: translateY(5px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.lethe-reveal { animation: lethe-reveal 0.55s ease-out 0.2s both; }
+
+@keyframes lethe-overlay-in { from { opacity: 0; } to { opacity: 1; } }
+.lethe-overlay-in { animation: lethe-overlay-in 0.25s ease-out both; }
+
+@keyframes lethe-card-in {
+  from { opacity: 0; transform: translateY(10px) scale(0.99); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.lethe-card-in { animation: lethe-card-in 0.4s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .lethe-shimmer, .lethe-fade-in, .lethe-reveal, .lethe-overlay-in, .lethe-card-in { animation: none; }
+}

@@ -8,6 +8,8 @@ import {
   TRAIT_CATEGORIES,
   defaultSelection,
   traitsToString,
+  selectionLabels,
+  computeRarity,
   type Rarity,
   type TraitSelection,
 } from "@/src/lib/traits";
@@ -17,7 +19,39 @@ import house from "@/src/data/house-artworks.json";
 const NETWORK = process.env.NEXT_PUBLIC_SUI_NETWORK ?? "testnet";
 const AGG = process.env.NEXT_PUBLIC_WALRUS_AGGREGATOR_URL;
 const txUrl = (d: string) => `https://suiscan.xyz/${NETWORK}/tx/${d}`;
+const objUrl = (id: string) => `https://suiscan.xyz/${NETWORK}/object/${id}`;
 const MAX_REGENS = 2;
+
+/** One proof receipt row: label, monospace value, optional sub + external link. */
+function Receipt({
+  label,
+  value,
+  sub,
+  href,
+  cta,
+  note,
+}: {
+  label: string;
+  value: string;
+  sub?: string;
+  href: string;
+  cta: string;
+  note?: string;
+}) {
+  return (
+    <div className="rounded-lg border p-3" style={{ borderColor: "var(--border)" }}>
+      <div className="flex items-center justify-between">
+        <span className="text-xs uppercase tracking-wide" style={{ color: "var(--text-dim)" }}>{label}</span>
+        <a href={href} target="_blank" rel="noreferrer" className="text-xs underline shrink-0">{cta}</a>
+      </div>
+      <div className="mt-0.5 font-mono text-sm break-all">
+        {value}
+        {sub ? <span style={{ color: "var(--text-dim)" }}> · {sub}</span> : null}
+      </div>
+      {note ? <div className="text-xs mt-0.5" style={{ color: "var(--text-dim)" }}>{note}</div> : null}
+    </div>
+  );
+}
 
 interface HousePiece {
   id: string;
@@ -40,7 +74,13 @@ interface Preview {
 interface Blob {
   blobId: string;
   aggregatorUrl: string;
+  size?: number;
 }
+
+const short = (s: string, head = 10, tail = 6) =>
+  s && s.length > head + tail ? `${s.slice(0, head)}…${s.slice(-tail)}` : s;
+const fmtBytes = (n?: number) =>
+  typeof n === "number" ? (n < 1024 ? `${n} B` : `${(n / 1024).toFixed(0)} KB`) : "";
 type Status = "idle" | "generating" | "preview" | "storing" | "minting" | "done";
 
 export default function CreatePage() {
@@ -52,9 +92,12 @@ export default function CreatePage() {
   const [preview, setPreview] = useState<Preview | null>(null);
   const [blob, setBlob] = useState<Blob | null>(null);
   const [digest, setDigest] = useState<string | null>(null);
+  const [objectId, setObjectId] = useState<string | null>(null);
+  const [gasOwner, setGasOwner] = useState<string | null>(null);
   const [regens, setRegens] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [sampleIdx, setSampleIdx] = useState(0);
+  const [proofDismissed, setProofDismissed] = useState(false);
 
   /** Load a pre-baked house piece (already on Walrus) so the OWN step is
    *  reachable instantly — the safe demo path if live gen is slow/flaky. */
@@ -66,6 +109,8 @@ export default function CreatePage() {
     setPreview({ src: `/api/img/${s.blobId}`, prompt: s.prompt, rarity: s.rarity });
     setBlob({ blobId: s.blobId, aggregatorUrl: `${AGG}/v1/blobs/${s.blobId}` });
     setDigest(null);
+    setObjectId(null);
+    setGasOwner(null);
     setRegens(0);
     setError(null);
     setStatus("preview");
@@ -77,6 +122,8 @@ export default function CreatePage() {
     setPreview(null);
     setBlob(null);
     setDigest(null);
+    setObjectId(null);
+    setGasOwner(null);
     setRegens(0);
     setStatus("idle");
   }
@@ -112,6 +159,7 @@ export default function CreatePage() {
   async function mintIt() {
     if (!preview) return;
     setError(null);
+    setProofDismissed(false);
     setStatus("storing");
     let stored = false;
     try {
@@ -127,19 +175,21 @@ export default function CreatePage() {
         });
         const sj = await sres.json();
         if (!sres.ok) throw new Error(sj.error ?? "upload rejected");
-        current = { blobId: sj.blobId, aggregatorUrl: sj.aggregatorUrl };
+        current = { blobId: sj.blobId, aggregatorUrl: sj.aggregatorUrl, size: sj.size };
         setBlob(current);
       }
       stored = true;
 
       // Phase E — gasless sponsored mint
       setStatus("minting");
-      const { digest: d } = await mint({
+      const { digest: d, objectId: oid, gasOwner: go } = await mint({
         blobId: current.blobId,
         prompt: preview.prompt,
         traits: traitsToString(selection),
       });
       setDigest(d);
+      setObjectId(oid);
+      setGasOwner(go);
       setStatus("done");
     } catch (e) {
       const msg = e instanceof Error ? e.message : "unknown error";
@@ -150,6 +200,18 @@ export default function CreatePage() {
   }
 
   const busy = status === "generating" || status === "storing" || status === "minting";
+
+  // Loading line: "Generating your [tier] [color] [species]…" from the picked traits.
+  const genLabels = selectionLabels(selection); // [species, color, accessory, background]
+  let genTier = "";
+  try {
+    genTier = computeRarity(selection).tier;
+  } catch {
+    /* incomplete selection — leave tier blank */
+  }
+  const loadingLine = `Generating your ${genTier} ${genLabels[1]} ${genLabels[0]}…`
+    .replace(/\s+/g, " ")
+    .trim();
 
   return (
     <main className="min-h-screen" style={{ color: "var(--text)" }}>
@@ -227,28 +289,38 @@ export default function CreatePage() {
         {/* ── Preview / mint ── */}
         <div>
           <div
-            className="aspect-square w-full rounded-xl border grid place-items-center overflow-hidden"
+            className="aspect-square w-full rounded-xl border grid place-items-center overflow-hidden relative"
             style={{ borderColor: "var(--border)", background: "var(--bg-panel)" }}
           >
-            {preview ? (
+            {status === "generating" ? (
+              <div className="absolute inset-0 lethe-shimmer grid place-items-center">
+                <div className="text-center px-8">
+                  <div className="text-base" style={{ fontFamily: "var(--font-display)" }}>{loadingLine}</div>
+                  <div className="mt-2 text-[11px] tracking-wide" style={{ color: "var(--text-dim)" }}>
+                    one locked style · rendering on MiniMax
+                  </div>
+                </div>
+              </div>
+            ) : preview ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
+                key={preview.src}
                 src={preview.src}
                 alt="generated collectible"
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover lethe-fade-in"
               />
             ) : (
-              <span className="text-sm" style={{ color: "var(--text-dim)" }}>
-                {status === "generating" ? "Generating…" : "Your collectible appears here"}
-              </span>
+              <span className="text-sm" style={{ color: "var(--text-dim)" }}>Your collectible appears here</span>
             )}
           </div>
 
-          {preview && (
+          {preview && status !== "generating" && (
             <div className="mt-4 space-y-3">
-              <div className="flex items-center justify-between text-sm">
+              <div className="lethe-reveal flex items-center justify-between text-sm">
                 <span style={{ color: "var(--text-dim)" }}>Rarity</span>
-                <span className="font-semibold">{preview.rarity.tier} · 1 in {preview.rarity.score} ({preview.rarity.percent}%)</span>
+                <span className="font-semibold px-2 py-0.5 rounded" style={{ border: "1px solid var(--accent)" }}>
+                  {preview.rarity.tier} · 1 in {preview.rarity.score} ({preview.rarity.percent}%)
+                </span>
               </div>
 
               {!digest && (
@@ -258,23 +330,19 @@ export default function CreatePage() {
                   className="w-full h-11 rounded-md font-semibold disabled:opacity-50"
                   style={{ background: "var(--text)", color: "var(--accent)" }}
                 >
-                  {status === "storing" ? "Saving to Walrus…" : status === "minting" ? "Minting…" : account ? "Mint & own" : "Sign in to mint"}
+                  {status === "storing"
+                    ? "Saving to Walrus…"
+                    : status === "minting"
+                      ? "Minting (gasless)…"
+                      : account
+                        ? "Mint & own"
+                        : "Sign in to mint"}
                 </button>
               )}
 
-              {blob && (
-                <div className="text-xs p-3 rounded-md border" style={{ borderColor: "var(--border)", color: "var(--text-dim)" }}>
-                  <div className="font-semibold" style={{ color: "var(--text)" }}>Stored on Walrus ✓</div>
-                  <div className="mt-1 break-all">blobId: {blob.blobId}</div>
-                  <a href={blob.aggregatorUrl} target="_blank" rel="noreferrer" className="underline">open on aggregator ↗</a>
-                </div>
-              )}
-
-              {digest && (
-                <div className="text-xs p-3 rounded-md border" style={{ borderColor: "var(--border)", color: "var(--text-dim)" }}>
-                  <div className="font-semibold" style={{ color: "var(--text)" }}>Minted on Sui ✓ (gasless)</div>
-                  <a href={txUrl(digest)} target="_blank" rel="noreferrer" className="underline break-all">view transaction ↗</a>
-                  <div className="mt-1"><Link href="/me" className="underline">see it in your collection →</Link></div>
+              {blob && !digest && status !== "storing" && status !== "minting" && (
+                <div className="text-xs" style={{ color: "var(--text-dim)" }}>
+                  Stored on Walrus ✓ <span className="font-mono">{short(blob.blobId)}</span>
                 </div>
               )}
 
@@ -288,6 +356,80 @@ export default function CreatePage() {
         </div>
       </div>
       </div>
+
+      {/* ── Post-mint proof moment ── */}
+      {digest && !proofDismissed && (
+        <div
+          className="fixed inset-0 z-50 grid place-items-center p-4 lethe-overlay-in"
+          style={{ background: "rgba(10,22,40,0.55)" }}
+          onClick={() => setProofDismissed(true)}
+        >
+          <div
+            className="lethe-card-in w-full max-w-md rounded-2xl border p-6 max-h-[90vh] overflow-y-auto"
+            style={{ background: "var(--bg-panel)", borderColor: "var(--border)" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start justify-between">
+              <div>
+                <div className="text-xs uppercase tracking-wide" style={{ color: "var(--text-dim)" }}>Minted</div>
+                <h2 className="text-2xl mt-0.5" style={{ fontFamily: "var(--font-display)" }}>It&apos;s real, and it&apos;s yours.</h2>
+              </div>
+              <button onClick={() => setProofDismissed(true)} aria-label="Close" className="text-2xl leading-none px-1" style={{ color: "var(--text-dim)" }}>×</button>
+            </div>
+
+            <div className="mt-4 flex gap-4 items-center">
+              <div className="w-24 h-24 rounded-lg overflow-hidden border shrink-0" style={{ borderColor: "var(--border)" }}>
+                {blob && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={`/api/img/${encodeURIComponent(blob.blobId)}`} alt="your collectible" className="w-full h-full object-cover" />
+                )}
+              </div>
+              <div className="text-sm">
+                <div className="font-semibold">{selectionLabels(selection).join(" · ")}</div>
+                {preview && (
+                  <div style={{ color: "var(--text-dim)" }}>{preview.rarity.tier} · 1 in {preview.rarity.score}</div>
+                )}
+              </div>
+            </div>
+
+            <div className="mt-5 space-y-3">
+              {blob && (
+                <Receipt
+                  label="Stored on Walrus"
+                  value={short(blob.blobId)}
+                  sub={fmtBytes(blob.size)}
+                  href={blob.aggregatorUrl}
+                  cta="View on Walrus ↗"
+                  note="The image lives on decentralized storage — not our server."
+                />
+              )}
+              <Receipt
+                label="Owned on Sui"
+                value={objectId ? short(objectId) : short(digest)}
+                href={objectId ? objUrl(objectId) : txUrl(digest)}
+                cta={objectId ? "View on Sui Explorer ↗" : "View transaction ↗"}
+                note={account ? `Owner ${short(account.address, 6, 4)}` : undefined}
+              />
+              <div className="rounded-lg border p-3" style={{ borderColor: "var(--border)" }}>
+                <div className="text-xs uppercase tracking-wide" style={{ color: "var(--text-dim)" }}>Gasless</div>
+                <div className="mt-0.5 text-sm">Gas paid by sponsor · you paid <strong>0 SUI</strong></div>
+                {gasOwner && (
+                  <div className="text-xs font-mono mt-0.5" style={{ color: "var(--text-dim)" }}>sponsor {short(gasOwner, 6, 4)}</div>
+                )}
+              </div>
+            </div>
+
+            <div className="mt-6 flex flex-col sm:flex-row gap-3">
+              <Link href="/me" className="flex-1 h-11 rounded-md font-semibold grid place-items-center" style={{ background: "var(--text)", color: "var(--accent)" }}>
+                View in My Collection →
+              </Link>
+              <Link href="/battle" className="flex-1 h-11 rounded-md font-semibold grid place-items-center border" style={{ borderColor: "var(--border)", color: "var(--text)" }}>
+                Enter a battle →
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
