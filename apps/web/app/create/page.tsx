@@ -30,6 +30,8 @@ function Receipt({
   href,
   cta,
   note,
+  rawUrl,
+  rawLabel,
 }: {
   label: string;
   value: string;
@@ -37,6 +39,9 @@ function Receipt({
   href: string;
   cta: string;
   note?: string;
+  /** Canonical URL shown as copyable monospace text (e.g. the Walrus aggregator URL). */
+  rawUrl?: string;
+  rawLabel?: string;
 }) {
   return (
     <div className="rounded-lg border p-3" style={{ borderColor: "var(--border)" }}>
@@ -48,6 +53,12 @@ function Receipt({
         {value}
         {sub ? <span style={{ color: "var(--text-dim)" }}> · {sub}</span> : null}
       </div>
+      {rawUrl ? (
+        <div className="mt-1">
+          {rawLabel ? <span className="text-[10px] uppercase tracking-wide" style={{ color: "var(--text-dim)" }}>{rawLabel} </span> : null}
+          <span className="text-[11px] font-mono break-all select-all" style={{ color: "var(--text-dim)" }}>{rawUrl}</span>
+        </div>
+      ) : null}
       {note ? <div className="text-xs mt-0.5" style={{ color: "var(--text-dim)" }}>{note}</div> : null}
     </div>
   );
@@ -398,8 +409,10 @@ export default function CreatePage() {
                   label="Stored on Walrus"
                   value={short(blob.blobId)}
                   sub={fmtBytes(blob.size)}
-                  href={blob.aggregatorUrl}
+                  href={`/api/img/${encodeURIComponent(blob.blobId)}`}
                   cta="View on Walrus ↗"
+                  rawUrl={blob.aggregatorUrl}
+                  rawLabel="Walrus blob"
                   note="The image lives on decentralized storage — not our server."
                 />
               )}

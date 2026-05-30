@@ -89,8 +89,16 @@ export default function MePage() {
                 <div className="p-3 text-xs" style={{ color: "var(--text-dim)" }}>
                   <div className="font-semibold" style={{ color: "var(--text)" }}>{selectionLabels(parseTraits(a.traits)).join(" · ")}</div>
                   <div className="mt-1">{rarityLabel(a.traits)}</div>
-                  <a href={aggregatorUrl(a.blobId)} target="_blank" rel="noreferrer" className="mt-1 inline-block break-all opacity-70 underline">
-                    blob {a.blobId.slice(0, 10)}… ↗
+                  {/* Clickable opens the rendered image (proxy sets image/jpeg);
+                      the raw Walrus aggregator URL is exposed via title as proof. */}
+                  <a
+                    href={blobUrl(a.blobId)}
+                    target="_blank"
+                    rel="noreferrer"
+                    title={aggregatorUrl(a.blobId)}
+                    className="mt-1 inline-block break-all opacity-70 underline"
+                  >
+                    Walrus blob {a.blobId.slice(0, 10)}… ↗
                   </a>
                 </div>
               </div>
