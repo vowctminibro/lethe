@@ -10,24 +10,24 @@ Lethe = consumer app **create → own → battle** (art collectible, Walrus trac
   Enoki sponsor `0x0dec…`, not the sender). `/api/sponsor` returns a sponsored tx,
   no allowlist/key error. Keys live in `apps/web/.env.local` (gitignored).
 
-## 🔜 TODO — add the BATTLE VOTE target to the Enoki allowlist (next dispatch)
+## 🔜 TODO — allowlist the BATTLE targets (FINAL package, post-resolve)
 
-⚠️ The battle package was REPUBLISHED with per-address vote dedup, so the package
-id changed. Allowlist ONLY the FINAL target below — the old `0x34df9a5a…` package
-is superseded; do NOT allowlist it.
+⚠️ The battle package was REPUBLISHED again to add close/resolve. The package id
+changed. Allowlist ONLY the targets below. Superseded packages `0x34df9a5a…` and
+`0xd44a778d…` are DEAD — do NOT allowlist them.
 
-FINAL vote target (testnet, sandbox — same Enoki app as mint):
+FINAL targets (testnet, sandbox — same Enoki app as mint):
 
-    0xd44a778db90f4623e3b652098ab5c127e0741575c4193561f3cad97d3ac069c5::battle::vote
+    0x1e7048dcb7592991e7da775e6516d4755a3ca07f5d71b898ae173d95ddfdc983::battle::vote
+    0x1e7048dcb7592991e7da775e6516d4755a3ca07f5d71b898ae173d95ddfdc983::battle::resolve_battle
 
-Optionally also allowlist (for gasless battle creation by users):
-
-    0xd44a778db90f4623e3b652098ab5c127e0741575c4193561f3cad97d3ac069c5::battle::create_battle
+(`resolve_battle` recommended so closing a battle is gasless too. Optionally also
+`…::battle::create_battle` for gasless battle creation by users.)
 
 Steps: Enoki portal → Sponsored Transactions → add the target(s) → Save. Then in
 `apps/web/.env.local` set `NEXT_PUBLIC_BATTLE_VOTE_ALLOWLISTED=true` and restart.
-Gasless voting then works with NO code change (same path as mint). The vote UI is
-already wired and gated on that flag.
+Gasless voting AND gasless close/resolve then work with NO code change (same path
+as mint). Both the vote and close buttons are wired and gated on that flag.
 
 ## Notes
 - Account is in **sandbox** mode (testnet only). Upgrade plan for mainnet + higher limits.
@@ -126,7 +126,7 @@ that is Vow's manual step, tracked separately.
 
 **Status:** Cannot verify allowlist targets without completing Google sign-in. Vow will need to sign in manually at `portal.enoki.mystenlabs.com` → select Lethe project → Sponsored Transactions to confirm both targets:
 - ✅ `0xea40338dececbdaacf834cbbdd54187cc73ff874944f81e9e815f253b813e1f1::artwork::mint` (already verified working)
-- 🔜 `0xd44a778db90f4623e3b652098ab5c127e0741575c4193561f3cad97d3ac069c5::battle::vote` (pending Vow to add via portal)
+- 🔜 `0x1e7048dcb7592991e7da775e6516d4755a3ca07f5d71b898ae173d95ddfdc983::battle::vote (+ ::resolve_battle)` (pending Vow to add via portal)
 
 ---
 
@@ -143,7 +143,7 @@ that is Vow's manual step, tracked separately.
 2. Click "Sign in with Google"
 3. Complete Google OAuth flow (your browser, your credentials)
 4. Navigate to Lethe project → Sponsored Transactions
-5. Verify/add the battle vote allowlist target: `0xd44a778db90f4623e3b652098ab5c127e0741575c4193561f3cad97d3ac069c5::battle::vote`
+5. Verify/add the battle vote allowlist target: `0x1e7048dcb7592991e7da775e6516d4755a3ca07f5d71b898ae173d95ddfdc983::battle::vote (+ ::resolve_battle)`
 6. In `apps/web/.env.local`, set `NEXT_PUBLIC_BATTLE_VOTE_ALLOWLISTED=true` and restart the dev server
 
 **After manual sign-in, the full loop to test is:**

@@ -29,8 +29,11 @@
       "blobId": "Lh-2JNCdPoRxzwZrK0i17UxJJubFA4nvKLXcBZcQql0"
     }
   ],
+  "battlesNote": "Battle ids on the resolve-enabled package 0x1e7048…dc983. B1/B3 resolved (winners), B2 resolved tie, B4 open (for the close-button demo). The indexer also discovers battles via BattleCreated events; this list is the never-empty fallback.",
   "battles": [
-    { "id": "0x333c3e973d5da7a2f554fc50ebbdb8048227c5d881ee99cec6a5498cd7819a88", "label": "Ember Fox vs Sage Owl", "artworkA": "0x5473c84288ece2aeb10c6c31a1aeca9db5dfc881cf4fd23cd3699009cf84d634", "artworkB": "0x0ac6681c91227ee260b5bed1e792dccffa09787488b0e375067ddfc1b1a8a217" },
-    { "id": "0x209db50176fe7e6dde557ba0b4b9d6c4d4894cd29e23d879b1c2cc82f8724fc7", "label": "Royal Dragon vs Ember Fox", "artworkA": "0xdbb091b39c936ef927f0f3fcb58f4a06a09d932db15f52ae99b3d0d5a9c17784", "artworkB": "0x5473c84288ece2aeb10c6c31a1aeca9db5dfc881cf4fd23cd3699009cf84d634" }
+    { "id": "0xf78ae7b7b9b9474d91f3a47ce98122b8748af5b6655125c7ad5366f4e2c1749d", "label": "Ember Fox vs Sage Owl (resolved)", "artworkA": "0x5473c84288ece2aeb10c6c31a1aeca9db5dfc881cf4fd23cd3699009cf84d634", "artworkB": "0x0ac6681c91227ee260b5bed1e792dccffa09787488b0e375067ddfc1b1a8a217" },
+    { "id": "0x2b892ea327c76639d520a39b190d4035c99ab95ee45af55fbd6a61b07554cca3", "label": "Royal Dragon vs Ember Fox (tie)", "artworkA": "0xdbb091b39c936ef927f0f3fcb58f4a06a09d932db15f52ae99b3d0d5a9c17784", "artworkB": "0x5473c84288ece2aeb10c6c31a1aeca9db5dfc881cf4fd23cd3699009cf84d634" },
+    { "id": "0x30c6ba08ca8ebb585d3fe07f1e48c623bb356d6118736d6b1af1c5dff391fd5e", "label": "Royal Dragon vs Sage Owl (resolved)", "artworkA": "0xdbb091b39c936ef927f0f3fcb58f4a06a09d932db15f52ae99b3d0d5a9c17784", "artworkB": "0x0ac6681c91227ee260b5bed1e792dccffa09787488b0e375067ddfc1b1a8a217" },
+    { "id": "0x24d33711c0387e1231551cf006fc95b978b436a99c60124f4c80cf089b92bcec", "label": "Ember Fox vs Royal Dragon (open)", "artworkA": "0x5473c84288ece2aeb10c6c31a1aeca9db5dfc881cf4fd23cd3699009cf84d634", "artworkB": "0xdbb091b39c936ef927f0f3fcb58f4a06a09d932db15f52ae99b3d0d5a9c17784" }
   ]
 }

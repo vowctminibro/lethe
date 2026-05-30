@@ -544,3 +544,44 @@ The real app path — **browser Google zkLogin → /create UI → sponsored mint
 by the zkLogin account** — has NEVER run. Layer 1 is not a substitute for it.
 
 ---
+
+## 2026-05-30 (cont.) — Battle lifecycle: close/resolve + REAL wins
+
+### Move — close/resolve (republished)
+- `lethe_battle::battle` now has `creator`, `status` (0 open/1 closed), `winner_side`
+  (0=A,1=B,2=tie,255=open), `winner_artwork`. New entry fun **`resolve_battle`**
+  (creator-only, `ENotCreator=4`); ties close cleanly (winner_side=2, no artwork).
+  `vote` still aborts on a closed battle (`EBattleClosed=1`). dedup intact.
+- **NEW package id: `0x1e7048dcb7592991e7da775e6516d4755a3ca07f5d71b898ae173d95ddfdc983`**
+  (supersedes `0xd44a778d…` and `0x34df9a5a…` — both DEAD, do not allowlist).
+- CLI smoke (PASS): create→vote A,B,A→resolve → status=closed, winner=A
+  (`0xf78ae7b7…`); post-resolve vote aborts; a 1–1 tie battle resolves to tie
+  (`0x2b892ea3…`, winner_side=2).
+
+### Leaderboard — REAL wins (approach)
+- `src/lib/indexer.ts`: reads battles via `BattleCreated` events (+ manifest
+  fallback) → battle objects → artwork objects. **Wins now count ONLY resolved
+  battles (`status==1`) where a side actually won (`winner_side` 0 or 1)**; ties
+  and open battles award nothing. Ranking = wins desc, then rarity score (rarity
+  is the sole tiebreak). Total votes are still shown but no longer affect rank.
+  Aggregation is computed per request (cheap at demo scale); no separate cache.
+- Seeded non-empty: resolved house battles give **Royal Dragon 1 win (Legendary,
+  #1), Ember Fox 1 win (Rare, #2), Sage Owl 0 (#3)**. Verified via /leaderboard.
+
+### UI — close + winner
+- `/battle`: the battle **creator** sees "Close & declare winner" on an open
+  battle → `resolve_battle` via the same Enoki sponsor path (gated on
+  `NEXT_PUBLIC_BATTLE_VOTE_ALLOWLISTED`; graceful "goes gasless shortly" when off).
+  Closed cards show a Closed badge, the winning artwork outlined with "Winner 🏆"
+  (loser dimmed), or "Closed · Tie". Vote buttons hidden once closed.
+- `/leaderboard` shows the real-wins ranking; winners render via `/api/img`.
+
+### Allowlist regression note (expected)
+- Republishing changed the package, so the OLD vote target is stale and the NEW
+  `::battle::vote` + `::battle::resolve_battle` are NOT yet allowlisted →
+  `NEXT_PUBLIC_BATTLE_VOTE_ALLOWLISTED` set back to **false**. Vote/close degrade
+  gracefully meanwhile; seeded battles still show live tallies + winners.
+- To re-enable gasless vote AND close: allowlist both targets (HERMES_HANDOFF.md),
+  set the flag true, restart. Also set the flag in the Vercel env for deploys.
+
+---
