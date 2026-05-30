@@ -51,3 +51,4 @@ research/legacy/demo-game/MemoryCaptures/
 
 # throwaway scratch (Enoki allowlist targets — copy/paste only; canonical in HERMES_HANDOFF.md)
 ALLOWLIST_TARGETS.txt
+.vercel

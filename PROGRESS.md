@@ -585,3 +585,15 @@ by the zkLogin account** — has NEVER run. Layer 1 is not a substitute for it.
   set the flag true, restart. Also set the flag in the Vercel env for deploys.
 
 ---
+
+---
+
+## 2026-05-31 — Overnight autonomous session
+
+### Phase 0 — build PASS
+`pnpm install` + `pnpm --filter web build` → GREEN, all 14 routes compile. Code is deploy-ready; no code blocker.
+
+### Phase 1 — Vercel env + deploy
+- Env: lethesdk had 0/10 prod vars. Added all 10 from apps/web/.env.local. NOTE: this Vercel CLI (54.x) runs `--non-interactive` for agents, so piped stdin is ignored (stored empty twice); the working method is `vercel env add NAME production --value "<v>" --force --yes` (NEXT_PUBLIC as `--no-sensitive` so they're verifiable; secrets sensitive/write-only). Verified: 10/10 present, NEXT_PUBLIC values correct (SUI_NETWORK=testnet, artwork + battle ids match, VOTE_ALLOWLISTED=true). The 2 secrets read back empty via `env pull` — expected (sensitive).
+- Deploy: single `vercel --prod --yes` → still `Error: No Next.js version detected / check Root Directory`. Did NOT retry (rule c). 
+- **VERDICT B:** code builds + env correct; blocked ONLY by dashboard Root Directory ≠ apps/web on project `lethesdk`. Fix: Settings → Build & Deployment → Root Directory = `apps/web` → Redeploy. Nothing else blocks it.
