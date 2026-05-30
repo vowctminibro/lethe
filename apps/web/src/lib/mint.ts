@@ -25,6 +25,42 @@ export interface MintInput {
 
 export interface MintResult {
   digest: string;
+  /** Created Artwork object id (resolved from tx effects; may be null if the lookup lags). */
+  objectId: string | null;
+  /** The gas sponsor address that paid (proves gasless; null if the lookup lags). */
+  gasOwner: string | null;
+}
+
+const ARTWORK_TYPE_SUFFIX = "::artwork::Artwork";
+
+/** After execution, resolve the created Artwork id + gas sponsor from the tx. */
+async function resolveMintReceipts(
+  client: ReturnType<typeof useSuiClient>,
+  digest: string,
+): Promise<{ objectId: string | null; gasOwner: string | null }> {
+  // The fullnode may lag a beat behind the sponsor's execute; retry briefly.
+  for (let attempt = 0; attempt < 5; attempt++) {
+    try {
+      const tx = await client.getTransactionBlock({
+        digest,
+        options: { showObjectChanges: true, showInput: true },
+      });
+      let objectId: string | null = null;
+      for (const ch of tx.objectChanges ?? []) {
+        if (ch.type === "created" && String(ch.objectType ?? "").endsWith(ARTWORK_TYPE_SUFFIX)) {
+          objectId = ch.objectId;
+          break;
+        }
+      }
+      const gasOwnerRaw = tx.transaction?.data?.gasData?.owner ?? null;
+      const gasOwner = typeof gasOwnerRaw === "string" ? gasOwnerRaw : null;
+      if (objectId || gasOwner) return { objectId, gasOwner };
+    } catch {
+      /* not indexed yet — retry */
+    }
+    await new Promise((r) => setTimeout(r, 800));
+  }
+  return { objectId: null, gasOwner: null };
 }
 
 export function useMintArtwork() {
@@ -72,7 +108,8 @@ export function useMintArtwork() {
         throw new Error(err?.error ?? "Execution failed");
       }
       const { digest: finalDigest } = await execRes.json();
-      return { digest: finalDigest };
+      const { objectId, gasOwner } = await resolveMintReceipts(client, finalDigest);
+      return { digest: finalDigest, objectId, gasOwner };
     },
     [account, client, signTransaction],
   );

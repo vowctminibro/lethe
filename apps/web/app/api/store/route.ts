@@ -21,6 +21,7 @@ export async function POST(req: NextRequest) {
     const blobId = await store(bytes);
     return NextResponse.json({
       blobId,
+      size: bytes.byteLength,
       aggregatorUrl: `${AGGREGATOR_URL}/v1/blobs/${blobId}`,
     });
   } catch (e) {
