@@ -597,3 +597,10 @@ by the zkLogin account** — has NEVER run. Layer 1 is not a substitute for it.
 - Env: lethesdk had 0/10 prod vars. Added all 10 from apps/web/.env.local. NOTE: this Vercel CLI (54.x) runs `--non-interactive` for agents, so piped stdin is ignored (stored empty twice); the working method is `vercel env add NAME production --value "<v>" --force --yes` (NEXT_PUBLIC as `--no-sensitive` so they're verifiable; secrets sensitive/write-only). Verified: 10/10 present, NEXT_PUBLIC values correct (SUI_NETWORK=testnet, artwork + battle ids match, VOTE_ALLOWLISTED=true). The 2 secrets read back empty via `env pull` — expected (sensitive).
 - Deploy: single `vercel --prod --yes` → still `Error: No Next.js version detected / check Root Directory`. Did NOT retry (rule c). 
 - **VERDICT B:** code builds + env correct; blocked ONLY by dashboard Root Directory ≠ apps/web on project `lethesdk`. Fix: Settings → Build & Deployment → Root Directory = `apps/web` → Redeploy. Nothing else blocks it.
+
+### Phase 2-6 (overnight, cont.)
+- Wiring audit: full create→own→battle PRESENT, no placeholders, packages live on-chain, no secrets committed (research/wiring-audit.md).
+- feat/walrus-deepening (branch, NOT merged): provenance bundle (Walrus manifest + on-chain ;bundle: ref, round-trip proven) + live minted counter (ArtworkMinted events, currently 10). Reviewer/edge-case subagents: no blockers, hardening applied. docs/provenance-bundle-spec.md + docs/walrus-deepening-notes.md.
+- Phase 4 main: BRAND.md verbal → collectible; og.png 1200×630; removed stray repo-root brand PNGs.
+- Phase 5 deps (report only): stack at latest (Next 16.2.6, @mysten/sui 2.17, dapp-kit 1.0.6, enoki 1.0.8, walrus 1.1.7); only react patch + TS6/@types/node majors (dev) lag. Nothing changed.
+- Morning briefing: OVERNIGHT-BRIEFING.md. Deploy verdict B (Vow sets Root Directory=apps/web then redeploy).
