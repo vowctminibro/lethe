@@ -506,3 +506,41 @@ Walrus track. NOT an SDK. Storytelling layer fully removed.
   mechanism is proven; only the browser OAuth round-trip is unexercised.
 
 ---
+
+## 2026-05-30 (cont.) — Object ledger correction + Layer-1 pipeline proof
+
+A browser check caught a reporting conflation: an earlier report cited `0x9841…`
+as "the gasless-minted artwork" when it actually carries PLACEHOLDER data. Truth,
+verified via curl + RPC:
+
+**Object ledger (authoritative — do NOT conflate):**
+| Object | image_blob_id | What it is |
+|---|---|---|
+| `0x9841963e…835d` | `demoblob` / `demo prompt` | ⚠️ Gasless-SPONSORSHIP mechanism test (placeholder). NOT a real artwork. |
+| `0xfdf6833b…24ce` | `smoke_blob_validation` | ⚠️ Early CLI mint validation (placeholder). NOT a real artwork. |
+| `0xf266936a…d160` | `WKfWG2P-…` (real JPEG 187,678 B) | ✅ Real-pipeline object (CLI smoke), dragon/midnight/crown/blue. |
+| `0xd7d5541d…c7b6` | `KPWWxymZ…` (real JPEG 159,448 B) | ✅ Layer-1 real-pipeline proof, owl/gold/crown/cream. |
+
+**Findings:**
+- Blob `WKfWG2P-…` **IS a real JPEG** (curl: 187,678 B, `FF D8 FF`). The browser's
+  "config dump" was not reproducible; cause was the aggregator sending no
+  Content-Type — handled by the `/api/img/<blobId>` proxy. NOT a placeholder.
+- `demoblob`/`smoke_blob_validation` exist ONLY on those two past test objects and
+  in docs. **Shipping code has zero placeholders** — `mintIt` uploads the real image
+  via `/api/store` and mints the returned blobId (`create/page.tsx` → `mint.ts` →
+  `sui.ts buildMintArtworkTx` → `tx.pure.string(blobId)`).
+
+**Layer-1 proof (NEW, `0xd7d5541d…c7b6`):** ran the REAL pipeline functions
+(generate via `/api/generate` → upload via `/api/store` → mint via the app's
+`buildMintArtworkTx`/`sui.ts`), signed with the **dev key**. On-chain
+`image_blob_id == KPWWxymZ…` (the freshly-uploaded blob, NOT a placeholder), traits
+== owl/gold/crown/cream, prompt matches; `/api/img/<blob>` → 200 image/jpeg.
+
+⮕ This proves the gen→store→mint LOGIC is correct at the code level. It was signed
+with the dev key and **did NOT go through browser zkLogin**.
+
+### STILL NOT PROVEN (Vow's manual browser step)
+The real app path — **browser Google zkLogin → /create UI → sponsored mint signed
+by the zkLogin account** — has NEVER run. Layer 1 is not a substitute for it.
+
+---
