@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useCurrentAccount, useSuiClient } from "@mysten/dapp-kit";
 import { getOwnedArtworks, type OwnedArtwork } from "@/src/lib/sui";
 import { parseTraits, computeRarity, selectionLabels } from "@/src/lib/traits";
+import { SiteHeader } from "@/src/components/SiteHeader";
 
 const AGG = process.env.NEXT_PUBLIC_WALRUS_AGGREGATOR_URL;
 // Render through our proxy (sets a correct image MIME); keep the raw aggregator
@@ -45,13 +46,10 @@ export default function MePage() {
   }, [account, client, nonce]);
 
   return (
-    <main className="min-h-screen max-w-5xl mx-auto px-6 py-8" style={{ color: "var(--text)" }}>
-      <header className="flex items-center justify-between">
-        <Link href="/" className="font-display text-xl" style={{ fontFamily: "var(--font-display)" }}>lethe</Link>
-        <Link href="/create" className="text-sm underline" style={{ color: "var(--text-dim)" }}>+ create</Link>
-      </header>
-
-      <h1 className="mt-8 text-3xl tracking-tight" style={{ fontFamily: "var(--font-display)" }}>My collection</h1>
+    <main className="min-h-screen" style={{ color: "var(--text)" }}>
+      <SiteHeader active="me" />
+      <div className="max-w-5xl mx-auto px-6 pb-16">
+      <h1 className="mt-4 text-3xl tracking-tight" style={{ fontFamily: "var(--font-display)" }}>My collection</h1>
       <p className="mt-2 text-sm" style={{ color: "var(--text-dim)" }}>
         Owned Artwork NFTs, with images fetched live from Walrus.
       </p>
@@ -99,6 +97,7 @@ export default function MePage() {
             ))}
           </div>
         )}
+      </div>
       </div>
     </main>
   );

@@ -2,13 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import {
-  useCurrentAccount,
-  useConnectWallet,
-  useWallets,
-  useDisconnectWallet,
-} from "@mysten/dapp-kit";
-import { isGoogleWallet } from "@mysten/enoki";
+import { useCurrentAccount } from "@mysten/dapp-kit";
+import { SiteHeader } from "@/src/components/SiteHeader";
 import {
   TRAIT_CATEGORIES,
   defaultSelection,
@@ -22,7 +17,6 @@ import house from "@/src/data/house-artworks.json";
 const NETWORK = process.env.NEXT_PUBLIC_SUI_NETWORK ?? "testnet";
 const AGG = process.env.NEXT_PUBLIC_WALRUS_AGGREGATOR_URL;
 const txUrl = (d: string) => `https://suiscan.xyz/${NETWORK}/tx/${d}`;
-const short = (a: string) => `${a.slice(0, 6)}…${a.slice(-4)}`;
 const MAX_REGENS = 2;
 
 interface HousePiece {
@@ -48,40 +42,6 @@ interface Blob {
   aggregatorUrl: string;
 }
 type Status = "idle" | "generating" | "preview" | "storing" | "minting" | "done";
-
-function SignIn() {
-  const account = useCurrentAccount();
-  const wallets = useWallets();
-  const { mutate: connect, isPending } = useConnectWallet();
-  const { mutate: disconnect } = useDisconnectWallet();
-  const google = wallets.find((w) => isGoogleWallet(w));
-
-  if (account) {
-    return (
-      <div className="flex items-center gap-3 text-xs" style={{ color: "var(--text-dim)" }}>
-        <span>signed in · {short(account.address)}</span>
-        <button onClick={() => disconnect()} className="underline hover:opacity-70">sign out</button>
-      </div>
-    );
-  }
-  if (!google) {
-    return (
-      <span className="text-xs" style={{ color: "var(--text-dim)" }}>
-        Sign-in unavailable — set NEXT_PUBLIC_ENOKI_API_KEY to enable Google zkLogin.
-      </span>
-    );
-  }
-  return (
-    <button
-      onClick={() => connect({ wallet: google })}
-      disabled={isPending}
-      className="h-10 px-4 rounded-md text-sm font-semibold disabled:opacity-50"
-      style={{ background: "var(--text)", color: "var(--accent)" }}
-    >
-      {isPending ? "Connecting…" : "Sign in with Google"}
-    </button>
-  );
-}
 
 export default function CreatePage() {
   const account = useCurrentAccount();
@@ -192,13 +152,10 @@ export default function CreatePage() {
   const busy = status === "generating" || status === "storing" || status === "minting";
 
   return (
-    <main className="min-h-screen max-w-5xl mx-auto px-6 py-8" style={{ color: "var(--text)" }}>
-      <header className="flex items-center justify-between">
-        <Link href="/" className="font-display text-xl" style={{ fontFamily: "var(--font-display)" }}>lethe</Link>
-        <SignIn />
-      </header>
-
-      <h1 className="mt-8 text-3xl tracking-tight" style={{ fontFamily: "var(--font-display)" }}>
+    <main className="min-h-screen" style={{ color: "var(--text)" }}>
+      <SiteHeader active="create" />
+      <div className="max-w-5xl mx-auto px-6 pb-16">
+      <h1 className="mt-4 text-3xl tracking-tight" style={{ fontFamily: "var(--font-display)" }}>
         Create your collectible
       </h1>
       <p className="mt-2 text-sm" style={{ color: "var(--text-dim)" }}>
@@ -329,6 +286,7 @@ export default function CreatePage() {
             </div>
           )}
         </div>
+      </div>
       </div>
     </main>
   );
