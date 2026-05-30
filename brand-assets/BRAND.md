@@ -8,9 +8,9 @@
 ## Identity
 
 - **Name:** Lethe
-- **Tagline:** Stories that remember.
-- **One-liner:** AI storytelling on Sui. Sign in with Google, write a sentence, watch your story grow. Chapters persist on Walrus, ownership on Sui. Forever.
-- **Origin:** Λήθη — river of forgetfulness in Greek myth. The product is its inverse: stories that never forget.
+- **Tagline:** Art you make. Yours forever.
+- **One-liner:** Lethe is a consumer dApp for creating AI art collectibles on Sui — pick curated traits, mint a one-of-a-kind piece stored on Walrus, and battle others head-to-head. Sign in with Google: no wallet, no gas.
+- **Origin:** Λήθη — the river of forgetfulness in Greek myth. Lethe is its inverse: what you create is yours, on-chain, forever.
 
 ---
 
@@ -98,13 +98,13 @@ For code snippets only.
 - **Lethe** capitalized; "lethe" lowercase only in wordmark glyph
 
 ### On-brand examples
-- ✅ "Stories that remember."
-- ✅ "Your story remembers itself."
-- ✅ "Start your first chapter."
+- ✅ "Art you make. Yours forever."
+- ✅ "Create your collectible."
+- ✅ "Mint it. Own it. Battle it."
 - ✅ "Sign in with Google."
 
 ### Off-brand examples
-- ❌ "🔥 Mint your story NFT now!"
+- ❌ "🔥 Mint your NFT now!"
 - ❌ "Built on Sui Blockchain Powered by AI"
 - ❌ "gm storytellers wagmi 🚀"
 
