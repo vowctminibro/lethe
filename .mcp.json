@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "move-lsp": {
+      "command": "node",
+      "args": [
+        "/Users/mini/.hermes/plugins/sui-pilot/mcp/move-lsp-mcp/dist/index.js"
+      ]
+    },
+    "sui-prover": {
+      "command": "node",
+      "args": [
+        "/Users/mini/.hermes/plugins/sui-pilot/mcp/sui-prover-mcp/dist/index.js"
+      ]
+    }
+  }
+}
