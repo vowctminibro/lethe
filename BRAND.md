@@ -8,9 +8,9 @@
 ## Identity
 
 - **Name:** Lethe
-- **Tagline:** Art you make. Yours forever.
-- **One-liner:** Lethe is a consumer dApp for creating AI art collectibles on Sui — pick curated traits, mint a one-of-a-kind piece stored on Walrus, and battle others head-to-head. Sign in with Google: no wallet, no gas.
-- **Origin:** Λήθη — the river of forgetfulness in Greek myth. Lethe is its inverse: what you create is yours, on-chain, forever.
+- **Tagline:** Your AI remembers you. The memory is yours.
+- **One-liner:** Lethe is owned AI memory on Walrus — it learns your on-chain style and saves what it knows as encrypted Walrus blobs referenced by a Sui object you control: owned by you, verifiable, and portable across apps. Sign in with Google: no wallet, no gas.
+- **Origin:** Λήθη — the river of forgetfulness in Greek myth. Lethe is its inverse: what an AI learns about you is remembered, owned by you, on-chain.
 
 ---
 

@@ -21,9 +21,9 @@ const jetbrains = JetBrains_Mono({
   weight: ["400", "500"],
 });
 
-const TITLE = "Lethe — AI art collectibles on Sui";
+const TITLE = "Lethe — Owned AI memory on Walrus";
 const DESCRIPTION =
-  "Create your own AI art collectible on Sui. One Google login — no wallet, no gas. Stored on Walrus.";
+  "Your AI remembers you — and the memory is yours. Lethe saves what it learns on Walrus: owned by you, verifiable, and portable across apps. Sign in with Google — no wallet, no gas.";
 
 export const metadata: Metadata = {
   title: TITLE,
