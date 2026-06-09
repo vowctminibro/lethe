@@ -30,6 +30,9 @@ export default function MemoryPage() {
   const [hits, setHits] = useState<RecallHit[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [nonce, setNonce] = useState(0);
+  const [appAddr, setAppAddr] = useState("");
+  const [accessBusy, setAccessBusy] = useState<string | null>(null);
+  const [accessError, setAccessError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     if (!account || !memory) return;
@@ -49,6 +52,38 @@ export default function MemoryPage() {
   useEffect(() => {
     void load();
   }, [load]);
+
+  async function grant() {
+    const app = appAddr.trim();
+    if (!memory || !app) return;
+    setAccessError(null);
+    setAccessBusy("grant");
+    try {
+      await memory.grant(app);
+      setAppAddr("");
+      setNonce((n) => n + 1); // reload authorized list from chain
+    } catch (e) {
+      setAccessError(e instanceof Error ? e.message : "grant failed");
+    } finally {
+      setAccessBusy(null);
+    }
+  }
+
+  async function revoke(app: string) {
+    if (!memory) return;
+    setAccessError(null);
+    setAccessBusy(app);
+    try {
+      await memory.revoke(app);
+      setNonce((n) => n + 1);
+    } catch (e) {
+      setAccessError(e instanceof Error ? e.message : "revoke failed");
+    } finally {
+      setAccessBusy(null);
+    }
+  }
+
+  const validApp = /^0x[0-9a-fA-F]{1,64}$/.test(appAddr.trim());
 
   return (
     <main className="min-h-screen" style={{ background: "var(--bg)", color: "var(--text)" }}>
@@ -81,6 +116,67 @@ export default function MemoryPage() {
             <span className="mx-2">·</span>
             {chain.authorized.length} app{chain.authorized.length === 1 ? "" : "s"} authorized
           </div>
+        )}
+
+        {account && (
+          <section className="mt-6 rounded-xl border p-4" style={{ borderColor: "var(--border)", background: "var(--bg-panel)" }}>
+            <h2 className="text-sm font-semibold">App access</h2>
+            <p className="mt-1 text-xs" style={{ color: "var(--text-dim)" }}>
+              Grant an app address read access to your memory, or revoke it. Revoke = forget: a revoked app
+              can no longer recall anything you stored. Each change is a gasless, owner-only transaction on your Memory object.
+            </p>
+
+            <div className="mt-3 flex gap-2">
+              <input
+                value={appAddr}
+                onChange={(e) => setAppAddr(e.target.value)}
+                placeholder="0x… app address to grant"
+                className="flex-1 h-10 px-3 rounded-md text-sm outline-none"
+                style={{ background: "var(--bg)", border: "1px solid var(--border)", color: "var(--text)" }}
+              />
+              <button
+                onClick={grant}
+                disabled={!validApp || accessBusy !== null}
+                className="h-10 px-4 rounded-md text-sm font-semibold disabled:opacity-50"
+                style={{ background: "var(--text)", color: "var(--accent)" }}
+              >
+                {accessBusy === "grant" ? "Granting…" : "Grant"}
+              </button>
+            </div>
+
+            {accessError && (
+              <p className="mt-2 text-xs" style={{ color: "var(--accent-h)" }}>{accessError}</p>
+            )}
+
+            <div className="mt-4">
+              <div className="text-xs uppercase tracking-wide" style={{ color: "var(--text-dim)" }}>
+                Authorized apps
+              </div>
+              {chain && chain.authorized.length > 0 ? (
+                <ul className="mt-2 flex flex-col gap-2">
+                  {chain.authorized.map((app) => (
+                    <li key={app} className="flex items-center justify-between gap-3 text-sm">
+                      <a href={objUrl(app)} target="_blank" rel="noreferrer" className="underline break-all" style={{ color: "var(--text-dim)" }}>
+                        {short(app)} ↗
+                      </a>
+                      <button
+                        onClick={() => revoke(app)}
+                        disabled={accessBusy !== null}
+                        className="text-xs px-3 py-1 rounded-md border disabled:opacity-50 shrink-0"
+                        style={{ borderColor: "var(--accent-h)", color: "var(--accent-h)" }}
+                      >
+                        {accessBusy === app ? "Revoking…" : "Revoke = forget"}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="mt-2 text-xs" style={{ color: "var(--text-dim)" }}>
+                  No apps authorized yet — only you can read this memory.
+                </p>
+              )}
+            </div>
+          </section>
         )}
 
         <div className="mt-6">
