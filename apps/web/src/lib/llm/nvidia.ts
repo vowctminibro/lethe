@@ -11,7 +11,9 @@
 import type { ChatMessage, CompleteOptions, LLMProvider } from "./types";
 
 const ENDPOINT = "https://integrate.api.nvidia.com/v1/chat/completions";
-const DEFAULT_MODEL = "moonshotai/kimi-k2-instruct";
+// Was moonshotai/kimi-k2-instruct — reached NIM end-of-life 2026-05-12 (410 Gone).
+// Llama 3.3 70B is live on the free tier and mirrors the Groq default.
+const DEFAULT_MODEL = "meta/llama-3.3-70b-instruct";
 
 export class NvidiaNimProvider implements LLMProvider {
   get id() {
