@@ -119,7 +119,33 @@ Run: `cd apps/memory-service && node --experimental-strip-types scripts/memwal-s
 2. zkLogin `redirect_uri_mismatch` historically flagged for Google — verify before the demo.
 
 ## 5. Next chunk (NOT this one)
-- Hero-flow UI: chat surface that writes memories + the "Your Memory" view (blob id + Sui object → explorer).
-- The **two-surface portability demo** (the differentiator).
-- Wire the web app's sponsored-tx flow to `memory::create` / `add_entry` / `grant` / `revoke`.
-- Resolve the MemWal data-plane blocker (§3 unblock paths).
+- The **two-surface portability demo** (the differentiator) — a 2nd Lethe-powered surface reading the SAME owned Memory.
+- Revoke flow live in the UI (grant/revoke tx builders already wired; needs the demo).
+- Swap the lightweight `Encryptor` (AES-GCM) for `@mysten/seal` (threshold + `seal_approve` policy bound to `Memory.authorized`) → crypto-enforced "revoke = forget".
+- Resolve the MemWal data-plane blocker (§3) — see §7 finding.
+- Hero-flow landing re-skin (chat/memory routes exist; landing page still shows legacy art copy).
+
+---
+
+## 6. Chunk 2 — Core memory loop (DONE 2026-06-09)
+
+**Goal:** store→recall end-to-end on Walrus + verifiable view. **Result: working, verified with real testnet txs + real Walrus blobs.**
+
+### What shipped (apps/web)
+- **`memory::memory` deployed to testnet.** Package `0x9dcc482cd7fb5d7fa2a0cf90c7dc1e6efec6f40e817e352c61ed0f63951c1331` (publish digest `GxAt9srErNUoTwnoXkM27VJ1cyrF1T6Teen957ARFP9M`). Set as `NEXT_PUBLIC_MEMORY_PACKAGE_ID` (.env.local — gitignored; **must also be set in Vercel env for prod**).
+- **MemoryProvider seam** (`src/lib/memory/`): `provider.ts` (interface mirroring MemWal: `remember`/`recall`/`grant`/`revoke`), `manual-provider.ts` (default — Walrus + encryption + on-chain Memory object, gasless via Enoki), `memwal-provider.ts` (stub, throws until 0.0.4), `index.ts` (factory + `useMemory()` hook, `NEXT_PUBLIC_MEMORY_PROVIDER` flag, default manual).
+- **Encryptor seam** (`encryptor.ts`, server-only): lightweight AES-256-GCM keyed per user `HKDF(MEMORY_ENCRYPTION_SECRET, ownerAddress)`. **This is the SEAL swap-point** — chosen over full `@mysten/seal` this chunk to keep the loop bulletproof (Seal needs key servers + a `seal_approve` policy + session keys; revoke/portability that justify it are next-chunk). Blobs ARE encrypted (verified: raw Walrus blob is ciphertext, plaintext absent).
+- **API routes**: `/api/memory/remember` (encrypt → Walrus store), `/api/memory/recall` (fetch → decrypt → rank). Retrieval = lightweight keyword/cosine (`retrieval.ts`) over text + `kind`; semantic embeddings deferred to MemWal.
+- **Surfaces**: `/chat` (state facts → remembered; ask questions → recalled, with blob/object/tx proof chips), `/memory` (verifiable view — each entry's decrypted text + Walrus blob link + Sui object link).
+- **Sponsor allowlist**: `/api/sponsor` now allows the 4 memory targets.
+
+### Verification (real, not "should")
+- ✅ **On-chain Move**: `create` → `add_entry` executed via CLI; entry persisted in `entries` vector, owner set. (Also re-proven gasless below.)
+- ✅ **remember → Walrus**: `/api/memory/remember` stored real blobs (`cJhbgVk…`, `uN7Yhay…`); raw aggregator fetch returns ciphertext (version byte `01`+IV), "momentum" not present.
+- ✅ **gasless**: full sponsor→sign→execute for `create` + `add_entry` on testnet — gas sponsor `0x0dec4c7d…` ≠ signer ⇒ gasless. **No separate Enoki dashboard allowlist step needed** (sponsor accepted the targets). Memory `0x6899c9fc…`.
+- ✅ **recall**: ranks correctly — "trading style?"→trading-style (0.704), "bullish on SUI?"→market-view (0.674), "use leverage?"→trading-style (0.352).
+- ✅ **memory view + explorer links**: `/chat` + `/memory` render (200), links to suiscan.xyz/testnet + Walrus aggregator.
+- ⚠️ **Browser zkLogin full loop (sign in → type → reload → recall)**: every component verified (encrypt/store/recall via API; gasless create+add_entry via sponsor with a real signature; pages render). NOT click-tested in a live Google OAuth browser session by the agent — the only unverified seam is the real zkLogin sign-in + dapp-kit wiring in-browser. Verification scripts: `apps/web/scripts/gasless-e2e.mjs`.
+
+### MemWal 0.0.4 check (optional item)
+npm `@mysten/memwal` still **0.0.2**. GitHub `main` package.json now reports **1.0.0** (≥ relayer's 0.0.4 minimum) but is **not on npm** — installing from GitHub main is a possible future unblock but pulls a breaking 1.0.0 API; not attempted (manual path is working).
