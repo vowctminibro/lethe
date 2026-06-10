@@ -93,6 +93,31 @@ Resolution paths (for when content update is urgent):
 
 ---
 
+## B16 — MemWal data plane blocked → memory store verdict: FALLBACK
+Status: OPEN (worked around — not blocking the hero flow)
+Logged: 2026-06-10 (Mega-Block 1, Phase 1B)
+
+`remember`/`recall` against the MemWal relayer return **HTTP 426 Upgrade
+Required** on both `relayer.memwal.ai` and `relayer.staging.memwal.ai`:
+the published SDK `@mysten/memwal@0.0.2` is below the relayers'
+`minSupportedSdk.typescript = 0.0.4`, and **0.0.4 is not on npm** (GitHub
+main is already a breaking 1.0.0). Full spike details in REAIM.md §3
+(`apps/memory-service/scripts/memwal-spike.ts`).
+
+**Verdict: FALLBACK.** The memory store is `ManualProvider`
+(`apps/web/src/lib/memory/manual-provider.ts`): AES-256-GCM encrypt
+(HKDF per owner) → Walrus HTTP publisher → blob ref appended to the
+user-owned `memory::Memory` object (gasless); recall = on-chain refs →
+aggregator fetch → decrypt → rank. Product story unchanged (memory =
+Walrus blobs + on-chain registry). Round-trip re-verified 2026-06-10:
+blob `011jbrJ487fHpWQMWbc82N04unj2AO90SKQSMnnD1nU` — aggregator 200
+(ciphertext only), recall returns exact plaintext.
+
+Revisit if `@mysten/memwal` ≥0.0.4 ships on npm (swap point:
+`memwal-provider.ts` behind `NEXT_PUBLIC_MEMORY_PROVIDER=memwal`).
+
+---
+
 # Day 2 — Storytelling pivot blockers (2026-05-28)
 
 > The user's brief named these "B2 (MemWal integration)" + "B3 (Walrus

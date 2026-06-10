@@ -639,3 +639,17 @@ verified readable on-chain this session; smoke Memory `0x5dedf577…2054` +
 add_entry/grant/revoke (3 expected-failure tests), duplicate-grant +
 unknown-revoke aborts, and the full create→add→grant→revoke happy path.
 `sui move test`: **6/6 PASS**. No republish — same package stays live.
+
+## 2026-06-10 — MEGA-BLOCK 1, Phase 1B (memory store de-risk)
+
+Store impl chosen in a prior chunk; this phase closed the two gaps the audit
+found: (1) verdict now logged as **BLOCKERS.md B16** — **FALLBACK**
+(ManualProvider; MemWal data plane 426: npm SDK 0.0.2 < relayer min 0.0.4,
+0.0.4 unpublished); (2) round-trip **re-verified live this session**:
+
+- write: `POST /api/memory/remember` → blob `011jbrJ487fHpWQMWbc82N04unj2AO90SKQSMnnD1nU`
+- aggregator: `GET …/v1/blobs/011jbrJ…` → HTTP 200, 152 B ciphertext (no plaintext leak)
+- recall: `POST /api/memory/recall` → exact plaintext back ("…momentum trader, no leverage")
+
+Interface already matches the spec shape (`remember`/`recall`/`grant`/`revoke`
+in `src/lib/memory/provider.ts`). GATE PASSED.
