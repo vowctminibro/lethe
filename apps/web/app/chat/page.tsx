@@ -288,15 +288,15 @@ export default function ChatPage() {
     <main className="h-screen flex flex-col" style={{ background: "var(--bg)", color: "var(--text)" }}>
       <header className="border-b shrink-0" style={{ borderColor: "var(--border)", background: "var(--bg-panel)" }}>
         <div className="max-w-6xl mx-auto w-full px-6 py-3.5 flex items-center justify-between">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <Logo />
-            <Link href="/memory" className="text-sm hover:opacity-70 transition" style={{ color: "var(--text-dim)" }}>
+            <Link href="/memory" className="text-sm whitespace-nowrap hover:opacity-70 transition" style={{ color: "var(--text-dim)" }}>
               Your Memory →
             </Link>
           </div>
           <div className="flex items-center gap-3">
             {DEMO_MOCK && (
-              <span className="text-[10px] px-2 py-0.5 rounded border uppercase tracking-wide" style={{ borderColor: "var(--accent-h)", color: "var(--accent-h)" }}>
+              <span className="hidden sm:inline-block text-[10px] px-2 py-0.5 rounded border uppercase tracking-wide" style={{ borderColor: "var(--accent-h)", color: "var(--accent-h)" }}>
                 demo mock
               </span>
             )}

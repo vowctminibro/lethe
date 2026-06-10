@@ -795,3 +795,26 @@ own." with Coral ink-stroke under "own", Mist subline, L-mark + wordmark,
 oversized ghost-L texture. Viewed at full size, 1 iteration (right-edge coral
 dot tied into the ghost-L). **22.8 KB** < 300 KB. GATE PASSED.
 `tsc` clean · `pnpm build` GREEN.
+
+## 2026-06-10 — BLOCK 2, Step 3 (Visual pass, 4 surfaces)
+
+Playwright pass (`apps/web/scripts/shoot-screens.mjs`) on :3010 with
+NEXT_PUBLIC_DEMO_MOCK=1 — landing, /chat mid-stream (cursor caught mid-token)
++ memory-chip moment ("writing…" pending chip), /memory, /pulse granted AND
+revoked, at 1440x900 + 390x844 @2x. Every shot VIEWED. Zero console errors
+on both viewports.
+
+**Fix round (4 issues):**
+1. Landing hero still carried v1 copy → now brand v2: "Memory you own."
+   headline + one-liner subline + river-of-forgetting eyebrow (also puts the
+   Step-5 grep phrase in the body, not just <title>).
+2. /chat mobile header wrapped "Your Memory →" to two lines → nowrap, tighter
+   gap, dev-only DEMO MOCK chip hidden <sm.
+3. Next dev-tools floating button polluted every shot → hidden via injected
+   CSS in the shoot script (dev-only chrome, not product).
+4. /pulse fullPage shots exaggerated below-fold void → viewport shots.
+
+Re-shot after fixes. Final set: `design/screens/*.png` (12 shots; round-1
+archive in `design/screens/r1/`). GATE: each screen reads shippable —
+chip moment shows `via minimax/MiniMax-Text-01` (Step 1 visible in product).
+`tsc` clean · `pnpm build` GREEN.

@@ -22,21 +22,19 @@ export default function Home() {
       <section className="flex-1 max-w-3xl mx-auto w-full px-6 flex flex-col items-center justify-center text-center gap-8 py-20">
         <div className="inline-flex items-center gap-2 text-xs opacity-60">
           <span className="w-2 h-2 rounded-full inline-block" style={{ background: "var(--accent)" }} />
-          Owned AI memory on Walrus
+          Named after the river of forgetting. Built so nothing is.
         </div>
 
         <h1
-          className="text-5xl md:text-6xl leading-[1.05] tracking-tight"
+          className="text-6xl md:text-7xl leading-[1.05] tracking-tight"
           style={{ fontFamily: "var(--font-display)", fontWeight: 400, color: "var(--text)" }}
         >
-          Your AI remembers you —
-          <br />
-          and the memory is yours.
+          Memory you own.
         </h1>
 
         <p className="text-lg max-w-xl leading-relaxed" style={{ color: "var(--text-dim)" }}>
-          Lethe learns your on-chain style and saves what it knows on Walrus: owned by you,
-          verifiable, and portable across apps. Sign in with Google — no wallet, no gas.
+          Lethe is user-owned memory for AI agents — stored on Walrus, anchored on Sui,
+          portable across every app. Sign in with Google — no wallet, no gas.
         </p>
 
         <HeroCTA />
