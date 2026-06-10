@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Logo } from "@/src/components/Logo";
+import { HeroCTA } from "@/src/components/HeroCTA";
 
 export default function Home() {
   return (
@@ -38,18 +39,7 @@ export default function Home() {
           verifiable, and portable across apps. Sign in with Google — no wallet, no gas.
         </p>
 
-        <div className="flex flex-col items-center gap-3">
-          <Link
-            href="/chat"
-            className="h-12 px-6 rounded-md font-semibold grid place-items-center hover:opacity-90 transition"
-            style={{ background: "var(--text)", color: "var(--accent)", fontFamily: "var(--font-sans)" }}
-          >
-            Start your memory
-          </Link>
-          <span className="text-xs" style={{ color: "var(--text-dim)" }}>
-            Google sign-in via zkLogin · stored on Walrus · gasless
-          </span>
-        </div>
+        <HeroCTA />
 
         {/* ── Three pillars ── */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full mt-8 text-left">

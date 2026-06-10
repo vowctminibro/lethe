@@ -653,3 +653,23 @@ found: (1) verdict now logged as **BLOCKERS.md B16** — **FALLBACK**
 
 Interface already matches the spec shape (`remember`/`recall`/`grant`/`revoke`
 in `src/lib/memory/provider.ts`). GATE PASSED.
+
+## 2026-06-10 — MEGA-BLOCK 1, Phase 2 (sign-in → vault birth)
+
+Landing already carried Lethe positioning; this phase added the missing **birth
+moment**. New `src/lib/memory/gasless.ts` extracts the sponsor→sign→execute
+plumbing and adds `ensureVault()` — app-wide per-address dedupe so landing hero,
+chat, and strict-mode double effects can never double-mint. `useVaultBirth()`
+(`src/lib/memory/vault.ts`) drives the hero: fresh session → gasless
+`memory::create` → "Memory vault created on Sui" card with live Suiscan
+object + tx links; returning user resolves silently to "Vault live on Sui".
+ManualProvider refactored onto the shared module (no behavior change).
+
+**Gate verification (real testnet):** `node scripts/gasless-e2e.mjs` →
+fresh vault `0x47374a34a1a0c8cf606f30efa716b8106ad5f3a2677957c8e897282bae527655`,
+status success, gas sponsor `0x0dec4c7d…` ≠ signer ⇒ **zero gas paid by user**;
+object read back on-chain with a real BlobRef appended.
+Suiscan: https://suiscan.xyz/testnet/object/0x47374a34a1a0c8cf606f30efa716b8106ad5f3a2677957c8e897282bae527655
+Known seam (unchanged, logged in REAIM): live Google OAuth click-through not
+agent-testable; signing path identical to the proven art-mint flow.
+`tsc --noEmit` clean, `pnpm build` GREEN. GATE PASSED.
