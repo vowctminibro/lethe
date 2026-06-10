@@ -604,3 +604,28 @@ by the zkLogin account** — has NEVER run. Layer 1 is not a substitute for it.
 - Phase 4 main: BRAND.md verbal → collectible; og.png 1200×630; removed stray repo-root brand PNGs.
 - Phase 5 deps (report only): stack at latest (Next 16.2.6, @mysten/sui 2.17, dapp-kit 1.0.6, enoki 1.0.8, walrus 1.1.7); only react patch + TS6/@types/node majors (dev) lag. Nothing changed.
 - Morning briefing: OVERNIGHT-BRIEFING.md. Deploy verdict B (Vow sets Root Directory=apps/web then redeploy).
+
+---
+
+## 2026-06-10 — MEGA-BLOCK 1, Phase 0 audit
+
+**Toolchain:** node v24.14.1, pnpm 10.33.0, sui 1.72.1 — all green.
+Wallet `lethe-dev` (`0x4bf2…8077`) active, **0.94 SUI** (just under the 1-SUI
+threshold; CLI faucet now web-UI-only → non-blocking: package already
+published and ALL app txs are Enoki-sponsored. Logged, moving on).
+
+**Prior-run coverage (Jun 8–10 commits `861143e`→`548451a`, logged in REAIM.md
+not PROGRESS.md — this entry reconciles):**
+
+| Mega-block phase | Status found |
+|---|---|
+| HERO_FLOW.md | ✅ exists, canon (owned portable memory, 90s flow) |
+| 1A Move package | ✅ EQUIVALENT DONE — `memory::memory` published `0x9dcc482cd7fb5d7fa2a0cf90c7dc1e6efec6f40e817e352c61ed0f63951c1331` (Memory{owner, entries:vector<BlobRef>, authorized:vector<address>}, create/add_entry/grant/revoke + events). Verified on-chain this session: package object readable; smoke Memory objects `0x5dedf577…2054` + `0x6899c9fc…3bf4` readable with real BlobRefs. Naming differs from spec (memory::Memory vs lethe_memory::MemoryVault; authorized addresses vs app_id strings; no on-chain summary — content is ENCRYPTED on Walrus by design). NOT re-publishing. **Gap: no `sui move test` suite** → added this block. |
+| 1B store de-risk | ✅ DONE — verdict **FALLBACK** (ManualProvider: AES-256-GCM encrypt → Walrus HTTP publisher → on-chain BlobRef; recall = on-chain refs → aggregator fetch → decrypt → rank). MemWal data plane blocked: npm SDK 0.0.2 < relayer minSupportedSdk 0.0.4 → HTTP 426 (REAIM §3). **Gap: verdict not in BLOCKERS.md** → added this block. |
+| 2 sign-in → vault | ⚠️ PARTIAL — landing re-skinned to Lethe positioning; gasless create verified via script; but vault creation is LAZY (first remember), no "vault created" birth moment at sign-in. → built this block. |
+| 3 chat + rail | ⚠️ PARTIAL — /chat real LLM (Groq→Gemini→NIM) + RAG + auto-remember + proof chips; /memory verifiable view + grant/revoke UI. **Gaps:** no token streaming, no right-side memory rail, no dev mock, no polish-loop screenshots, e2e not re-verified post-LLM-switch. → built this block. |
+| 4 second surface | ❌ NOT DONE — /pulse missing (the portability money shot). |
+
+**Skipping as verifiably done:** Move package publish, MemoryStore impl choice,
+landing re-skin, /memory grants UI. Old art routes (/create /me /battle
+/leaderboard) remain orphaned-not-deleted (only legacy pages link them). ✓
