@@ -1,16 +1,20 @@
 # Lethe Brand System
 
-**Locked:** 2026-05-28
-**Version:** 1.0
+**Locked:** 2026-05-28 · verbal identity v2: 2026-06-10
+**Version:** 2.0
 
 ---
 
 ## Identity
 
-- **Name:** Lethe
-- **Tagline:** Your AI remembers you. The memory is yours.
-- **One-liner:** Lethe is owned AI memory on Walrus — it learns your on-chain style and saves what it knows as encrypted Walrus blobs referenced by a Sui object you control: owned by you, verifiable, and portable across apps. Sign in with Google: no wallet, no gas.
-- **Origin:** Λήθη — the river of forgetfulness in Greek myth. Lethe is its inverse: what an AI learns about you is remembered, owned by you, on-chain.
+Lethe — Named after the river of forgetting. Built so nothing is.
+
+- **Tagline:** "Memory you own."
+- **One-liner:** Lethe is user-owned memory for AI agents — stored on Walrus, anchored on Sui, portable across every app.
+- **Problem:** Every AI agent you talk to locks what it learns about you inside someone else's server — switch apps, start from zero.
+- **Solution:** Lethe writes your agent's memory to Walrus as objects you own: any agent you authorize knows you instantly, every entry is verifiable on-chain, and revoking access makes it forget — live.
+- **Closing lines:** "Lethe is the wedge." / "Memory infrastructure for the agentic web — a 10-year category." / "Built solo. Live on testnet today."
+- **Walrus integration note:** encrypted memory blobs (AES-256-GCM, HKDF per owner) on Walrus; on-chain BlobRefs in an owned MemoryVault on Sui. MemWal integration attempted day-5 post-launch; blocked by SDK/relayer version gap (BLOCKERS.md B16); provider abstraction in place to adopt @mysten/memwal the day ≥0.0.4 publishes.
 
 ---
 
@@ -98,9 +102,9 @@ For code snippets only.
 - **Lethe** capitalized; "lethe" lowercase only in wordmark glyph
 
 ### On-brand examples
-- ✅ "Art you make. Yours forever."
-- ✅ "Create your collectible."
-- ✅ "Mint it. Own it. Battle it."
+- ✅ "Memory you own."
+- ✅ "Any agent you authorize knows you instantly."
+- ✅ "Revoke access and it forgets — live."
 - ✅ "Sign in with Google."
 
 ### Off-brand examples

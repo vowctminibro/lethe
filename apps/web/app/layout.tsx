@@ -21,11 +21,12 @@ const jetbrains = JetBrains_Mono({
   weight: ["400", "500"],
 });
 
-const TITLE = "Lethe — Owned AI memory on Walrus";
+const TITLE = "Lethe — Memory you own";
 const DESCRIPTION =
-  "Your AI remembers you — and the memory is yours. Lethe saves what it learns on Walrus: owned by you, verifiable, and portable across apps. Sign in with Google — no wallet, no gas.";
+  "Lethe is user-owned memory for AI agents — stored on Walrus, anchored on Sui, portable across every app.";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://lethe-gold.vercel.app"),
   title: TITLE,
   description: DESCRIPTION,
   // Favicon + apple-icon are auto-served from app/icon.svg and app/apple-icon.svg.

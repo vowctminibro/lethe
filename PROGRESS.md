@@ -774,3 +774,24 @@ Stream timeout covers setup-to-first-byte only — a live stream is never killed
   aggregator 200, gasless add_entry 7y3b2dprDCtSbYmc4Fxa47MFVAxrLsWknqEjKU4uAc9m
   (entries=3).
 `tsc --noEmit` clean · `pnpm build` GREEN.
+
+## 2026-06-10 — BLOCK 2, Step 2 (Brand v2 + metadata + OG image)
+
+**BRAND.md verbal identity → v2** with the locked copy: "Memory you own." /
+one-liner / problem / solution / closing lines / Walrus integration note
+(MemWal B16 + provider abstraction). On-brand voice examples refreshed from
+art-era to memory-era.
+
+**Metadata app-wide** (`app/layout.tsx`, the only metadata export): title
+"Lethe — Memory you own", description = the one-liner, OpenGraph + Twitter
+card → /og.png, plus `metadataBase` https://lethe-gold.vercel.app so social
+crawlers get absolute URLs. Grep confirms **0** "art collectibles" strings in
+metadata/landing copy (the stale title lives only on the old deployment —
+Step 5's job).
+
+**og.png** generated programmatically (sharp + inline SVG,
+`scripts/generate-og.mjs`): Fog bg, Georgia-italic Ink headline "Memory you
+own." with Coral ink-stroke under "own", Mist subline, L-mark + wordmark,
+oversized ghost-L texture. Viewed at full size, 1 iteration (right-edge coral
+dot tied into the ghost-L). **22.8 KB** < 300 KB. GATE PASSED.
+`tsc` clean · `pnpm build` GREEN.
