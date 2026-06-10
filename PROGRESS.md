@@ -629,3 +629,13 @@ not PROGRESS.md — this entry reconciles):**
 **Skipping as verifiably done:** Move package publish, MemoryStore impl choice,
 landing re-skin, /memory grants UI. Old art routes (/create /me /battle
 /leaderboard) remain orphaned-not-deleted (only legacy pages link them). ✓
+
+## 2026-06-10 — MEGA-BLOCK 1, Phase 1A (Move)
+
+Package already published (`0x9dcc482cd7fb5d7fa2a0cf90c7dc1e6efec6f40e817e352c61ed0f63951c1331`,
+verified readable on-chain this session; smoke Memory `0x5dedf577…2054` +
+`0x6899c9fc…3bf4` readable with real BlobRefs). Added the missing unit suite
+`contracts/memory/tests/memory_tests.move`: owner-only enforcement on
+add_entry/grant/revoke (3 expected-failure tests), duplicate-grant +
+unknown-revoke aborts, and the full create→add→grant→revoke happy path.
+`sui move test`: **6/6 PASS**. No republish — same package stays live.
