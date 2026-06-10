@@ -1,0 +1,15 @@
+# Deploy needs: apps/, packages/, root manifests. Everything below is
+# docs/assets/research that only bloats the upload (44MB+ tripped Vercel's
+# file API).
+design/
+docs/
+research/
+twitter-growth/
+brand-assets/
+trash/
+contracts/
+*.md
+*.flag
+*.py
+vercel.json.bak
+apps/web/scripts/

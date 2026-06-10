@@ -840,3 +840,22 @@ MINIMAX_MODEL, NVIDIA_NIM_MODEL (model defaults), NEXT_PUBLIC_DEMO_MOCK
 (dev-only dead code in prod builds), NODE_ENV (platform-managed).
 
 GATE: zero missing required names — verified via `vercel env ls`.
+
+## 2026-06-10 — BLOCK 2, Step 5 (Deploy + external verify — Build ≠ Ship)
+
+`npx vercel --prod` from the linked repo root. Two transient Vercel API 500s
+on /v2/files (44.7MB upload) → added `.vercelignore` (docs/design/research/
+assets trimmed) → deploy succeeded:
+lethe-md556mro7-vowctminibro-7069s-projects.vercel.app. The lethe-gold alias
+picked up the new production deployment automatically — no alias surgery
+needed.
+
+**External checks (REAL public URL, not localhost) — ALL GREEN:**
+- `curl https://lethe-gold.vercel.app` → "Memory you own" ×1 in body+title,
+  "art collectibles" ×0 · `<title>Lethe — Memory you own</title>`
+- /chat /memory /pulse → all HTTP 200
+- /og.png → 200, image/png, 23,345 B
+- Playwright prod (unauthed, desktop+mobile): h1 "Memory you own." renders,
+  sign-in button visible on landing + /chat, **zero console errors**.
+  Screenshots → `design/screens/prod/` (4 shots, viewed).
+GATE PASSED — lethe-gold serves the NEW app, verified externally.
