@@ -17,6 +17,7 @@ import { Logo } from "@/src/components/Logo";
 import { SignIn } from "@/src/components/SiteHeader";
 import { useMemory, getOwnedMemory, type OwnedMemory, type RecallHit } from "@/src/lib/memory";
 import { DEMO_MOCK, getMockOwnedMemory, useLetheAccount } from "@/src/lib/demo/mock";
+import { PULSE_APP_ADDRESS } from "@/src/lib/pulse";
 
 const AGG = process.env.NEXT_PUBLIC_WALRUS_AGGREGATOR_URL;
 const blobUrl = (id: string) => `${AGG}/v1/blobs/${id}`;
@@ -127,6 +128,52 @@ export default function MemoryPage() {
               can no longer recall anything you stored. Each change is a gasless, owner-only transaction on your Memory object.
             </p>
 
+            {/* Pulse — the known second surface, one-tap toggle */}
+            <div className="mt-3 rounded-lg border p-3 flex items-center justify-between gap-3" style={{ borderColor: "var(--border)", background: "var(--bg)" }}>
+              <div className="min-w-0">
+                <div className="text-sm font-semibold flex items-center gap-2">
+                  ◍ Pulse
+                  <Link href="/pulse" className="text-[11px] font-normal underline" style={{ color: "var(--text-dim)" }}>
+                    open ↗
+                  </Link>
+                </div>
+                <p className="text-[11px] mt-0.5" style={{ color: "var(--text-dim)" }}>
+                  Portfolio companion — reads this vault when granted. App address {PULSE_APP_ADDRESS.slice(0, 10)}…{PULSE_APP_ADDRESS.slice(-6)}
+                </p>
+              </div>
+              {chain?.authorized.includes(PULSE_APP_ADDRESS) ? (
+                <button
+                  onClick={() => revoke(PULSE_APP_ADDRESS)}
+                  disabled={accessBusy !== null}
+                  className="text-xs px-3 py-1.5 rounded-md border disabled:opacity-50 shrink-0"
+                  style={{ borderColor: "var(--accent-h)", color: "var(--accent-h)" }}
+                >
+                  {accessBusy === PULSE_APP_ADDRESS ? "Revoking…" : "Revoke = forget"}
+                </button>
+              ) : (
+                <button
+                  onClick={async () => {
+                    if (!memory || accessBusy) return;
+                    setAccessError(null);
+                    setAccessBusy("grant-pulse");
+                    try {
+                      await memory.grant(PULSE_APP_ADDRESS);
+                      setNonce((n) => n + 1);
+                    } catch (e) {
+                      setAccessError(e instanceof Error ? e.message : "grant failed");
+                    } finally {
+                      setAccessBusy(null);
+                    }
+                  }}
+                  disabled={accessBusy !== null}
+                  className="text-xs px-3 py-1.5 rounded-md font-semibold disabled:opacity-50 shrink-0"
+                  style={{ background: "var(--text)", color: "var(--accent)" }}
+                >
+                  {accessBusy === "grant-pulse" ? "Granting…" : "Grant access"}
+                </button>
+              )}
+            </div>
+
             <div className="mt-3 flex gap-2">
               <input
                 value={appAddr}
@@ -153,9 +200,9 @@ export default function MemoryPage() {
               <div className="text-xs uppercase tracking-wide" style={{ color: "var(--text-dim)" }}>
                 Authorized apps
               </div>
-              {chain && chain.authorized.length > 0 ? (
+              {chain && chain.authorized.filter((a) => a !== PULSE_APP_ADDRESS).length > 0 ? (
                 <ul className="mt-2 flex flex-col gap-2">
-                  {chain.authorized.map((app) => (
+                  {chain.authorized.filter((a) => a !== PULSE_APP_ADDRESS).map((app) => (
                     <li key={app} className="flex items-center justify-between gap-3 text-sm">
                       <a href={objUrl(app)} target="_blank" rel="noreferrer" className="underline break-all" style={{ color: "var(--text-dim)" }}>
                         {short(app)} ↗
@@ -173,7 +220,7 @@ export default function MemoryPage() {
                 </ul>
               ) : (
                 <p className="mt-2 text-xs" style={{ color: "var(--text-dim)" }}>
-                  No apps authorized yet — only you can read this memory.
+                  No other apps authorized — only you{chain?.authorized.includes(PULSE_APP_ADDRESS) ? " and Pulse" : ""} can read this memory.
                 </p>
               )}
             </div>

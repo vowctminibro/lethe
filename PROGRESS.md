@@ -710,3 +710,27 @@ affordance + verified the chip moment with novel facts.
 - aggregator URL: https://aggregator.walrus-testnet.walrus.space/v1/blobs/TliDaVCGd3BS0HWfitcf-HVyXoTZ_r4Y5jRxpGZyRxs
 - Suiscan: https://suiscan.xyz/testnet/tx/H2Wi7PwDoFFaQeuA3etYokwPwqhkQXtNybTxuprfwB99
 `tsc --noEmit` clean · `pnpm build` GREEN (14/14 routes). GATE PASSED.
+
+## 2026-06-10 — MEGA-BLOCK 1, Phase 4 (Pulse — the money shot)
+
+**/pulse shipped** — a visually distinct second surface (midnight palette,
+dashboard layout, own wordmark "◍ Pulse — powered by Lethe memory") that reads
+the SAME owned vault. Pulse's identity is a well-known app address
+(`0x…70756c7365`, "pulse" in hex — `src/lib/pulse.ts`), granted/revoked on the
+vault's on-chain `authorized` vector, so access is judge-verifiable on Suiscan.
+
+**Enforcement is server-side**: `/api/pulse/recall` reads the vault from chain
+and decrypts ONLY if Pulse's address is authorized — revoked → HTTP 403, zero
+entries. Granted → entries + a token-streamed personalized briefing proving it
+already knows the user. /memory gained a one-tap Pulse grant/revoke row.
+Dev mock moved to sessionStorage so revoke-on-/memory → /pulse-knows-nothing
+demos across page loads.
+
+**GATE (real testnet) — pulse-e2e.mjs PASSED:**
+- baseline never-granted → 403 "Pulse is not authorized on this vault"
+- gasless grant `DWeR7SCSFs4aLP59vhnHxvUqwyCfbhPhNSb63KyS5o4b` → 200, 2 decrypted entries
+  ("5% position-size cap", "I am a momentum trader and I hate leverage")
+- gasless revoke `9Qudg7kxtNgSigjyK8PV2vN1J9gpCR7eEg7PovtFi6Uv` → 403, zero entries
+- vault: https://suiscan.xyz/testnet/object/0x47374a34a1a0c8cf606f30efa716b8106ad5f3a2677957c8e897282bae527655
+Screenshots: docs/screenshots/mega1/p2-pulse-{granted,denied}.png + p2-memory-pulse-row.png.
+`tsc` clean · `pnpm build` GREEN. GATE PASSED.

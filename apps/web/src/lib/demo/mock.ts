@@ -16,6 +16,7 @@
 
 import { useMemo } from "react";
 import { useCurrentAccount } from "@mysten/dapp-kit";
+import { PULSE_APP_ADDRESS } from "../pulse";
 import type { MemoryProvider } from "../memory/provider";
 import type { MemoryEntry, RememberResult, RecallHit } from "../memory/types";
 import type { OwnedMemory } from "../memory/chain";
@@ -49,21 +50,50 @@ const SEEDS: RecallHit[] = [
   seed("Active on DeepBook — trades on-chain, not CEX", "fact", "4rlJ6lleJ1K_AJPh8qcZVSSyvF5MXAhp9Lyxf5k1KjU", 20),
 ];
 
-// Module-level store so chat rail + /memory see the same session.
-const added: RecallHit[] = [];
-let authorized: string[] = ["0x91f7a2c4de8b35a1906c4f50e7d28a63b0c5f4e8d217396ab84cd01e5f6a7b32"];
+// Session-scoped store (sessionStorage) so chat rail + /memory + /pulse share
+// state ACROSS page navigations — revoking Pulse on /memory must stick when
+// /pulse loads. Pulse starts granted so the portability moment demos out of
+// the box; close the tab to reset.
+const LS_KEY = "lethe-demo-mock";
+
+interface MockStore {
+  added: RecallHit[];
+  authorized: string[];
+}
+
+function loadStore(): MockStore {
+  if (typeof window !== "undefined") {
+    try {
+      const raw = window.sessionStorage.getItem(LS_KEY);
+      if (raw) return JSON.parse(raw) as MockStore;
+    } catch {
+      /* corrupted/unavailable — fall through to defaults */
+    }
+  }
+  return { added: [], authorized: [PULSE_APP_ADDRESS] };
+}
+
+function saveStore(s: MockStore) {
+  if (typeof window === "undefined") return;
+  try {
+    window.sessionStorage.setItem(LS_KEY, JSON.stringify(s));
+  } catch {
+    /* storage full/blocked — mock keeps working in-memory */
+  }
+}
 
 export function getMockOwnedMemory(): OwnedMemory {
+  const s = loadStore();
   return {
     objectId: MOCK_VAULT_ID,
     owner: MOCK_ADDRESS,
-    entries: [...SEEDS, ...added].map(({ blobId, namespace, kind, createdAtMs }) => ({
+    entries: [...SEEDS, ...s.added].map(({ blobId, namespace, kind, createdAtMs }) => ({
       blobId,
       namespace,
       kind,
       createdAtMs,
     })),
-    authorized: [...authorized],
+    authorized: [...s.authorized],
   };
 }
 
@@ -80,7 +110,9 @@ class MockProvider implements MemoryProvider {
       createdAtMs: Date.now(),
       score: 1,
     };
-    added.push(hit);
+    const s = loadStore();
+    s.added.push(hit);
+    saveStore(s);
     return {
       blobId: hit.blobId,
       namespace: hit.namespace,
@@ -94,7 +126,7 @@ class MockProvider implements MemoryProvider {
 
   async recall(query: string, opts?: { limit?: number }): Promise<RecallHit[]> {
     await wait(300);
-    const all = [...SEEDS, ...added].sort((a, b) => b.createdAtMs - a.createdAtMs);
+    const all = [...SEEDS, ...loadStore().added].sort((a, b) => b.createdAtMs - a.createdAtMs);
     if (!query.trim()) return all;
     const q = query.toLowerCase();
     const scored = all
@@ -108,13 +140,17 @@ class MockProvider implements MemoryProvider {
 
   async grant(app: string): Promise<{ digest: string }> {
     await wait(800);
-    if (!authorized.includes(app)) authorized.push(app);
+    const s = loadStore();
+    if (!s.authorized.includes(app)) s.authorized.push(app);
+    saveStore(s);
     return { digest: MOCK_DIGEST };
   }
 
   async revoke(app: string): Promise<{ digest: string }> {
     await wait(800);
-    authorized = authorized.filter((a) => a !== app);
+    const s = loadStore();
+    s.authorized = s.authorized.filter((a) => a !== app);
+    saveStore(s);
     return { digest: MOCK_DIGEST };
   }
 }
