@@ -746,3 +746,31 @@ Commits: eb83050 (1B) · b9d0bcd (2) · ab9c761 (3) · b1bf77e (4) — plus prio
 Blockers: B16 MemWal data plane (worked around, FALLBACK shipped). NEW for Vow: GROQ_API_KEY + GEMINI_API_KEY are EMPTY in apps/web/.env.local — whole LLM chain currently rides on NVIDIA NIM alone; fill the two free keys for redundancy. Browser zkLogin OAuth still needs one human click-through pass.
 Recommended next block: (1) Vow does ONE live browser pass: Google sign-in → vault birth → chat → /memory → grant Pulse → /pulse → revoke → /pulse (everything underneath is verified; this de-risks the only untested seam). (2) Vercel deploy of the new app (env vars incl. MEMORY_PACKAGE_ID + ENCRYPTION_SECRET; Root Directory fix from B11). (3) Demo video script around the 90s flow + judge-facing README. Optional polish: nav link to Pulse from chat, mobile rail treatment.
 === END REPORT ===
+
+## 2026-06-10 — BLOCK 2, Step 1 (LLM provider chain: MiniMax primary → NIM fallback)
+
+**MiniMax verdict: NOT broken — just never wired in.** The paid key was only
+used by the legacy image plane (`lib/minimax.ts`, image_generation). Live test:
+chatcompletion_v2 → HTTP 200 in 2.4s, streaming SSE works. Two API quirks
+handled in the new provider: `response_format: json_object` unsupported
+(error 2013 → JSON via prompt + object-slice when `json: true`), and errors can
+arrive as HTTP 200 + `base_resp.status_code != 0` (now thrown).
+
+**Chain rebuilt** (`src/lib/llm/`): MiniMax (paid, primary) → NVIDIA NIM →
+Groq → Gemini, for BOTH chat streaming and extraction (both routes go through
+the same factory). Per-request failover: each attempt runs under a timeout
+(30s default, `LLM_TIMEOUT_MS` override) chained to the caller's signal;
+timeout/5xx/429/any setup error logs `[llm] … failing over` and falls through.
+Stream timeout covers setup-to-first-byte only — a live stream is never killed.
+
+**GATES:**
+- Failover unit tests (`scripts/test-llm-failover.mjs`, mocked fetch, no
+  network): 8/8 PASS — incl. "mock a MiniMax failure (500/429/base_resp/hang)
+  → NIM serves" for complete() AND streamComplete(), healthy-MiniMax-primary,
+  and both-down readable error.
+- hero-e2e.mjs re-run through the chain (real, non-mock): PASSED —
+  `provider=minimax/MiniMax-Text-01`, fact "Uses a strict 5% position-size cap
+  per trade" extracted, blob GbB45iJxmH5F8Si_78GG_macC6WeLS64jXjx7x852Eg →
+  aggregator 200, gasless add_entry 7y3b2dprDCtSbYmc4Fxa47MFVAxrLsWknqEjKU4uAc9m
+  (entries=3).
+`tsc --noEmit` clean · `pnpm build` GREEN.

@@ -3,8 +3,8 @@
  *
  * Mirrors the MemoryProvider/Encryptor seams: one small interface, multiple
  * implementations chosen by env, never importing a paid/secret key into a client
- * component. The factory in ./index.ts chains free providers (Groq → Gemini) so
- * the repo stays open-source-cloneable: a judge sets ONE free key and chat works.
+ * component. The factory in ./index.ts chains providers (MiniMax → NIM → Groq →
+ * Gemini) so the repo stays clone-and-run: a judge sets ONE key and chat works.
  *
  * All implementations read keys from process.env only — nothing is hardcoded.
  */
