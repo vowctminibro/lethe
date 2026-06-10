@@ -33,4 +33,10 @@ export interface LLMProvider {
   isConfigured(): boolean;
   /** Run a chat completion and return the assistant's text. */
   complete(messages: ChatMessage[], opts?: CompleteOptions): Promise<string>;
+  /**
+   * Stream a completion token-by-token. Connection/setup errors throw before
+   * the first token, so the factory can fall through to the next provider.
+   * Optional — providers without it fall back to complete().
+   */
+  stream?(messages: ChatMessage[], opts?: CompleteOptions): Promise<AsyncIterable<string>>;
 }

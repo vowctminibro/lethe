@@ -11,9 +11,10 @@
  */
 
 import Link from "next/link";
-import { useCurrentAccount, useConnectWallet, useWallets } from "@mysten/dapp-kit";
+import { useConnectWallet, useWallets } from "@mysten/dapp-kit";
 import { isGoogleWallet } from "@mysten/enoki";
 import { useVaultBirth } from "@/src/lib/memory/vault";
+import { useLetheAccount } from "@/src/lib/demo/mock";
 
 const SUISCAN_OBJ = (id: string) => `https://suiscan.xyz/testnet/object/${id}`;
 const SUISCAN_TX = (d: string) => `https://suiscan.xyz/testnet/tx/${d}`;
@@ -32,7 +33,7 @@ function PrimaryLink({ href, children }: { href: string; children: React.ReactNo
 }
 
 export function HeroCTA() {
-  const account = useCurrentAccount();
+  const account = useLetheAccount();
   const wallets = useWallets();
   const { mutate: connect, isPending } = useConnectWallet();
   const vault = useVaultBirth();

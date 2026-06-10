@@ -673,3 +673,40 @@ Suiscan: https://suiscan.xyz/testnet/object/0x47374a34a1a0c8cf606f30efa716b8106a
 Known seam (unchanged, logged in REAIM): live Google OAuth click-through not
 agent-testable; signing path identical to the proven art-mint flow.
 `tsc --noEmit` clean, `pnpm build` GREEN. GATE PASSED.
+
+## 2026-06-10 — MEGA-BLOCK 1, Phase 3 (streaming chat + memory rail + dev mock)
+
+**Streaming:** LLM seam grew `stream()` (SSE) on Groq/Gemini/NIM + `streamComplete()`
+factory with fall-through; `/api/chat` now streams plain-text tokens (model id in
+`x-provider`). Found en route: **GROQ_API_KEY + GEMINI_API_KEY are EMPTY in
+.env.local** — chain runs entirely on NVIDIA NIM (llama-3.3-70b). Works fine;
+filling the other free keys gives redundancy (note for Vow).
+
+**Extraction:** new `/api/chat/extract` — strict-JSON, 0–2 durable facts per user
+turn, deduped against recalled context (verified: restating known facts → 0).
+
+**Memory rail:** right-side rail on /chat seeds from the on-chain vault and
+animates each extracted fact in as a chip: pending (pulse) → confirmed with
+Walrus blob + Suiscan links. Memory writes are the visible product moment.
+
+**Wallet link:** thin read-only `/api/onchain/snapshot` (balances/objects/
+protocols via RPC, no LLM) + "Link a wallet" affordance injecting flavor into chat.
+
+**Dev mock:** `NODE_ENV==='development' && NEXT_PUBLIC_DEMO_MOCK==='1'` →
+seeded session (real testnet vault `0x4737…7655` + 5 real blob ids, so links
+resolve) without OAuth. NODE_ENV is build-inlined ⇒ impossible in prod.
+
+**Polish loop (3 rounds, screenshots in docs/screenshots/mega1/):** r1 caught a
+real bug (unstable account identity → infinite effect loop locking the rail in
+skeletons); r2 fixed + mock identity in header; r3/r4 fixed post-reply shimmer
+affordance + verified the chip moment with novel facts.
+
+**GATE (real, non-mock) — hero-e2e.mjs PASSED:**
+- chat streamed: 69 chunks via nvidia-nim/meta/llama-3.3-70b-instruct
+- extracted: "5% position-size cap" (trading-style)
+- blob: `TliDaVCGd3BS0HWfitcf-HVyXoTZ_r4Y5jRxpGZyRxs` → aggregator 200 (111 B ciphertext)
+- gasless add_entry: `H2Wi7PwDoFFaQeuA3etYokwPwqhkQXtNybTxuprfwB99` (sponsor ≠ signer)
+- entry on-chain: vault `0x47374a34a1a0c8cf606f30efa716b8106ad5f3a2677957c8e897282bae527655` (entries=2)
+- aggregator URL: https://aggregator.walrus-testnet.walrus.space/v1/blobs/TliDaVCGd3BS0HWfitcf-HVyXoTZ_r4Y5jRxpGZyRxs
+- Suiscan: https://suiscan.xyz/testnet/tx/H2Wi7PwDoFFaQeuA3etYokwPwqhkQXtNybTxuprfwB99
+`tsc --noEmit` clean · `pnpm build` GREEN (14/14 routes). GATE PASSED.

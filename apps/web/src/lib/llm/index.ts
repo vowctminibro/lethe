@@ -64,3 +64,47 @@ export async function complete(
   const msg = lastErr instanceof Error ? lastErr.message : String(lastErr);
   throw new Error(`All LLM providers failed. Last error: ${msg}`);
 }
+
+/** A live token stream plus which model is producing it. */
+export interface StreamResult {
+  stream: AsyncIterable<string>;
+  provider: string;
+}
+
+/**
+ * Stream a completion through the chain. Stream-capable providers are tried
+ * first; setup errors (bad key, 429, network) throw before the first token so
+ * we fall through cleanly. If no provider can stream, the best provider's
+ * complete() result is wrapped as a single-chunk stream — callers never branch.
+ */
+export async function streamComplete(
+  messages: ChatMessage[],
+  opts?: CompleteOptions,
+): Promise<StreamResult> {
+  const chain = configuredProviders();
+  if (chain.length === 0) throw new Error(SETUP_HINT);
+
+  let lastErr: unknown;
+  for (const p of chain) {
+    if (!p.stream) continue;
+    try {
+      return { stream: await p.stream(messages, opts), provider: p.id };
+    } catch (e) {
+      lastErr = e;
+    }
+  }
+  // No streaming provider worked — degrade to a one-chunk "stream".
+  try {
+    const { text, provider } = await complete(messages, opts);
+    return {
+      stream: (async function* () {
+        yield text;
+      })(),
+      provider,
+    };
+  } catch (e) {
+    const msg =
+      (lastErr ?? e) instanceof Error ? ((lastErr ?? e) as Error).message : String(lastErr ?? e);
+    throw new Error(`All LLM providers failed. Last error: ${msg}`);
+  }
+}

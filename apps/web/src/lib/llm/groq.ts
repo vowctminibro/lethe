@@ -7,6 +7,7 @@
  */
 
 import type { ChatMessage, CompleteOptions, LLMProvider } from "./types";
+import { parseSse } from "./sse";
 
 const ENDPOINT = "https://api.groq.com/openai/v1/chat/completions";
 const MODEL = "llama-3.3-70b-versatile";
@@ -44,5 +45,32 @@ export class GroqProvider implements LLMProvider {
     const text: string | undefined = data?.choices?.[0]?.message?.content;
     if (typeof text !== "string") throw new Error("Groq returned no content");
     return text.trim();
+  }
+
+  async stream(messages: ChatMessage[], opts: CompleteOptions = {}): Promise<AsyncIterable<string>> {
+    const key = process.env.GROQ_API_KEY;
+    if (!key) throw new Error("Missing GROQ_API_KEY");
+
+    const res = await fetch(ENDPOINT, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: MODEL,
+        messages,
+        temperature: opts.temperature ?? 0.6,
+        max_tokens: opts.maxTokens ?? 700,
+        stream: true,
+      }),
+      signal: opts.signal,
+    });
+    if (!res.ok || !res.body) {
+      const detail = await res.text().catch(() => "");
+      throw new Error(`Groq HTTP ${res.status} ${res.statusText} ${detail.slice(0, 200)}`);
+    }
+    return parseSse(
+      res.body,
+      (e) =>
+        (e as { choices?: { delta?: { content?: string } }[] })?.choices?.[0]?.delta?.content ?? "",
+    );
   }
 }

@@ -13,6 +13,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useCurrentAccount, useSuiClient, useSignTransaction } from "@mysten/dapp-kit";
 import { ensureVault, type SignFn } from "./gasless";
+import { DEMO_MOCK, MOCK_VAULT_ID } from "../demo/mock";
 
 export type VaultBirth =
   | { phase: "signed-out" }
@@ -32,6 +33,10 @@ export function useVaultBirth(): VaultBirth & { retry: () => void } {
   const retry = useCallback(() => setNonce((n) => n + 1), []);
 
   useEffect(() => {
+    if (DEMO_MOCK) {
+      setState({ phase: "ready", vaultId: MOCK_VAULT_ID });
+      return;
+    }
     if (!account) {
       setState({ phase: "signed-out" });
       return;

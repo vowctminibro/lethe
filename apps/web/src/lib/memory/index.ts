@@ -14,6 +14,7 @@ import { useCurrentAccount, useSuiClient, useSignTransaction } from "@mysten/dap
 import type { MemoryProvider } from "./provider";
 import { ManualProvider, type SignFn } from "./manual-provider";
 import { MemWalProvider } from "./memwal-provider";
+import { DEMO_MOCK, getMockProvider } from "../demo/mock";
 
 export type { MemoryProvider } from "./provider";
 export type { MemoryEntry, RememberResult, RecallHit, BlobRef } from "./types";
@@ -38,6 +39,7 @@ export function useMemory(namespace?: string): MemoryProvider | null {
   const { mutateAsync: signTransaction } = useSignTransaction();
 
   return useMemo(() => {
+    if (DEMO_MOCK) return getMockProvider();
     if (!account) return null;
     if (selectedProviderKind() === "memwal") return new MemWalProvider();
     return new ManualProvider({

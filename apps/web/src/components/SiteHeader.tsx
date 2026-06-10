@@ -9,6 +9,7 @@ import {
 } from "@mysten/dapp-kit";
 import { isGoogleWallet } from "@mysten/enoki";
 import { Logo } from "./Logo";
+import { DEMO_MOCK, MOCK_ADDRESS } from "@/src/lib/demo/mock";
 
 const short = (a: string) => `${a.slice(0, 6)}…${a.slice(-4)}`;
 
@@ -27,6 +28,15 @@ export function SignIn() {
   const google = wallets.find((w) => isGoogleWallet(w));
   // Slush is auto-detected via wallet-standard (extension) — secondary option.
   const slush = wallets.find((w) => /slush/i.test(w.name) && !isGoogleWallet(w));
+
+  // Dev-only seeded session: show the mock identity, no OAuth round-trip.
+  if (DEMO_MOCK) {
+    return (
+      <span className="text-xs" style={{ color: "var(--text-dim)" }}>
+        {short(MOCK_ADDRESS)}
+      </span>
+    );
+  }
 
   if (account) {
     return (

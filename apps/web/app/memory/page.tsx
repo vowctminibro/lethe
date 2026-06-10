@@ -12,10 +12,11 @@
 
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
-import { useCurrentAccount, useSuiClient } from "@mysten/dapp-kit";
+import { useSuiClient } from "@mysten/dapp-kit";
 import { Logo } from "@/src/components/Logo";
 import { SignIn } from "@/src/components/SiteHeader";
 import { useMemory, getOwnedMemory, type OwnedMemory, type RecallHit } from "@/src/lib/memory";
+import { DEMO_MOCK, getMockOwnedMemory, useLetheAccount } from "@/src/lib/demo/mock";
 
 const AGG = process.env.NEXT_PUBLIC_WALRUS_AGGREGATOR_URL;
 const blobUrl = (id: string) => `${AGG}/v1/blobs/${id}`;
@@ -23,7 +24,7 @@ const objUrl = (id: string) => `https://suiscan.xyz/testnet/object/${id}`;
 const short = (s: string) => (s.length > 16 ? `${s.slice(0, 10)}…${s.slice(-6)}` : s);
 
 export default function MemoryPage() {
-  const account = useCurrentAccount();
+  const account = useLetheAccount();
   const client = useSuiClient();
   const memory = useMemory();
   const [chain, setChain] = useState<OwnedMemory | null>(null);
@@ -39,7 +40,7 @@ export default function MemoryPage() {
     setError(null);
     setHits(null);
     try {
-      const owned = await getOwnedMemory(client, account.address);
+      const owned = DEMO_MOCK ? getMockOwnedMemory() : await getOwnedMemory(client, account.address);
       setChain(owned);
       // recall("") decrypts all entries, newest first.
       const all = owned && owned.entries.length > 0 ? await memory.recall("") : [];
@@ -218,9 +219,14 @@ export default function MemoryPage() {
                       Walrus blob {short(h.blobId)} ↗
                     </a>
                     {chain && (
-                      <a className="underline break-all" href={objUrl(chain.objectId)} target="_blank" rel="noreferrer">
-                        on object {short(chain.objectId)} ↗
+                      <a className="underline break-all" href={objUrl(chain.objectId)} target="_blank" rel="noreferrer" title="Referenced on your Memory vault object">
+                        Suiscan object {short(chain.objectId)} ↗
                       </a>
+                    )}
+                    {h.createdAtMs > 0 && (
+                      <span title={new Date(h.createdAtMs).toISOString()}>
+                        {new Date(h.createdAtMs).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}
+                      </span>
                     )}
                   </div>
                 </li>
