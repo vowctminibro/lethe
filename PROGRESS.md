@@ -818,3 +818,25 @@ Re-shot after fixes. Final set: `design/screens/*.png` (12 shots; round-1
 archive in `design/screens/r1/`). GATE: each screen reads shippable —
 chip moment shows `via minimax/MiniMax-Text-01` (Step 1 visible in product).
 `tsc` clean · `pnpm build` GREEN.
+
+## 2026-06-10 — BLOCK 2, Step 4 (Vercel env sync)
+
+Vercel link: repo root `.vercel/project.json` (project "lethe"). Diffed
+`process.env.*` / `NEXT_PUBLIC_*` across apps/web vs `npx vercel env ls`.
+
+**Missing required names added to production + preview + development (3):**
+MEMORY_ENCRYPTION_SECRET · NEXT_PUBLIC_MEMORY_PACKAGE_ID ·
+NEXT_PUBLIC_MEMORY_ALLOWLISTED (values from .env.local, never printed).
+Prod/dev via `printf | vercel env add`; preview via Vercel REST API
+(POST /v10/projects/:id/env) because the CLI's non-interactive preview add
+loops on `git_branch_required` even with `--yes` — documented workaround.
+
+**Intentionally NOT added** (referenced in code but optional with safe
+defaults, unset/empty in the locally-verified config — placeholders would
+CHANGE behavior, e.g. a non-empty GROQ_API_KEY makes the chain try Groq):
+GEMINI_API_KEY, GROQ_API_KEY (empty locally), NEXT_PUBLIC_MEMORY_PROVIDER
+(defaults "manual" = verified FALLBACK), LLM_TIMEOUT_MS (default 30s),
+MINIMAX_MODEL, NVIDIA_NIM_MODEL (model defaults), NEXT_PUBLIC_DEMO_MOCK
+(dev-only dead code in prod builds), NODE_ENV (platform-managed).
+
+GATE: zero missing required names — verified via `vercel env ls`.
