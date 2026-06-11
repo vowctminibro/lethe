@@ -39,6 +39,13 @@ No wallet needed. ~2 minutes.
 - **Trust model, stated honestly:** memories are encrypted per-user at rest on Walrus (AES-256-GCM, HKDF per owner), but today the per-owner key derives from a server-held secret — access is enforced by the on-chain grants you control plus server-side checks, not by key custody. Seal threshold encryption on the roadmap removes the server from decryption entirely — aligned with Walrus Memory's model.
 - **MemWal:** integrated days after MemWal launched; blocked by the published-SDK (`@mysten/memwal@0.0.2`) vs relayer (≥0.0.4) version gap — documented honestly in [BLOCKERS.md](BLOCKERS.md) (B16). A provider abstraction keeps us one adapter away from adopting `@mysten/memwal` the day it publishes.
 
+### Memory economics
+
+- **Today (testnet):** each fact is its own Walrus blob; storage is sponsored by the app.
+- **We know the cost model:** Walrus prices storage at a fixed [$0.023/GB/month](https://docs.wal.app/docs/system-overview/storage-costs); erasure coding is ~5× the raw size, and for sub-10MB blobs the fixed per-blob metadata dominates — exactly the shape of a memory fact.
+- **Designed mitigation (mainnet, designed — not yet built):** batch facts via Walrus Quilt — per-patch IDs preserve individual recall while amortizing the per-blob overhead, so a lifetime of memories costs effectively pennies per month at $0.023/GB.
+- **Ownership economics (roadmap framing):** the long-term model is vault-funded renewal — your WAL, your memory, your call to extend or let it expire.
+
 ## Architecture
 
 ```

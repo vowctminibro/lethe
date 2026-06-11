@@ -16,6 +16,7 @@ Lethe — Named after the river of forgetting. Built so nothing is.
 - **Closing lines:** "Lethe is the wedge." / "Memory infrastructure for the agentic web — a 10-year category." / "Built solo. Live on testnet today."
 - **Walrus integration note:** encrypted memory blobs (AES-256-GCM, HKDF per owner) on Walrus; on-chain BlobRefs in an owned MemoryVault on Sui. MemWal integration attempted day-5 post-launch; blocked by SDK/relayer version gap (BLOCKERS.md B16); provider abstraction in place to adopt @mysten/memwal the day ≥0.0.4 publishes.
 - **Encryption honesty rule (copy guardrail):** never claim "only you can decrypt" / "we can't read your memories". Honest framing: encrypted per-user at rest on Walrus; access enforced by grants you control on-chain (plus server checks); the per-owner key currently derives from a server-held secret. Seal threshold encryption on the roadmap removes the server from decryption entirely — aligned with Walrus Memory's model.
+- **Memory economics (deck line):** today each fact is a sponsored Walrus blob; Walrus prices storage at a fixed $0.023/GB/month (~5× erasure coding; sub-10MB blobs are dominated by fixed per-blob metadata — our exact shape). Designed (not yet built): batch facts via Walrus Quilt — per-patch IDs keep individual recall, amortized overhead makes a lifetime of memories pennies per month. Roadmap: vault-funded renewal — your WAL, your memory, your call to extend or expire. Source: docs.wal.app/docs/system-overview/storage-costs
 
 ---
 
