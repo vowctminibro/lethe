@@ -76,7 +76,7 @@ html, body {
   font-family: var(--font-display);
   font-style: italic;
   font-weight: 400;
-  font-size: clamp(3.5rem, 7.5vw, 5.5rem); /* 56 → 88px */
+  font-size: clamp(2.25rem, 1rem + 4.6vw, 4.5rem); /* 48 → 72px — the verse breaks where the poem does */
   line-height: 1.04;
   letter-spacing: -0.015em;
 }
