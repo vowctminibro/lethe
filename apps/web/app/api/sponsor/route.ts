@@ -7,6 +7,7 @@ import {
   ADD_ENTRY_TARGET as MEMORY_ADD_ENTRY_TARGET,
   GRANT_TARGET as MEMORY_GRANT_TARGET,
   REVOKE_TARGET as MEMORY_REVOKE_TARGET,
+  REMOVE_ENTRY_TARGET as MEMORY_REMOVE_ENTRY_TARGET,
 } from "@/src/lib/memory/chain";
 
 export const runtime = "nodejs";
@@ -56,6 +57,7 @@ export async function POST(req: NextRequest) {
         MEMORY_ADD_ENTRY_TARGET,
         MEMORY_GRANT_TARGET,
         MEMORY_REVOKE_TARGET,
+        MEMORY_REMOVE_ENTRY_TARGET,
       ].filter(Boolean);
       const res = await enoki.createSponsoredTransaction({
         network: NETWORK,

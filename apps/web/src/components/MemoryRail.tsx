@@ -73,22 +73,32 @@ export function MemoryRail({
       className="rounded-2xl border flex flex-col min-h-0 overflow-hidden"
       style={{ borderColor: "var(--border)", background: "var(--bg-panel)" }}
     >
-      <div className="px-4 py-3 border-b flex items-center justify-between" style={{ borderColor: "var(--border)" }}>
+      <div className="px-4 py-3 border-b flex items-center justify-between gap-2" style={{ borderColor: "var(--border)" }}>
         <div className="text-[11px] font-semibold tracking-[0.14em] uppercase" style={{ color: "var(--text-dim)" }}>
           Memory
         </div>
-        {vaultId && (
+        <span className="flex items-center gap-3">
           <a
             className="text-[11px] underline decoration-dotted underline-offset-2 hover:opacity-70 transition"
             style={{ color: "var(--text-dim)" }}
-            href={SUISCAN_OBJ(vaultId)}
-            target="_blank"
-            rel="noreferrer"
-            title="Your Memory vault object on Sui"
+            href="/memory"
+            title="View, verify, or forget any memory"
           >
-            vault {short(vaultId)} ↗
+            manage / forget
           </a>
-        )}
+          {vaultId && (
+            <a
+              className="text-[11px] underline decoration-dotted underline-offset-2 hover:opacity-70 transition"
+              style={{ color: "var(--text-dim)" }}
+              href={SUISCAN_OBJ(vaultId)}
+              target="_blank"
+              rel="noreferrer"
+              title="Your Memory vault object on Sui"
+            >
+              vault {short(vaultId)} ↗
+            </a>
+          )}
+        </span>
       </div>
 
       <div className="flex-1 overflow-y-auto px-3 py-3 flex flex-col gap-2.5">

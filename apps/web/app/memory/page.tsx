@@ -35,6 +35,10 @@ export default function MemoryPage() {
   const [appAddr, setAppAddr] = useState("");
   const [accessBusy, setAccessBusy] = useState<string | null>(null);
   const [accessError, setAccessError] = useState<string | null>(null);
+  const [forgetTarget, setForgetTarget] = useState<RecallHit | null>(null);
+  const [forgetBusy, setForgetBusy] = useState(false);
+  const [leaving, setLeaving] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ text: string; href?: string } | null>(null);
 
   const load = useCallback(async () => {
     if (!account || !memory) return;
@@ -82,6 +86,39 @@ export default function MemoryPage() {
       setAccessError(e instanceof Error ? e.message : "revoke failed");
     } finally {
       setAccessBusy(null);
+    }
+  }
+
+  // Forget one entry: confirm → optimistic row-out → gasless remove_entry →
+  // toast with the Suiscan tx. On failure the row comes back.
+  async function confirmForget() {
+    const hit = forgetTarget;
+    if (!memory || !hit || forgetBusy) return;
+    setForgetBusy(true);
+    setLeaving(hit.blobId);
+    try {
+      const { digest } = await memory.forget(hit.blobId);
+      setForgetTarget(null);
+      // Let the row-out transition play before the list collapses.
+      setTimeout(() => {
+        setHits((h) => (h ? h.filter((x) => x.blobId !== hit.blobId) : h));
+        setChain((c) =>
+          c ? { ...c, entries: c.entries.filter((e) => e.blobId !== hit.blobId) } : c,
+        );
+        setLeaving(null);
+      }, 350);
+      setToast({
+        text: "Forgotten — the on-chain reference is gone.",
+        href: `https://suiscan.xyz/testnet/tx/${digest}`,
+      });
+      setTimeout(() => setToast(null), 8000);
+    } catch (e) {
+      setLeaving(null);
+      setForgetTarget(null);
+      setToast({ text: e instanceof Error ? `Forget failed: ${e.message}` : "Forget failed" });
+      setTimeout(() => setToast(null), 8000);
+    } finally {
+      setForgetBusy(false);
     }
   }
 
@@ -258,11 +295,28 @@ export default function MemoryPage() {
           {account && hits && hits.length > 0 && (
             <ul className="flex flex-col gap-3">
               {hits.map((h) => (
-                <li key={h.blobId} className="rounded-xl border p-4" style={{ borderColor: "var(--border)", background: "var(--bg-panel)" }}>
+                <li
+                  key={h.blobId}
+                  data-testid="memory-entry"
+                  className={`rounded-xl border p-4 transition-all duration-300 ${leaving === h.blobId ? "opacity-0 translate-x-6" : ""}`}
+                  style={{ borderColor: "var(--border)", background: "var(--bg-panel)" }}
+                >
                   <div className="flex items-start justify-between gap-3">
                     <p className="text-sm" style={{ color: "var(--text)" }}>{h.text}</p>
-                    <span className="text-[10px] uppercase tracking-wide shrink-0 px-2 py-0.5 rounded" style={{ background: "var(--bg)", color: "var(--text-dim)" }}>
-                      {h.kind}
+                    <span className="flex items-center gap-2 shrink-0">
+                      <span className="text-[10px] uppercase tracking-wide px-2 py-0.5 rounded" style={{ background: "var(--bg)", color: "var(--text-dim)" }}>
+                        {h.kind}
+                      </span>
+                      <button
+                        data-testid="forget-button"
+                        onClick={() => setForgetTarget(h)}
+                        disabled={forgetBusy}
+                        className="text-[11px] px-2 py-0.5 rounded border disabled:opacity-50"
+                        style={{ borderColor: "var(--accent-h)", color: "var(--accent-h)" }}
+                        title="Remove this entry from your vault"
+                      >
+                        Forget
+                      </button>
                     </span>
                   </div>
                   <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[11px]" style={{ color: "var(--text-dim)" }}>
@@ -286,6 +340,56 @@ export default function MemoryPage() {
           )}
         </div>
       </div>
+
+      {/* ── Forget confirm dialog ── */}
+      {forgetTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-6" style={{ background: "rgba(10, 22, 40, 0.45)" }} onClick={() => !forgetBusy && setForgetTarget(null)}>
+          <div
+            data-testid="forget-dialog"
+            className="w-full max-w-md rounded-xl border p-5"
+            style={{ borderColor: "var(--border)", background: "var(--bg-panel)" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-sm font-semibold" style={{ color: "var(--text)" }}>Forget this memory?</h3>
+            <p className="mt-2 text-sm" style={{ color: "var(--text)" }}>&ldquo;{forgetTarget.text}&rdquo;</p>
+            <p className="mt-3 text-xs leading-relaxed" style={{ color: "var(--text-dim)" }}>
+              Removes the on-chain reference from your vault. The encrypted blob on Walrus becomes
+              orphaned ciphertext — unreadable and no longer part of your memory. Gasless, owner-only.
+            </p>
+            <div className="mt-4 flex justify-end gap-2">
+              <button
+                onClick={() => setForgetTarget(null)}
+                disabled={forgetBusy}
+                className="h-9 px-4 rounded-md text-sm border disabled:opacity-50"
+                style={{ borderColor: "var(--border)", color: "var(--text-dim)" }}
+              >
+                Keep it
+              </button>
+              <button
+                data-testid="forget-confirm"
+                onClick={confirmForget}
+                disabled={forgetBusy}
+                className="h-9 px-4 rounded-md text-sm font-semibold disabled:opacity-50"
+                style={{ background: "var(--accent-h)", color: "var(--bg-panel)" }}
+              >
+                {forgetBusy ? "Forgetting…" : "Forget"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Toast ── */}
+      {toast && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 rounded-lg border px-4 py-2.5 text-sm shadow-lg flex items-center gap-3" style={{ borderColor: "var(--border)", background: "var(--bg-panel)", color: "var(--text)" }}>
+          <span>{toast.text}</span>
+          {toast.href && (
+            <a href={toast.href} target="_blank" rel="noreferrer" className="underline text-xs shrink-0" style={{ color: "var(--text-dim)" }}>
+              Suiscan tx ↗
+            </a>
+          )}
+        </div>
+      )}
     </main>
   );
 }

@@ -19,4 +19,10 @@ export interface MemoryProvider {
   grant(app: string): Promise<{ digest: string }>;
   /** Revoke an app address's read access = forget (gasless, owner-only). */
   revoke(app: string): Promise<{ digest: string }>;
+  /**
+   * Remove one entry from the vault (= forget a single memory). Drops the
+   * on-chain reference via `memory::remove_entry`; the encrypted Walrus blob
+   * becomes orphaned ciphertext. Gasless, owner-only.
+   */
+  forget(blobId: string): Promise<{ digest: string }>;
 }

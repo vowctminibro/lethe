@@ -25,6 +25,7 @@ import {
   buildAddEntryTx,
   buildGrantTx,
   buildRevokeTx,
+  buildRemoveEntryTx,
   getOwnedMemory,
   MEMORY_PACKAGE_ID,
 } from "./chain";
@@ -110,6 +111,20 @@ export class ManualProvider implements MemoryProvider {
   async revoke(app: string): Promise<{ digest: string }> {
     const memoryId = await this.#ensureMemoryId();
     const { digest } = await executeGasless(this.#deps, buildRevokeTx({ memoryId, app }));
+    return { digest };
+  }
+
+  async forget(blobId: string): Promise<{ digest: string }> {
+    // remove_entry is keyed by (index, blob_id) on chain, so resolve the
+    // entry's current index from a fresh read right before the tx.
+    const memory = await getOwnedMemory(this.#deps.client, this.#deps.ownerAddress);
+    if (!memory) throw new Error("No Memory vault found");
+    const index = memory.entries.findIndex((e) => e.blobId === blobId);
+    if (index < 0) throw new Error("Entry not found in your vault");
+    const { digest } = await executeGasless(
+      this.#deps,
+      buildRemoveEntryTx({ memoryId: memory.objectId, index, blobId }),
+    );
     return { digest };
   }
 }

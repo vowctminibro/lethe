@@ -59,6 +59,8 @@ const LS_KEY = "lethe-demo-mock";
 interface MockStore {
   added: RecallHit[];
   authorized: string[];
+  /** blobIds the user has forgotten (covers seeds too). */
+  forgotten?: string[];
 }
 
 function loadStore(): MockStore {
@@ -70,7 +72,7 @@ function loadStore(): MockStore {
       /* corrupted/unavailable — fall through to defaults */
     }
   }
-  return { added: [], authorized: [PULSE_APP_ADDRESS] };
+  return { added: [], authorized: [PULSE_APP_ADDRESS], forgotten: [] };
 }
 
 function saveStore(s: MockStore) {
@@ -84,10 +86,11 @@ function saveStore(s: MockStore) {
 
 export function getMockOwnedMemory(): OwnedMemory {
   const s = loadStore();
+  const gone = new Set(s.forgotten ?? []);
   return {
     objectId: MOCK_VAULT_ID,
     owner: MOCK_ADDRESS,
-    entries: [...SEEDS, ...s.added].map(({ blobId, namespace, kind, createdAtMs }) => ({
+    entries: [...SEEDS, ...s.added].filter((h) => !gone.has(h.blobId)).map(({ blobId, namespace, kind, createdAtMs }) => ({
       blobId,
       namespace,
       kind,
@@ -126,7 +129,11 @@ class MockProvider implements MemoryProvider {
 
   async recall(query: string, opts?: { limit?: number }): Promise<RecallHit[]> {
     await wait(300);
-    const all = [...SEEDS, ...loadStore().added].sort((a, b) => b.createdAtMs - a.createdAtMs);
+    const s = loadStore();
+    const gone = new Set(s.forgotten ?? []);
+    const all = [...SEEDS, ...s.added]
+      .filter((h) => !gone.has(h.blobId))
+      .sort((a, b) => b.createdAtMs - a.createdAtMs);
     if (!query.trim()) return all;
     const q = query.toLowerCase();
     const scored = all
@@ -150,6 +157,14 @@ class MockProvider implements MemoryProvider {
     await wait(800);
     const s = loadStore();
     s.authorized = s.authorized.filter((a) => a !== app);
+    saveStore(s);
+    return { digest: MOCK_DIGEST };
+  }
+
+  async forget(blobId: string): Promise<{ digest: string }> {
+    await wait(800);
+    const s = loadStore();
+    s.forgotten = [...(s.forgotten ?? []), blobId];
     saveStore(s);
     return { digest: MOCK_DIGEST };
   }
