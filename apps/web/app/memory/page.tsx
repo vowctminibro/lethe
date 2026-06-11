@@ -224,6 +224,10 @@ export default function MemoryPage() {
                 </p>
               )}
             </div>
+
+            <p className="mt-4 text-[11px]" style={{ color: "var(--text-dim)" }}>
+              Encrypted at rest on Walrus · access enforced by your on-chain grants · Seal threshold encryption on the roadmap.
+            </p>
           </section>
         )}
 

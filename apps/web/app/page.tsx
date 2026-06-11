@@ -61,12 +61,15 @@ export default function Home() {
       >
         <span>Lethe — Walrus track, Sui Overflow 2026</span>
         {/* Official marks from sui.io/media-kit + walrus.xyz media kit — do not recolor or restyle */}
-        <span className="flex items-center gap-2">
-          <img src="/partners/sui-droplet.svg" alt="Sui" className="h-4 w-auto" />
-          <span>Built on Sui</span>
-          <span aria-hidden="true" className="px-1">·</span>
-          <img src="/partners/walrus-monogram.svg" alt="Walrus" className="h-3.5 w-auto" />
-          <span>Stored on Walrus</span>
+        <span className="flex flex-col items-center gap-1">
+          <span className="flex items-center gap-2">
+            <img src="/partners/sui-droplet.svg" alt="Sui" className="h-4 w-auto" />
+            <span>Built on Sui</span>
+            <span aria-hidden="true" className="px-1">·</span>
+            <img src="/partners/walrus-monogram.svg" alt="Walrus" className="h-3.5 w-auto" />
+            <span>Stored on Walrus</span>
+          </span>
+          <span className="text-[11px] opacity-80">Encrypted per-user · grant-controlled on-chain.</span>
         </span>
         <a href="https://github.com/vowctminibro/lethe" className="hover:opacity-70 transition">GitHub</a>
       </footer>
