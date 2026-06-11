@@ -157,3 +157,39 @@ export default {
 | `lethe-lockup.svg` | Mark + wordmark horizontal, for headers |
 
 All assets exported from this spec. Source of truth: `BRAND.md` + SVG files in `apps/web/public/brand/`.
+
+---
+
+## Visual identity v3 — "Letterpress on water" (locked 2026-06-11, Block 6)
+
+One art direction, every pixel obeys. NO new colors, NO gradients, NO stock rounded-card layouts.
+
+### Type
+- **Display:** Fraunces variable (italic + optical sizing, 400–600). Landing display 48–72px italic, set as verse — line breaks follow the poem, never the viewport. Section heads 28–36 upright.
+- **Body:** Instrument Sans 15.5/1.6.
+- **Mono:** IBM Plex Mono for EVERY on-chain id/hash — 12.5px, +0.08em tracking (`.lethe-id`). Ids are engraved plates with a copy affordance, never plain inline text.
+
+### Shape & surface
+- Corners 2–4px everywhere (the Tailwind radius scale is overridden in `globals.css` — `rounded-*` utilities all map to 2–4px).
+- Borders: hairline `rgba(26,58,74,.12)` (`--border`, `.lethe-hairline`). Shadows: hairline + faint ambient only (`--shadow-ambient`).
+- Confirmed memory chips: letterpress inset (`.lethe-letterpress`, ink-pool variant inline in MemoryRail).
+
+### Color law (hard rule)
+- Fog `#EFF5F4` = paper. Ink `#1A3A4A` = text. Mist `#5A8A9E` = secondary.
+- **Coral `#E8B894` is RESERVED for memory: memory events/chips, proof links (Walrus/Suiscan), remembrance actions (Save/grant/forget accents), selection + focus rings.** Coral on anything unrelated to memory is a bug — remove it.
+- The memory rail in /chat is the ONE dark surface on a paper page (the ink pool, `#1A3A4A`).
+
+### Water line-work
+- Contour-line SVG pattern, Mist at ≤6% opacity, drifting 75–90s (`.lethe-water`, `.lethe-divider`). Hero + section dividers ONLY. No gradients anywhere. `prefers-reduced-motion` kills all drift/motion globally.
+
+### Motion vocabulary (400–600ms, ease-out)
+- `.lethe-chip-lift` — fact lifts from the conversation with a soft coral glow.
+- `.lethe-stamp` — chip anchors on on-chain confirm (one stamp, then letterpress).
+- `.lethe-inkwash` — forget: the ledger row blurs and washes off.
+- `.lethe-draw` — vault birth: the L mark draws itself (1.5s rite, skippable).
+
+### Voice anchors per surface
+- Landing: verse hero ("Named after the river / of forgetting. / Built so nothing is.") + memory-constellation line-work + colophon footer.
+- /chat: Lethe speaks as typeset prose with a hanging italic "L." — no bubble. User notes are ink. Rail = ink pool.
+- /memory: MEMORY HUB constellation (grant/revoke ON the map, severing spokes) over an engraved ledger.
+- /pulse: same press, different publication — Mist-led italic wordmark, its own display moment, "POWERED BY LETHE MEMORY" colophon.

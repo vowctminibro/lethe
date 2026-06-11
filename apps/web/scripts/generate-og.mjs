@@ -16,6 +16,17 @@ const svg = `
 <svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
   <rect width="${W}" height="${H}" fill="${FOG}"/>
 
+  <!-- water line-work: contour lines, Mist at 6% — the river under everything -->
+  <g fill="none" stroke="${MIST}" stroke-width="1" opacity="0.06">
+    <path d="M0 90 C 200 60, 400 120, 600 90 S 1000 60, 1200 90"/>
+    <path d="M0 170 C 200 140, 400 200, 600 170 S 1000 140, 1200 170"/>
+    <path d="M0 250 C 200 220, 400 280, 600 250 S 1000 220, 1200 250"/>
+    <path d="M0 330 C 200 300, 400 360, 600 330 S 1000 300, 1200 330"/>
+    <path d="M0 410 C 200 380, 400 440, 600 410 S 1000 380, 1200 410"/>
+    <path d="M0 490 C 200 460, 400 520, 600 490 S 1000 460, 1200 490"/>
+    <path d="M0 570 C 200 540, 400 600, 600 570 S 1000 540, 1200 570"/>
+  </g>
+
   <!-- oversized ghost L, bleeding off the right edge — quiet texture, not clipart -->
   <text x="1065" y="540" font-family="Georgia, serif" font-style="italic" font-size="760"
         fill="${INK}" opacity="0.05">L</text>
@@ -31,15 +42,18 @@ const svg = `
           fill="${INK}">Lethe</text>
   </g>
 
+  <!-- verse -->
+  <text x="96" y="312" font-family="Georgia, serif" font-style="italic" font-size="56"
+        fill="${MIST}">Named after the river of forgetting.</text>
   <!-- headline -->
-  <text x="96" y="368" font-family="Georgia, serif" font-style="italic" font-size="104"
-        fill="${INK}" letter-spacing="-1">Memory you own.</text>
-  <!-- coral ink-stroke under "own" -->
-  <rect x="652" y="392" width="222" height="7" rx="3.5" fill="${CORAL}"/>
+  <text x="96" y="424" font-family="Georgia, serif" font-size="96"
+        fill="${INK}" letter-spacing="-1" font-weight="500">Built so nothing is.</text>
+  <!-- coral ink-stroke under "nothing" -->
+  <rect x="416" y="446" width="290" height="7" rx="3" fill="${CORAL}"/>
 
   <!-- subline -->
-  <text x="96" y="452" font-family="'Helvetica Neue', Arial, sans-serif" font-size="34"
-        fill="${MIST}">User-owned AI memory on Walrus + Sui</text>
+  <text x="96" y="492" font-family="'Helvetica Neue', Arial, sans-serif" font-size="30"
+        fill="${MIST}">Memory you own — on Walrus, anchored on Sui, portable across every app</text>
 
   <!-- footer rail -->
   <rect x="96" y="524" width="44" height="3" rx="1.5" fill="${CORAL}"/>
