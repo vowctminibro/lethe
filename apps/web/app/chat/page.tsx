@@ -432,30 +432,45 @@ export default function ChatPage() {
 
       <div className="flex-1 min-h-0 max-w-6xl mx-auto w-full px-6 py-5 grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_330px] gap-5">
         {/* ── chat column ── */}
-        <div className="flex flex-col min-h-0 rounded-2xl border overflow-hidden" style={{ borderColor: "var(--border)", background: "var(--bg-panel)" }}>
+        <div className="flex flex-col min-h-0 rounded border overflow-hidden" style={{ borderColor: "var(--border)", background: "var(--bg-panel)" }}>
           <div className="flex-1 min-h-0 overflow-y-auto px-5 py-5 flex flex-col gap-4">
-            {msgs.map((m, i) => (
-              <div key={i} className={m.role === "you" ? "self-end max-w-[80%]" : "self-start max-w-[85%]"}>
-                <div
-                  className="rounded-2xl px-4 py-2.5 text-sm whitespace-pre-wrap leading-relaxed"
-                  style={
-                    m.role === "you"
-                      ? { background: "var(--text)", color: "var(--accent)" }
-                      : { background: "var(--bg)", border: "1px solid var(--border)" }
-                  }
-                >
-                  {m.text}
-                  {m.streaming && (
-                    <span className="inline-block w-[2px] h-[1em] ml-0.5 align-text-bottom animate-pulse" style={{ background: "var(--text-dim)" }} />
-                  )}
-                </div>
-                {m.provider && !m.streaming && (
-                  <div className="mt-1 text-[10px]" style={{ color: "var(--text-dim)" }} title="The free LLM that produced this reply">
-                    via {m.provider}
+            {msgs.map((m, i) =>
+              m.role === "you" ? (
+                // The reader's voice — a compact ink note, set right.
+                <div key={i} className="self-end max-w-[80%]">
+                  <div
+                    className="rounded px-4 py-2.5 text-sm whitespace-pre-wrap leading-relaxed"
+                    style={{ background: "var(--text)", color: "var(--bg)" }}
+                  >
+                    {m.text}
                   </div>
-                )}
-              </div>
-            ))}
+                </div>
+              ) : (
+                // Lethe speaks as typeset prose with a hanging italic L. — no bubble.
+                <div key={i} className="self-start max-w-[85%] flex gap-3">
+                  <span
+                    aria-hidden="true"
+                    className="shrink-0 select-none"
+                    style={{ fontFamily: "var(--font-display)", fontStyle: "italic", fontSize: "1.2rem", lineHeight: 1.3, color: "var(--text-dim)" }}
+                  >
+                    L.
+                  </span>
+                  <div className="min-w-0 pb-1" style={{ borderBottom: "1px solid var(--border)" }}>
+                    <div className="text-sm whitespace-pre-wrap leading-relaxed" style={{ color: "var(--text)" }}>
+                      {m.text}
+                      {m.streaming && (
+                        <span className="inline-block w-[2px] h-[1em] ml-0.5 align-text-bottom animate-pulse" style={{ background: "var(--text-dim)" }} />
+                      )}
+                    </div>
+                    {m.provider && !m.streaming && (
+                      <div className="lethe-id mt-1.5" style={{ color: "var(--text-dim)" }} title="The free LLM that produced this reply">
+                        via {m.provider}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ),
+            )}
             {(analyzing || (busy && msgs[msgs.length - 1]?.role === "you")) && (
               <div className="self-start rounded-2xl px-4 py-3 border" style={{ borderColor: "var(--border)", background: "var(--bg)" }}>
                 <div className="lethe-shimmer h-3 w-36 rounded" />
