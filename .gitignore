@@ -52,3 +52,6 @@ research/legacy/demo-game/MemoryCaptures/
 # throwaway scratch (Enoki allowlist targets — copy/paste only; canonical in HERMES_HANDOFF.md)
 ALLOWLIST_TARGETS.txt
 .vercel
+
+# Local X/Twitter automation artifacts (Hermes daily job) — never publish
+twitter-growth/
