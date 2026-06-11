@@ -1,3 +1,7 @@
+> **LEGACY (pre-pivot, kept for history).** This is the earlier NPC-SDK-era demo script.
+> The current 90-second hero flow lives at the root: [HERO_FLOW.md](../HERO_FLOW.md);
+> the current app lives in [`apps/web`](../apps/web).
+
 HERO FLOW — Lethe SDK demo, 90 seconds
 
 0:00  VS Code on screen — new Sui game project, empty

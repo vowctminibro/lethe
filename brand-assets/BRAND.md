@@ -1,3 +1,7 @@
+> **LEGACY (pre-pivot, kept for history).** This is brand v1 from the art-collectibles era.
+> The current brand system (v2, "Memory you own") is the root [BRAND.md](../BRAND.md);
+> the current app lives in [`apps/web`](../apps/web).
+
 # Lethe Brand System
 
 **Locked:** 2026-05-28

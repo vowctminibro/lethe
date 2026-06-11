@@ -1,3 +1,7 @@
+> **LEGACY (pre-pivot, kept for history).** This describes the earlier NPC-memory-SDK era.
+> The current product is user-owned memory for AI agents — see the root [README](../README.md)
+> (current architecture diagram included); the current app lives in [`apps/web`](../apps/web).
+
 # ARCHITECTURE — Lethe SDK
 
 Lethe is a **developer SDK**: a persistent memory layer for Sui game
