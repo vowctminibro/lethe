@@ -75,4 +75,6 @@ Sui Move (owned objects) · Walrus · Enoki (zkLogin + sponsored transactions) �
 
 Built solo. Live on testnet today.
 
+Built on Sui · Stored on Walrus
+
 License: Apache-2.0
