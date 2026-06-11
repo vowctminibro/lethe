@@ -74,3 +74,5 @@ Sui Move (owned objects) · Walrus · Enoki (zkLogin + sponsored transactions) �
 - **MemWal adapter** ships the day `@mysten/memwal` ≥0.0.4 publishes.
 
 Built solo. Live on testnet today.
+
+License: Apache-2.0
