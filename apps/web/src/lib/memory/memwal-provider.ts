@@ -38,4 +38,8 @@ export class MemWalProvider implements MemoryProvider {
   async revoke(_app: string): Promise<{ digest: string }> {
     throw new Error(BLOCKED);
   }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async forget(_blobId: string): Promise<{ digest: string }> {
+    throw new Error(BLOCKED);
+  }
 }
