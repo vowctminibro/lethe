@@ -1,5 +1,9 @@
 # Lethe — Memory you own
 
+[![CI](https://github.com/vowctminibro/lethe/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/vowctminibro/lethe/actions/workflows/ci.yml)
+[![License: Apache-2.0](https://img.shields.io/github/license/vowctminibro/lethe)](LICENSE)
+[![Sui testnet](https://img.shields.io/badge/Sui-testnet-298DFF)](https://suiscan.xyz/testnet/object/0x9dcc482cd7fb5d7fa2a0cf90c7dc1e6efec6f40e817e352c61ed0f63951c1331)
+
 > Named after the river of forgetting. Built so nothing is.
 
 User-owned memory for AI agents — stored on Walrus, anchored on Sui, portable across every app.
