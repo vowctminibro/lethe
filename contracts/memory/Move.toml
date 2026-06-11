@@ -1,7 +1,7 @@
 [package]
 name = "memory"
 edition = "2024"
-license = "MIT"
+license = "Apache-2.0"
 authors = ["Lethe (Sui Overflow 2026)"]
 
 # Sui, MoveStdlib and system packages are auto-resolved by the Sui CLI

@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  move-tests:
+    name: Move tests (contracts/memory)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Pinned to the exact CLI version used for local dev + the testnet publish.
+      - name: Install Sui CLI (mainnet-v1.72.5)
+        run: |
+          curl -sSfL -o /tmp/sui.tgz \
+            https://github.com/MystenLabs/sui/releases/download/mainnet-v1.72.5/sui-mainnet-v1.72.5-ubuntu-x86_64.tgz
+          mkdir -p "$HOME/sui-bin"
+          tar -xzf /tmp/sui.tgz -C "$HOME/sui-bin"
+          echo "$HOME/sui-bin" >> "$GITHUB_PATH"
+
+      - name: sui --version
+        run: sui --version
+
+      - name: sui move test
+        working-directory: contracts/memory
+        run: sui move test
+
+  web-tests:
+    name: Web unit tests (LLM failover)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: pnpm install
+        run: pnpm install --frozen-lockfile
+
+      # Mocked-fetch suite — no network, no real keys (see the file header).
+      - name: LLM failover suite
+        working-directory: apps/web
+        run: node --import ./scripts/_register-hook.mjs scripts/test-llm-failover.mjs
