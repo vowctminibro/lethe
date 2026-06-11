@@ -20,17 +20,18 @@ const KINDS = ["trading-style", "market-view", "holding", "preference", "fact"] 
 
 const SYSTEM = [
   "You are Lethe analyzing a user's REAL on-chain activity on Sui. From the",
-  "snapshot below, infer durable, useful facts about this user as a crypto",
+  "snapshot below, infer durable STYLE TRAITS about this user as a crypto",
   "participant — what they hold, how active they are, what kinds of protocols",
-  "they touch. Be specific but do NOT invent anything not supported by the data.",
+  "they touch. Be specific, cite the numbers you see, and do NOT invent",
+  "anything not supported by the data.",
   "",
   "Respond ONLY with a JSON object: { \"entries\": [ { \"text\": string, \"kind\": string } ] }",
-  "- 2 to 5 entries.",
-  "- `text`: a concise third-person fact (e.g. \"Holds mostly SUI; ~40 recent txs,",
-  "  an active on-chain user\" or \"Interacts with DeepBook — trades on-chain\").",
+  "- 2 to 4 entries, each a trait card: a short label, then the evidence.",
+  "  e.g. \"Momentum-leaning: 14 swap txs in the recent sample\" or",
+  "  \"Builder profile: publishes Move packages and holds UpgradeCaps\" or",
+  "  \"NFT collector: 12 collectibles incl. 'Khun Tum'\".",
   `- \`kind\` one of: ${KINDS.join(", ")}.`,
-  "- If the address is essentially empty/inactive, return a single honest entry",
-  "  saying so with kind \"fact\".",
+  "- Quality over quantity — only traits the data actually supports.",
 ].join("\n");
 
 export async function POST(req: NextRequest) {
@@ -42,6 +43,15 @@ export async function POST(req: NextRequest) {
 
     const activity = await readActivity(getSuiClient(), address);
     const summary = activityToPrompt(activity);
+
+    // Empty/boring wallet: be graceful and honest — no LLM, no fabricated traits.
+    if (
+      activity.recentTxCount === 0 &&
+      activity.holdings.length === 0 &&
+      activity.ownedObjectCount === 0
+    ) {
+      return NextResponse.json({ summary, entries: [], inactive: true, provider: "none" });
+    }
 
     const { text, provider } = await complete(
       [
@@ -65,17 +75,17 @@ export async function POST(req: NextRequest) {
                 ? (e.kind as string)
                 : "fact",
           }))
-          .slice(0, 5);
+          .slice(0, 4);
       }
     } catch {
       /* model didn't return JSON — fall through to empty */
     }
 
     if (entries.length === 0) {
-      entries = [{ text: "On-chain activity analyzed; no strong signals derived.", kind: "fact" }];
+      return NextResponse.json({ summary, entries, inactive: true, provider });
     }
 
-    return NextResponse.json({ summary, entries, provider });
+    return NextResponse.json({ summary, entries, inactive: false, provider });
   } catch (e) {
     const message = e instanceof Error ? e.message : "derive failed";
     return NextResponse.json({ error: message }, { status: 500 });

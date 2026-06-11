@@ -42,10 +42,16 @@ export interface OnChainActivity {
   holdings: CoinHolding[];
   /** Count of owned objects (NFTs, coins, misc). */
   ownedObjectCount: number;
+  /** Owned-object type histogram, descending: [shortType, count]. */
+  objectTypes: [string, number][];
+  /** Display names of owned NFT-like objects (first ~10 with a Display name). */
+  nftNames: string[];
   /** Number of recent transactions sampled (capped). */
   recentTxCount: number;
   /** Distinct "module::function" Move calls seen in the sample. */
   moveCalls: string[];
+  /** Move-call kinds with counts, descending: [module::function, count]. */
+  callKinds: [string, number][];
   /** Protocol/category labels inferred from those calls. */
   protocols: string[];
 }
@@ -84,8 +90,11 @@ export async function readActivity(
     address,
     holdings: [],
     ownedObjectCount: 0,
+    objectTypes: [],
+    nftNames: [],
     recentTxCount: 0,
     moveCalls: [],
+    callKinds: [],
     protocols: [],
   };
 
@@ -103,12 +112,40 @@ export async function readActivity(
     /* leave holdings empty */
   }
 
-  // ── Owned objects (count) ─────────────────────────────────────────────
+  // ── Owned objects: count + type histogram + NFT display names ─────────
   try {
-    const owned = await client.getOwnedObjects({ owner: address, options: { showType: false } });
-    activity.ownedObjectCount = owned.data?.length ?? 0;
+    const typeCounts = new Map<string, number>();
+    const names: string[] = [];
+    let cursor: string | null | undefined = undefined;
+    let total = 0;
+    // Paginate up to ~200 objects — enough signal, bounded RPC cost.
+    for (let pageN = 0; pageN < 4; pageN++) {
+      const page = await client.getOwnedObjects({
+        owner: address,
+        options: { showType: true, showDisplay: true },
+        cursor,
+        limit: 50,
+      });
+      for (const o of page.data ?? []) {
+        total++;
+        const t = o.data?.type;
+        if (t && !/^0x2::coin::Coin</.test(t)) {
+          const st = shortType(t);
+          typeCounts.set(st, (typeCounts.get(st) ?? 0) + 1);
+        }
+        const display = (o.data as { display?: { data?: { name?: string } | null } } | null | undefined)
+          ?.display?.data;
+        const name = display?.name;
+        if (name && names.length < 10 && !names.includes(name)) names.push(name);
+      }
+      if (!page.hasNextPage || !page.nextCursor) break;
+      cursor = page.nextCursor;
+    }
+    activity.ownedObjectCount = total;
+    activity.objectTypes = [...typeCounts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10);
+    activity.nftNames = names;
   } catch {
-    /* leave 0 */
+    /* leave defaults */
   }
 
   // ── Recent transactions + Move-call fingerprints ──────────────────────
@@ -122,17 +159,21 @@ export async function readActivity(
     const blocks = txs.data ?? [];
     activity.recentTxCount = blocks.length;
 
-    const calls = new Set<string>();
+    const callCounts = new Map<string, number>();
     for (const tb of blocks) {
       // ProgrammableTransaction: data.transaction.transactions[] may hold MoveCall.
       const data = (tb as { transaction?: { data?: { transaction?: unknown } } }).transaction?.data
         ?.transaction as { transactions?: unknown[] } | undefined;
       for (const cmd of data?.transactions ?? []) {
         const mc = (cmd as { MoveCall?: { module?: string; function?: string } }).MoveCall;
-        if (mc?.module && mc.function) calls.add(`${mc.module}::${mc.function}`);
+        if (mc?.module && mc.function) {
+          const key = `${mc.module}::${mc.function}`;
+          callCounts.set(key, (callCounts.get(key) ?? 0) + 1);
+        }
       }
     }
-    activity.moveCalls = [...calls].slice(0, 20);
+    activity.callKinds = [...callCounts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 12);
+    activity.moveCalls = [...callCounts.keys()].slice(0, 20);
 
     const protos = new Set<string>();
     const haystack = activity.moveCalls.join(" ");
@@ -158,8 +199,16 @@ export function activityToPrompt(a: OnChainActivity): string {
     `Holdings: ${holdings}`,
     `Distinct coins held: ${a.holdings.length}`,
     `Owned objects: ${a.ownedObjectCount}`,
+    a.objectTypes.length > 0
+      ? `Owned object types (top): ${a.objectTypes.map(([t, n]) => `${t} ×${n}`).join(", ")}`
+      : "",
+    a.nftNames.length > 0 ? `NFT display names: ${a.nftNames.join(" · ")}` : "",
     `Recent transactions sampled: ${a.recentTxCount}`,
-    `Move calls observed: ${a.moveCalls.length > 0 ? a.moveCalls.join(", ") : "none in sample"}`,
+    a.callKinds.length > 0
+      ? `Move calls with counts: ${a.callKinds.map(([c, n]) => `${c} ×${n}`).join(", ")}`
+      : `Move calls observed: ${a.moveCalls.length > 0 ? a.moveCalls.join(", ") : "none in sample"}`,
     `Protocols inferred: ${a.protocols.length > 0 ? a.protocols.join(", ") : "none obvious"}`,
-  ].join("\n");
+  ]
+    .filter(Boolean)
+    .join("\n");
 }

@@ -47,6 +47,10 @@ export default function ChatPage() {
   const [walletOpen, setWalletOpen] = useState(false);
   const [walletBusy, setWalletBusy] = useState(false);
   const [linkedWallet, setLinkedWallet] = useState<{ address: string; lines: string[] } | null>(null);
+  // Suggested trait cards from on-chain analysis — saved ONLY on user [Save].
+  const [suggestions, setSuggestions] = useState<
+    { id: string; text: string; kind: string; status: "pending" | "saving" | "saved" | "dismissed" }[]
+  >([]);
   const [msgs, setMsgs] = useState<Msg[]>([
     {
       role: "lethe",
@@ -267,22 +271,41 @@ export default function ChatPage() {
         const err = await res.json().catch(() => ({}));
         throw new Error((err as { error?: string })?.error ?? "on-chain analysis failed");
       }
-      const { entries, provider } = (await res.json()) as {
+      const { entries, provider, inactive } = (await res.json()) as {
         entries: { text: string; kind: string }[];
         provider: string;
+        inactive?: boolean;
       };
+
+      if (inactive || entries.length === 0) {
+        setMsgs((m) => [
+          ...m,
+          {
+            role: "lethe",
+            provider,
+            text: "I looked at that address but there isn't enough on-chain history yet to learn a style from. Trade, mint, or move something on Sui and try again.",
+          },
+        ]);
+        return;
+      }
 
       setMsgs((m) => [
         ...m,
         {
           role: "lethe",
           provider,
-          text: `Here's what I learned from your on-chain activity — you didn't tell me any of this:\n${entries
-            .map((e) => `• ${e.text}`)
-            .join("\n")}\n\nSaving these to your owned memory — watch the rail.`,
+          text: `Here's what your on-chain activity suggests — you didn't tell me any of this. These are only suggestions: nothing is saved until YOU say so. Review the cards below.`,
         },
       ]);
-      await Promise.all(entries.map((e) => persistFact(e)));
+      setSuggestions((s) => [
+        ...s.filter((x) => x.status !== "dismissed"),
+        ...entries.map((e, i) => ({
+          id: `sug-${Date.now()}-${i}`,
+          text: e.text,
+          kind: e.kind,
+          status: "pending" as const,
+        })),
+      ]);
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Something went wrong.";
       setMsgs((m) => [...m, { role: "lethe", text: `Hmm — ${msg}.` }]);
@@ -314,15 +337,65 @@ export default function ChatPage() {
         ...m,
         {
           role: "lethe",
-          text: `Linked ${addr.slice(0, 8)}…${addr.slice(-4)} (read-only). I'll keep its holdings and activity in mind as we talk.`,
+          text: `Linked ${addr.slice(0, 8)}…${addr.slice(-4)} (read-only). I'll keep its holdings and activity in mind as we talk. Reading its style now…`,
         },
       ]);
+
+      // Style depth: derive suggested trait cards from the linked wallet.
+      try {
+        const dr = await fetch("/api/onchain/derive", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ address: addr }),
+        });
+        if (dr.ok) {
+          const { entries, inactive } = (await dr.json()) as {
+            entries: { text: string; kind: string }[];
+            inactive?: boolean;
+          };
+          if (inactive || entries.length === 0) {
+            setMsgs((m) => [
+              ...m,
+              { role: "lethe", text: "That wallet doesn't have enough on-chain history yet to read a style from — I'll just keep its snapshot in mind." },
+            ]);
+          } else {
+            setMsgs((m) => [
+              ...m,
+              { role: "lethe", text: "Here's the style I read off that wallet — suggestions only, nothing saved until you say so:" },
+            ]);
+            setSuggestions((s) => [
+              ...s.filter((x) => x.status !== "dismissed"),
+              ...entries.map((e, i) => ({
+                id: `sug-${Date.now()}-${i}`,
+                text: e.text,
+                kind: e.kind,
+                status: "pending" as const,
+              })),
+            ]);
+          }
+        }
+      } catch {
+        /* style read is enrichment — the link itself already succeeded */
+      }
     } catch (e) {
       const msg = e instanceof Error ? e.message : "couldn't read that wallet";
       setMsgs((m) => [...m, { role: "lethe", text: `Hmm — ${msg}.` }]);
     } finally {
       setWalletBusy(false);
     }
+  }
+
+  // Save/dismiss one suggested trait card. Save goes through the normal
+  // write path (persistFact) — exactly like a chat-stated fact.
+  async function saveSuggestion(id: string) {
+    const sug = suggestions.find((s) => s.id === id);
+    if (!sug || sug.status !== "pending") return;
+    setSuggestions((s) => s.map((x) => (x.id === id ? { ...x, status: "saving" } : x)));
+    await persistFact({ text: sug.text, kind: sug.kind });
+    setSuggestions((s) => s.map((x) => (x.id === id ? { ...x, status: "saved" } : x)));
+  }
+  function dismissSuggestion(id: string) {
+    setSuggestions((s) => s.map((x) => (x.id === id ? { ...x, status: "dismissed" } : x)));
   }
 
   const short = (a: string) => `${a.slice(0, 6)}…${a.slice(-4)}`;
@@ -386,6 +459,59 @@ export default function ChatPage() {
             {(analyzing || (busy && msgs[msgs.length - 1]?.role === "you")) && (
               <div className="self-start rounded-2xl px-4 py-3 border" style={{ borderColor: "var(--border)", background: "var(--bg)" }}>
                 <div className="lethe-shimmer h-3 w-36 rounded" />
+              </div>
+            )}
+
+            {/* ── suggested trait cards — saved only on explicit [Save] ── */}
+            {suggestions.some((s) => s.status !== "dismissed") && (
+              <div className="self-start w-full max-w-xl flex flex-col gap-2" data-testid="suggestion-cards">
+                {suggestions
+                  .filter((s) => s.status !== "dismissed")
+                  .map((s) => (
+                    <div
+                      key={s.id}
+                      data-testid="suggestion-card"
+                      className="rounded-xl border p-3 flex items-start justify-between gap-3 transition-opacity duration-300"
+                      style={{
+                        borderColor: "var(--accent-h)",
+                        background: "var(--bg-panel)",
+                        opacity: s.status === "saved" ? 0.65 : 1,
+                      }}
+                    >
+                      <div className="min-w-0">
+                        <span className="text-[10px] uppercase tracking-wide px-1.5 py-0.5 rounded mr-2" style={{ background: "var(--bg)", color: "var(--text-dim)", border: "1px solid var(--border)" }}>
+                          {s.kind}
+                        </span>
+                        <span className="text-sm" style={{ color: "var(--text)" }}>{s.text}</span>
+                      </div>
+                      <span className="flex items-center gap-1.5 shrink-0">
+                        {s.status === "saved" ? (
+                          <span className="text-[11px]" style={{ color: "var(--text-dim)" }}>saved ✓</span>
+                        ) : (
+                          <>
+                            <button
+                              data-testid="suggestion-save"
+                              onClick={() => saveSuggestion(s.id)}
+                              disabled={s.status === "saving"}
+                              className="text-[11px] px-2.5 py-1 rounded-md font-semibold disabled:opacity-50"
+                              style={{ background: "var(--text)", color: "var(--accent)" }}
+                            >
+                              {s.status === "saving" ? "Saving…" : "Save"}
+                            </button>
+                            <button
+                              data-testid="suggestion-dismiss"
+                              onClick={() => dismissSuggestion(s.id)}
+                              disabled={s.status === "saving"}
+                              className="text-[11px] px-2.5 py-1 rounded-md border disabled:opacity-50"
+                              style={{ borderColor: "var(--border)", color: "var(--text-dim)" }}
+                            >
+                              Dismiss
+                            </button>
+                          </>
+                        )}
+                      </span>
+                    </div>
+                  ))}
               </div>
             )}
             <div ref={endRef} />
