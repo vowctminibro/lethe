@@ -1,0 +1,9 @@
+[package]
+name = "MemorySpecs"
+edition = "2024.beta"
+
+[dependencies]
+memory = { local = "../memory" }
+
+[addresses]
+memory_specs = "0x0"

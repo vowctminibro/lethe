@@ -56,11 +56,28 @@ No wallet needed. ~2 minutes.
  Pulse (2nd agent) ──► grant gate ──► read refs ──► decrypt
 ```
 
+## Formally verified
+
+The vault's core invariants are machine-checked with [sui-prover](https://github.com/asymptotic-code/sui-prover) (v1.5.3) — specs live in [`contracts/memory_specs`](contracts/memory_specs), the production module stays prover-free:
+
+- **Owner-only writes** — `add_entry` / `grant` / `revoke` abort for any sender that is not the vault owner, and *only* under the specified conditions (double-grant and unknown-revoke abort too).
+- **Entries are append-only** — `add_entry` grows the log by exactly one, the new blob id lands at the tail, and every pre-existing index is proven unchanged (universal quantification, not sampling).
+- **Access control never touches the log** — `grant` / `revoke` leave the owner and every entry intact.
+- **A fresh vault** belongs to its creator and starts empty.
+
+Reproduce (all 13 checks pass):
+
+```bash
+brew install asymptotic-code/sui-prover/sui-prover
+cd contracts/memory_specs && sui-prover
+```
+
 ## Where to look
 
 | What | Where |
 |---|---|
 | Move module — `create` / `add_entry` / `grant` / `revoke` | [`contracts/memory/sources/memory.move`](contracts/memory/sources/memory.move) |
+| Formal specs (sui-prover, 13/13 green) | [`contracts/memory_specs/sources/memory_specs.move`](contracts/memory_specs/sources/memory_specs.move) |
 | App — chat + memory rail, `/memory` proof view, `/pulse` second agent | [`apps/web`](apps/web) |
 | MemoryStore provider abstraction (Walrus today, MemWal-ready) | [`apps/web/src/lib/memory/provider.ts`](apps/web/src/lib/memory/provider.ts) |
 | End-to-end scripts (hero flow, portability, gasless) | [`apps/web/scripts/hero-e2e.mjs`](apps/web/scripts/hero-e2e.mjs) · [`pulse-e2e.mjs`](apps/web/scripts/pulse-e2e.mjs) · [`gasless-e2e.mjs`](apps/web/scripts/gasless-e2e.mjs) |

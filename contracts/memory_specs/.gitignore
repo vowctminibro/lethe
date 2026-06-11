@@ -1,0 +1,3 @@
+build/
+sui-prover.log*
+.specify-progress.json
