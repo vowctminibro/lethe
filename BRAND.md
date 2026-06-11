@@ -69,6 +69,8 @@ Candle       #D4A574    accents, CTAs, highlights
 
 ## Typography
 
+> **SUPERSEDED by Visual identity v3 (bottom of this file):** body = Instrument Sans, mono = IBM Plex Mono. Fraunces stays. The blocks below are kept for v2 history.
+
 ### Display — Fraunces
 
 Variable serif from Google Fonts. Optical sizing. Use for headlines, marks, story chapters.
