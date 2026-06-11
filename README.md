@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/vowctminibro/lethe/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/vowctminibro/lethe/actions/workflows/ci.yml)
 [![License: Apache-2.0](https://img.shields.io/github/license/vowctminibro/lethe)](LICENSE)
-[![Sui testnet](https://img.shields.io/badge/Sui-testnet-298DFF)](https://suiscan.xyz/testnet/object/0x9dcc482cd7fb5d7fa2a0cf90c7dc1e6efec6f40e817e352c61ed0f63951c1331)
+[![Sui testnet](https://img.shields.io/badge/Sui-testnet-298DFF)](https://suiscan.xyz/testnet/object/0x06b5c99940b5de954b2b37cd1198f421921986eabd57b35fe3fd4cc39169ba95)
 
 > Named after the river of forgetting. Built so nothing is.
 
@@ -35,7 +35,7 @@ No wallet needed. ~2 minutes.
 ## Why Walrus is load-bearing (not decorative)
 
 - **Every memory is an encrypted blob on Walrus** — fetchable from any aggregator, so storage is verifiable, not a claim.
-- **On-chain `BlobRef`s live in an owned Sui object** — your vault is [`memory::Memory`](contracts/memory/sources/memory.move), package [`0x9dcc482cd7fb5d7fa2a0cf90c7dc1e6efec6f40e817e352c61ed0f63951c1331`](https://suiscan.xyz/testnet/object/0x9dcc482cd7fb5d7fa2a0cf90c7dc1e6efec6f40e817e352c61ed0f63951c1331) on Sui testnet. The chain holds the index and the access list; Walrus holds the data.
+- **On-chain `BlobRef`s live in an owned Sui object** — your vault is [`memory::Memory`](contracts/memory/sources/memory.move), package [`0x06b5c99940b5de954b2b37cd1198f421921986eabd57b35fe3fd4cc39169ba95`](https://suiscan.xyz/testnet/object/0x06b5c99940b5de954b2b37cd1198f421921986eabd57b35fe3fd4cc39169ba95) on Sui testnet (v2, upgraded in place — existing vaults from [v1](https://suiscan.xyz/testnet/object/0x9dcc482cd7fb5d7fa2a0cf90c7dc1e6efec6f40e817e352c61ed0f63951c1331) keep working). The chain holds the index and the access list; Walrus holds the data.
 - **Trust model, stated honestly:** memories are encrypted per-user at rest on Walrus (AES-256-GCM, HKDF per owner), but today the per-owner key derives from a server-held secret — access is enforced by the on-chain grants you control plus server-side checks, not by key custody. Seal threshold encryption on the roadmap removes the server from decryption entirely — aligned with Walrus Memory's model.
 - **MemWal:** integrated days after MemWal launched; blocked by the published-SDK (`@mysten/memwal@0.0.2`) vs relayer (≥0.0.4) version gap — documented honestly in [BLOCKERS.md](BLOCKERS.md) (B16). A provider abstraction keeps us one adapter away from adopting `@mysten/memwal` the day it publishes.
 
@@ -77,7 +77,7 @@ cd contracts/memory_specs && sui-prover
 
 | What | Where |
 |---|---|
-| Move module — `create` / `add_entry` / `grant` / `revoke` | [`contracts/memory/sources/memory.move`](contracts/memory/sources/memory.move) |
+| Move module — `create` / `add_entry` / `remove_entry` / `grant` / `revoke` | [`contracts/memory/sources/memory.move`](contracts/memory/sources/memory.move) |
 | Formal specs (sui-prover, 13/13 green) | [`contracts/memory_specs/sources/memory_specs.move`](contracts/memory_specs/sources/memory_specs.move) |
 | App — chat + memory rail, `/memory` proof view, `/pulse` second agent | [`apps/web`](apps/web) |
 | MemoryStore provider abstraction (Walrus today, MemWal-ready) | [`apps/web/src/lib/memory/provider.ts`](apps/web/src/lib/memory/provider.ts) |

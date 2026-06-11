@@ -8,7 +8,9 @@ import { SuiJsonRpcClient, getJsonRpcFullnodeUrl } from "@mysten/sui/jsonRpc";
 import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
 import { toBase64, fromBase64 } from "@mysten/sui/utils";
 
-const PKG = "0x9dcc482cd7fb5d7fa2a0cf90c7dc1e6efec6f40e817e352c61ed0f63951c1331";
+// Latest package version (call target) vs original defining package (type filter).
+const PKG = "0x06b5c99940b5de954b2b37cd1198f421921986eabd57b35fe3fd4cc39169ba95";
+const TYPE_PKG = "0x9dcc482cd7fb5d7fa2a0cf90c7dc1e6efec6f40e817e352c61ed0f63951c1331";
 const PULSE = "0x00000000000000000000000000000000000000000000000000000070756c7365";
 const BASE = "http://localhost:3010";
 
@@ -20,7 +22,7 @@ const client = new SuiJsonRpcClient({ network: "testnet", url: getJsonRpcFullnod
 
 const owned = await client.getOwnedObjects({
   owner: SENDER,
-  filter: { StructType: `${PKG}::memory::Memory` },
+  filter: { StructType: `${TYPE_PKG}::memory::Memory` },
 });
 const memId = owned.data?.[0]?.data?.objectId;
 if (!memId) throw new Error("no Memory vault owned by sender");

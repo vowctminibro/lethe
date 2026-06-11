@@ -95,3 +95,62 @@ fun revoke_rejects_unknown_app() {
     mem.revoke(APP, scn.ctx());
     abort 0
 }
+
+#[test]
+fun remove_entry_removes_exactly_the_matching_entry() {
+    let mut scn = ts::begin(OWNER);
+    memory::create(scn.ctx());
+    scn.next_tx(OWNER);
+    let mut mem = scn.take_from_sender<Memory>();
+    mem.add_entry(blob(b"blob-1"), blob(b"lethe"), blob(b"k"), 1, scn.ctx());
+    mem.add_entry(blob(b"blob-2"), blob(b"lethe"), blob(b"k"), 2, scn.ctx());
+    mem.add_entry(blob(b"blob-3"), blob(b"lethe"), blob(b"k"), 3, scn.ctx());
+    scn.next_tx(OWNER);
+
+    // forget the middle entry; the others keep their order
+    mem.remove_entry(1, blob(b"blob-2"), scn.ctx());
+    let fx = scn.next_tx(OWNER);
+    assert!(fx.num_user_events() == 1); // exactly one MemoryForgotten
+
+    assert!(mem.entry_count() == 2);
+    assert!(mem.blob_id_at(0) == blob(b"blob-1"));
+    assert!(mem.blob_id_at(1) == blob(b"blob-3"));
+
+    scn.return_to_sender(mem);
+    scn.end();
+}
+
+#[test, expected_failure(abort_code = memory::ENotOwner)]
+fun remove_entry_rejects_non_owner() {
+    let mut scn = ts::begin(OWNER);
+    memory::create(scn.ctx());
+    scn.next_tx(OWNER);
+    let mut mem = scn.take_from_sender<Memory>();
+    mem.add_entry(blob(b"blob-1"), blob(b"lethe"), blob(b"k"), 1, scn.ctx());
+
+    scn.next_tx(INTRUDER);
+    mem.remove_entry(0, blob(b"blob-1"), scn.ctx());
+    abort 0
+}
+
+#[test, expected_failure(abort_code = memory::EEntryMismatch)]
+fun remove_entry_rejects_wrong_blob_id() {
+    let mut scn = ts::begin(OWNER);
+    memory::create(scn.ctx());
+    scn.next_tx(OWNER);
+    let mut mem = scn.take_from_sender<Memory>();
+    mem.add_entry(blob(b"blob-1"), blob(b"lethe"), blob(b"k"), 1, scn.ctx());
+    mem.remove_entry(0, blob(b"not-this-blob"), scn.ctx());
+    abort 0
+}
+
+#[test, expected_failure(abort_code = memory::EEntryMismatch)]
+fun remove_entry_rejects_out_of_bounds_index() {
+    let mut scn = ts::begin(OWNER);
+    memory::create(scn.ctx());
+    scn.next_tx(OWNER);
+    let mut mem = scn.take_from_sender<Memory>();
+    mem.add_entry(blob(b"blob-1"), blob(b"lethe"), blob(b"k"), 1, scn.ctx());
+    mem.remove_entry(1, blob(b"blob-1"), scn.ctx());
+    abort 0
+}

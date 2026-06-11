@@ -26,6 +26,8 @@ const ENotOwner: u64 = 0;
 const EAlreadyAuthorized: u64 = 1;
 /// The app address is not in the authorized set.
 const ENotAuthorized: u64 = 2;
+/// No entry exists at the given index with the given blob id.
+const EEntryMismatch: u64 = 3;
 
 /// A pointer to one stored memory entry on Walrus, plus its metadata.
 /// The semantic embedding + ciphertext live off-chain (MemWal/Walrus);
@@ -67,6 +69,13 @@ public struct EntryAdded has copy, drop {
 public struct AccessGranted has copy, drop {
     memory_id: ID,
     app: address,
+}
+
+/// Emitted when the owner removes an entry (= forgets it). The event name is
+/// deliberate: "MemoryForgotten" predates this module and is resurrected here.
+public struct MemoryForgotten has copy, drop {
+    memory_id: ID,
+    blob_id: String,
 }
 
 public struct AccessRevoked has copy, drop {
@@ -115,6 +124,19 @@ public fun add_entry(
         kind,
         created_at_ms,
     });
+}
+
+/// Remove one stored entry (= forget). Only the owner may remove. Blob ids
+/// are not guaranteed unique across entries, so the entry is keyed by index
+/// with a blob-id assertion — exactly the intended entry is removed and the
+/// order of the remaining log is preserved. The Walrus blob itself is not
+/// (and cannot be) deleted here; dropping the on-chain reference orphans it.
+public fun remove_entry(memory: &mut Memory, index: u64, blob_id: String, ctx: &TxContext) {
+    assert!(memory.owner == ctx.sender(), ENotOwner);
+    assert!(index < memory.entries.length(), EEntryMismatch);
+    assert!(memory.entries[index].blob_id == blob_id, EEntryMismatch);
+    memory.entries.remove(index);
+    event::emit(MemoryForgotten { memory_id: object::id(memory), blob_id });
 }
 
 /// Grant an app read access. Only the owner may grant. Aborts if already

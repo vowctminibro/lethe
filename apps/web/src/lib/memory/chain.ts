@@ -10,16 +10,26 @@ import { Transaction } from "@mysten/sui/transactions";
 import type { SuiJsonRpcClient } from "@mysten/sui/jsonRpc";
 import type { BlobRef } from "./types";
 
+/** Latest package version — the call target for every moveCall. */
 export const MEMORY_PACKAGE_ID = process.env.NEXT_PUBLIC_MEMORY_PACKAGE_ID ?? "";
+
+/**
+ * Original (v1) package id — Sui types keep their DEFINING package forever,
+ * so the `Memory` StructType filter must use this id even after upgrades.
+ * Falls back to the call id for a never-upgraded deployment.
+ */
+export const MEMORY_PACKAGE_ORIGINAL =
+  process.env.NEXT_PUBLIC_MEMORY_PACKAGE_ORIGINAL || MEMORY_PACKAGE_ID;
 
 /** Fully-qualified Move call targets — these are what must be Enoki-allowlisted. */
 export const CREATE_TARGET = MEMORY_PACKAGE_ID ? `${MEMORY_PACKAGE_ID}::memory::create` : "";
 export const ADD_ENTRY_TARGET = MEMORY_PACKAGE_ID ? `${MEMORY_PACKAGE_ID}::memory::add_entry` : "";
 export const GRANT_TARGET = MEMORY_PACKAGE_ID ? `${MEMORY_PACKAGE_ID}::memory::grant` : "";
 export const REVOKE_TARGET = MEMORY_PACKAGE_ID ? `${MEMORY_PACKAGE_ID}::memory::revoke` : "";
+export const REMOVE_ENTRY_TARGET = MEMORY_PACKAGE_ID ? `${MEMORY_PACKAGE_ID}::memory::remove_entry` : "";
 
-/** The Memory struct type, for owned-object queries. */
-export const MEMORY_TYPE = MEMORY_PACKAGE_ID ? `${MEMORY_PACKAGE_ID}::memory::Memory` : "";
+/** The Memory struct type, for owned-object queries (defining id, not latest). */
+export const MEMORY_TYPE = MEMORY_PACKAGE_ORIGINAL ? `${MEMORY_PACKAGE_ORIGINAL}::memory::Memory` : "";
 
 /** True once the targets are configured AND added to the Enoki allowlist. */
 export const MEMORY_ALLOWLISTED =
@@ -63,6 +73,20 @@ export function buildRevokeTx(args: { memoryId: string; app: string }): Transact
   if (!MEMORY_PACKAGE_ID) throw new Error("Missing NEXT_PUBLIC_MEMORY_PACKAGE_ID");
   const tx = new Transaction();
   tx.moveCall({ target: REVOKE_TARGET, arguments: [tx.object(args.memoryId), tx.pure.address(args.app)] });
+  return tx;
+}
+
+/**
+ * Build a `memory::remove_entry` tx (= forget one entry). Owner-only on chain.
+ * Keyed by index + blob id assertion, mirroring the Move signature.
+ */
+export function buildRemoveEntryTx(args: { memoryId: string; index: number; blobId: string }): Transaction {
+  if (!MEMORY_PACKAGE_ID) throw new Error("Missing NEXT_PUBLIC_MEMORY_PACKAGE_ID");
+  const tx = new Transaction();
+  tx.moveCall({
+    target: REMOVE_ENTRY_TARGET,
+    arguments: [tx.object(args.memoryId), tx.pure.u64(BigInt(args.index)), tx.pure.string(args.blobId)],
+  });
   return tx;
 }
 
