@@ -1,85 +1,76 @@
-# Lethe — Persistent memory for Sui games
+# Lethe — Memory you own
 
-> NPCs that remember every player across sessions.  
-> Three lines of code. Backed by Walrus.
+> Named after the river of forgetting. Built so nothing is.
 
-Built for [Sui Overflow 2026](https://overflow.sui.io) · Walrus Track
+User-owned memory for AI agents — stored on Walrus, anchored on Sui, portable across every app.
 
-- Landing: https://lethesdk.vercel.app
-- Live on: Sui testnet (package `0x8dafbfaeb5d8b8c8c8859981ed40c4a316e93ce3972e9e6114f7c3332b2069d1`)
-- License: Apache 2.0 (sdk) · Apache 2.0 (contract)
+**Live demo:** https://lethe-gold.vercel.app · **Sui Overflow 2026 · Walrus track**
 
 ---
 
-## What it does
+## The 90-second story
 
-AI NPCs in Web3 games can't remember players across sessions today.
-Each NPC interaction starts from zero. Memories vanish when the game studio shuts down.
+1. **Sign in with Google** (zkLogin) → a memory vault is born on Sui — gasless, no wallet, no seed phrase.
+2. **Chat with Lethe** → durable facts are extracted, encrypted (AES-256-GCM, HKDF-derived key per owner), stored as blobs on Walrus, and referenced on-chain in a vault **you** own.
+3. **Open Pulse** — a second, separate agent — it already knows you. Same memory, different app.
+4. **Revoke access** → Pulse forgets you, live. Enforced server-side, provable on-chain.
 
-Lethe stores NPC memories as encrypted blobs on Walrus, indexed by player wallet via Sui shared objects. NPCs recall the player's history in any game that uses the same NPC ID — cross-session, cross-game, cross-device.
+Your agent's memory stops being a hostage of whichever app learned it.
 
-## Quickstart
+## Try it (for judges)
 
-```bash
-# Install the SDK
-npm install @lethe/sdk   # coming to npm — github.com/vowctminibro/lethe for now
+No wallet needed. ~2 minutes.
 
-# Or use the memory-service directly
-cd memory-service && cp .env.example .env && pnpm dev
-```
+1. Open **https://lethe-gold.vercel.app** → **Sign in with Google**
+2. Tell Lethe something durable — *"I'm a momentum trader and I hate leverage"*
+3. Watch the memory rail write it to Walrus in real time
+4. Open **/memory** — every entry links to Suiscan (on-chain ref) and the Walrus aggregator (encrypted blob)
+5. Grant **Pulse** access → open **/pulse** → it already knows your style
+6. Revoke Pulse → ask again → it forgets. Live.
+
+## Why Walrus is load-bearing (not decorative)
+
+- **Every memory is an encrypted blob on Walrus** — fetchable from any aggregator, so storage is verifiable, not a claim.
+- **On-chain `BlobRef`s live in an owned Sui object** — your vault is [`memory::Memory`](contracts/memory/sources/memory.move), package [`0x9dcc482cd7fb5d7fa2a0cf90c7dc1e6efec6f40e817e352c61ed0f63951c1331`](https://suiscan.xyz/testnet/object/0x9dcc482cd7fb5d7fa2a0cf90c7dc1e6efec6f40e817e352c61ed0f63951c1331) on Sui testnet. The chain holds the index and the access list; Walrus holds the data.
+- **MemWal:** integrated days after MemWal launched; blocked by the published-SDK (`@mysten/memwal@0.0.2`) vs relayer (≥0.0.4) version gap — documented honestly in [BLOCKERS.md](BLOCKERS.md) (B16). A provider abstraction keeps us one adapter away from adopting `@mysten/memwal` the day it publishes.
 
 ## Architecture
 
 ```
-Player → SDK/Memory-Service → Walrus (store blob)
-                          ↓
-                    Sui (index by wallet + NPC ID)
-
-Any game client → recall(player_wallet) → encrypted memory history
+ you ──► chat (Lethe) ──► fact extraction (LLM chain)
+                                │
+                                ▼
+                  encrypt (AES-256-GCM, per-owner HKDF)
+                                │
+                                ▼
+                     Walrus blob  ──►  blob id
+                                          │
+                        gasless add_entry (Enoki sponsored)
+                                          ▼
+                          Memory vault (owned object, Sui)
+                                          ▲
+ Pulse (2nd agent) ──► grant gate ──► read refs ──► decrypt
 ```
 
-## Key components
+## Where to look
 
-| Component | Description |
+| What | Where |
 |---|---|
-| `contracts/lethe` | Sui Move contract — shared NPC objects, event emission |
-| `memory-service` | REST API — handles Walrus storage + Sui indexing |
-| `sdk` | Game client SDK — `remember()` / `recall()` |
-| `landing` | Public landing page |
+| Move module — `create` / `add_entry` / `grant` / `revoke` | [`contracts/memory/sources/memory.move`](contracts/memory/sources/memory.move) |
+| App — chat + memory rail, `/memory` proof view, `/pulse` second agent | [`apps/web`](apps/web) |
+| MemoryStore provider abstraction (Walrus today, MemWal-ready) | [`apps/web/src/lib/memory/provider.ts`](apps/web/src/lib/memory/provider.ts) |
+| End-to-end scripts (hero flow, portability, gasless) | [`apps/web/scripts/hero-e2e.mjs`](apps/web/scripts/hero-e2e.mjs) · [`pulse-e2e.mjs`](apps/web/scripts/pulse-e2e.mjs) · [`gasless-e2e.mjs`](apps/web/scripts/gasless-e2e.mjs) |
+| Build log, day by day | [PROGRESS.md](PROGRESS.md) |
+| Honest blockers (incl. B16 MemWal gap) | [BLOCKERS.md](BLOCKERS.md) |
 
-## Contract events (v1+)
+## Stack
 
-| Event | When |
-|---|---|
-| `NPCCreated` | New NPC shared object deployed |
-| `MemoryAdded` | Player stores a new memory on an NPC |
-| `MemoryForgotten` | Player wipes their own memories from an NPC |
+Sui Move (owned objects) · Walrus · Enoki (zkLogin + sponsored transactions) · Next.js 16 · LLM chain MiniMax → NVIDIA NIM → Groq → Gemini
 
-## Smart contract
+## Status & roadmap
 
-```move
-// Deploy NPC (once)
-sui client call --package 0x8dafbfaeb... --module npc --function create_npc --args '["npc-name"]' 0x6 --gas-budget 50000000
+- **Live on Sui testnet today** — the full loop (vault birth → encrypted Walrus write → cross-app recall → revoke) works in production.
+- **Q3–Q4 2026** — mainnet; Seal-gated selective sharing (share one memory, not the vault).
+- **MemWal adapter** ships the day `@mysten/memwal` ≥0.0.4 publishes.
 
-// Add memory (player action)
-sui client call --package 0x8dafbfaeb... --module npc --function add_memory --args <NPC_ID> <blob_id_bytes> 0x6 --gas-budget 50000000
-
-// Read memories (any client)
-let memories = npc::get_memories_for(npc, player_wallet);
-```
-
-## Running locally
-
-```bash
-# Memory service
-cd memory-service && pnpm install && pnpm dev
-
-# Contract build
-cd contracts/lethe && sui move build
-```
-
-## Related
-
-- [Walrus](https://www.walrus.xyz/) — decentralized blob storage
-- [Sui](https://sui.io/) — programmable objects blockchain
-- [Story Protocol](https://story.foundation/) — IP ownership layer (future integration)
+Built solo. Live on testnet today.
