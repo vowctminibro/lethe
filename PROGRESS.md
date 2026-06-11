@@ -916,3 +916,23 @@ Env/Deploy: GROQ_API_KEY + GEMINI_API_KEY both EMPTY in .env.local → skipped V
 Blockers: none new. B16 unchanged. Note for soft launch: package is now v2 — any external doc quoting the old package id for CALLS must use 0x06b5…ba95 (Suiscan links to the old id still resolve for history).
 Commits: 5c72008 (Step 1) · 31f42eb (1c) · 795b146 (Step 2) · a56eab9+4ab7ff1 (Step 3) · 21485a8 (Step 4) · f36f622 (Step 5)
 === END REPORT ===
+
+---
+
+## 2026-06-11 — BLOCK 6: BRAND IDENTITY PASS "Letterpress on water"
+
+=== LETHE BLOCK 6 REPORT ===
+Tokens (ddc1598): Fraunces variable (italic+opsz, weight:"variable" — next/font requires that for axes) · Instrument Sans body 15.5/1.6 · IBM Plex Mono for every id (.lethe-id, +0.08em). Radius law via Tailwind v4 theme override (--radius-xl→4px etc — every rounded-* in the app obeys without touching call sites). Hairline --border rgba(26,58,74,.12) — this also fixed a latent bug: var(--border) was referenced 49× but never defined. Coral reserved for memory (selection + focus rings included). Water contour SVG drift 75-90s ≤6% Mist, .lethe-water/.lethe-divider, hero+dividers only, no gradients. Motion vocab: chip-lift/stamp/inkwash/draw, all killed by prefers-reduced-motion. Gotcha: Turbopack dev served stale CSS after the token rewrite — rm -rf .next required before the classes appeared.
+Landing (c675d60): asymmetric editorial — verse hero in Fraunces italic breaking with the poem (3 iterations: 88px→80px→72px+fluid clamp until "Named after the river" held one line on desktop AND no orphan "is." on mobile), memory-constellation line-work right (vault disc + LETHE/PULSE/NEXT/YOURS nodes, coral motes), margin-note pillars (01/02/03, hairline dividers, no cards), colophon footer (· COLOPHON ·, marks, type credits, coral proof link to the vault contract).
+/chat (7362b64): Lethe speaks as typeset prose with a hanging italic "L." — no bubble; user notes = ink blocks (color-law fix: was coral text). Rail = INK POOL (#1A3A4A on the paper page): coral kind plates, letterpress-inset confirmed chips, stamp-on-confirm choreography (pending→confirmed tracked per chip), walrus/tx ids as engraved mono plates with copy affordance (⧉→✓). Live lifecycle exercised: typed a fact → chip lifted with coral glow → stamped with both plates.
+/memory (5dbb8b9): MEMORY HUB — living constellation: vault disc (italic L + entry count), LETHE spoke always solid with coral motes, PULSE node = grant/revoke toggle ON the map (revoke severs the spoke → dashed, dimmed, motes gone — 0.45s ease, exercised live both directions), dashed open slot "ANY AGENT — SAME MEMORY. CONNECT BELOW." Ledger: engraved hairline rows, mono ids, coral proof links, mono dates. Forget = ink-wash dissolve (.lethe-inkwash, exercised). 0 console errors.
+/pulse (07589f2): same press, different publication — italic Fraunces wordmark in Moonlight (Mist-led, was candle sans), mono tagline, display moment "First time here — / and I already know you." italic 4xl, colophon "POWERED BY LETHE MEMORY — A DIFFERENT PUBLICATION FROM THE SAME PRESS".
+Vault birth (07589f2): BirthRite overlay — L mark draws itself (stroke-dash .lethe-draw), "VAULT 0x…— BORN ON SUI" in mono, tap-to-skip, auto-settles at 1.7s into the existing header card. Triggers once on phase→born. Visual verified with the real CSS classes.
+og.png + BRAND.md (760bb76, 7faca81): OG regenerated — Mist italic verse + Ink "Built so nothing is." + coral stroke + contour line-work (40.5KB). BRAND.md "Visual identity v3" codifies type/shape/color-law/water/motion/voice-anchors; v2 typography block marked superseded.
+Default-detector: every surface ≥2 critique rounds (landing 3). The elements no template has: verse-broken italic hero, ink-pool rail, grant-revoke ON a constellation map, ink-wash forget, birth rite.
+E2E: gasless (vault 0x0d65da62… created) · hero+session-B · forget · pulse — ALL GREEN, zero feature/IA changes.
+Deploy: vercel --prod → lethe-gold.vercel.app. External: 4 routes 200 · Fraunces + Instrument Sans live with next/font fallbacks (25 woff2) · CLS 0.0000 · 0 console errors.
+Screens: AFTER → design/screens/brand/ (landing/chat/memory/pulse desktop+mobile + chip-stamped + hub-severed + inkwash + birth). BEFORE → design/screens/states/ + design/screens/prod/ (Block 5-era).
+Blockers: none new.
+Commits: ddc1598 · c675d60 · 7362b64 · 5dbb8b9 · 07589f2 · 760bb76 · 7faca81
+=== END REPORT ===
