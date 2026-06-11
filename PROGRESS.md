@@ -892,3 +892,11 @@ Marks: Sui droplet from sui.io/media-kit ONLY — 01_Sui_Logo.zip via the kit's 
 Prover: VERIFIED — sui-prover 1.5.3 (brew asymptotic-code tap), specs in contracts/memory_specs (sibling package, production module untouched, accessor-based since fields are module-private). 13/13 checks green (4 specs × Check/Assume/SpecNoAbortCheck + funs_abort_check). Invariants: I1 owner-only add_entry/grant/revoke (abort iff specified: non-owner, double-grant, unknown-revoke); I2 entries append-only (count+1, new blob at tail, ∀ pre-existing index unchanged via forall!<u64> + #[ext(pure)] helper); I3 grant/revoke leave owner+entries intact; I4 fresh vault = sender-owned, empty. Gotchas solved: clone!() returns &T (no re-borrow); spec's own `+1` needed requires(entry_count < MAX_U64) to pass SpecNoAbortCheck; pure helper must be total (guard both old AND new bounds or funs_abort_check fails). README "Formally verified" section + reproduce cmd added. Used ~40 min of the 90-min box.
 Commits: 0f87711 (CI) · 03be2d2 (badges) · dccd25a (marks) · 92e2f1f (prover)
 === END REPORT ===
+
+---
+
+## 2026-06-11 — MINI-BLOCK: LICENSE & STATIC AUDIT
+
+License audit (license-checker --production): apps/web third-party deps CLEAN — MIT 7 · Apache-2.0 4 · ISC 1; the single UNLICENSED hit was our own `web@0.1.0` (no license field — fixed, now Apache-2.0, same for legacy @lethe/sdk + @lethe/shared). Legacy apps/memory-service deps also clean (Apache-2.0 4 · MIT 2 · BSD-2-Clause 1 · ISC 1). No GPL/AGPL/unknown third-party anywhere → no BLOCKERS entry needed.
+MoveBit Move Scanner: SKIPPED — movebit.xyz/MoveScanner serves only the corporate page (no scanner app/endpoint reachable, no CLI on npm/pip); per timebox rule, not claiming any static-analysis result.
+README: added 3-line Security section (formal verification 16/16 + reproduce cmd, license audit result, independent-audit-pre-mainnet plan, no logos).

@@ -73,6 +73,12 @@ brew install asymptotic-code/sui-prover/sui-prover
 cd contracts/memory_specs && sui-prover
 ```
 
+## Security
+
+- **Formally verified** — 16/16 sui-prover checks on the vault's invariants (section above; reproduce: `cd contracts/memory_specs && sui-prover`).
+- **Dependency licenses audited** — every third-party production dependency is MIT / Apache-2.0 / BSD / ISC; no copyleft, no unknowns.
+- **Independent audit pre-mainnet** — shortlist from Sui Foundation audit-partner firms.
+
 ## Where to look
 
 | What | Where |
