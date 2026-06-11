@@ -11,6 +11,7 @@
  */
 
 import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 import { useConnectWallet, useWallets } from "@mysten/dapp-kit";
 import { isGoogleWallet } from "@mysten/enoki";
 import { isEnokiConfigured } from "@/src/lib/enoki";
@@ -26,10 +27,48 @@ function PrimaryLink({ href, children }: { href: string; children: React.ReactNo
     <Link
       href={href}
       className="h-12 px-6 rounded-md font-semibold grid place-items-center hover:opacity-90 transition shadow-sm"
-      style={{ background: "var(--text)", color: "var(--accent)", fontFamily: "var(--font-sans)" }}
+      style={{ background: "var(--text)", color: "var(--bg)", fontFamily: "var(--font-sans)" }}
     >
       {children}
     </Link>
+  );
+}
+
+/** 1.5s skippable birth rite — the L mark draws itself, the vault is named. */
+function BirthRite({ vaultId, onDone }: { vaultId: string; onDone: () => void }) {
+  useEffect(() => {
+    const t = setTimeout(onDone, 1700);
+    return () => clearTimeout(t);
+  }, [onDone]);
+  return (
+    <div
+      className="fixed inset-0 z-50 grid place-items-center lethe-overlay-in cursor-pointer"
+      style={{ background: "rgba(10, 22, 40, 0.93)" }}
+      onClick={onDone}
+      role="status"
+      aria-label="Your memory vault was just born on Sui"
+      data-testid="birth-rite"
+    >
+      <div className="flex flex-col items-center gap-5 select-none">
+        <svg viewBox="0 0 120 120" className="w-28 h-28">
+          <circle cx="60" cy="60" r="46" fill="none" stroke="#EFF5F4" strokeWidth="1.5" className="lethe-draw" />
+          <text
+            x="56" y="78"
+            fontFamily="var(--font-display)" fontStyle="italic" fontSize="52"
+            fill="#EFF5F4" textAnchor="middle" className="lethe-reveal"
+          >
+            L
+          </text>
+          <circle cx="86" cy="74" r="4" fill="#E8B894" className="lethe-fade-in" />
+        </svg>
+        <div className="lethe-id lethe-reveal text-center" style={{ color: "#EFF5F4" }}>
+          VAULT {`${vaultId.slice(0, 8)}…${vaultId.slice(-4)}`.toUpperCase()} — BORN ON SUI
+        </div>
+        <div className="text-[11px] lethe-fade-in" style={{ color: "rgba(239,245,244,0.5)" }}>
+          tap to continue
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -39,6 +78,12 @@ export function HeroCTA() {
   const { mutate: connect, isPending } = useConnectWallet();
   const vault = useVaultBirth();
   const google = wallets.find((w) => isGoogleWallet(w));
+  const [rite, setRite] = useState(false);
+  const prevPhase = useRef(vault.phase);
+  useEffect(() => {
+    if (vault.phase === "born" && prevPhase.current !== "born") setRite(true);
+    prevPhase.current = vault.phase;
+  }, [vault.phase]);
 
   return (
     <div className="flex flex-col items-center gap-3 min-h-[120px] justify-start">
@@ -88,6 +133,10 @@ export function HeroCTA() {
               : "Looking up your vault on Sui…"}
           </span>
         </div>
+      )}
+
+      {account && vault.phase === "born" && rite && "vaultId" in vault && (
+        <BirthRite vaultId={vault.vaultId} onDone={() => setRite(false)} />
       )}
 
       {account && vault.phase === "born" && (

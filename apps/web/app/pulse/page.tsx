@@ -168,11 +168,11 @@ export default function PulsePage() {
       <header className="border-b" style={{ borderColor: C.panelEdge }}>
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-baseline gap-3">
-            <span className="text-xl font-semibold tracking-tight" style={{ fontFamily: "var(--font-sans)", color: C.accent }}>
-              ◍ Pulse
+            <span className="text-2xl tracking-tight" style={{ fontFamily: "var(--font-display)", fontStyle: "italic", color: C.dim }}>
+              Pulse
             </span>
-            <span className="text-xs" style={{ color: C.dim }}>
-              {PULSE_TAGLINE}
+            <span className="lethe-id hidden sm:inline" style={{ color: C.dim, opacity: 0.75 }}>
+              {PULSE_TAGLINE.toUpperCase()}
             </span>
           </div>
           <div className="flex items-center gap-3 text-xs" style={{ color: C.dim }}>
@@ -285,8 +285,10 @@ export default function PulsePage() {
               <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: C.accent }} />
               reading your Lethe memory · {state.entries.length} {state.entries.length === 1 ? "entry" : "entries"}
             </div>
-            <h1 className="mt-3 text-3xl leading-snug" style={{ fontFamily: "var(--font-display)" }}>
-              First time here — and I already know you.
+            <h1 className="mt-3 text-4xl leading-snug" style={{ fontFamily: "var(--font-display)", fontStyle: "italic", fontWeight: 400 }}>
+              First time here —
+              <br />
+              and I already know you.
             </h1>
 
             <div className="mt-5 rounded-2xl p-5 border" style={{ borderColor: C.accent + "55", background: C.panel }}>
@@ -331,6 +333,17 @@ export default function PulsePage() {
           </>
         )}
       </div>
+      <footer className="mt-2 pb-8">
+        <div className="max-w-4xl mx-auto px-6 pt-6 text-center" style={{ borderTop: `1px solid ${C.panelEdge}` }}>
+          <span className="lethe-id" style={{ color: C.dim, opacity: 0.8 }}>
+            POWERED BY{" "}
+            <Link href="/" className="underline decoration-dotted underline-offset-2 hover:opacity-70">
+              LETHE MEMORY
+            </Link>{" "}
+            — A DIFFERENT PUBLICATION FROM THE SAME PRESS
+          </span>
+        </div>
+      </footer>
     </main>
   );
 }
