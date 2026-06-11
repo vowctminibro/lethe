@@ -4,8 +4,8 @@
  * Method names mirror the MemWal SDK (`remember` / `recall` / `grant` / `revoke`)
  * on purpose: when MemWal ships 0.0.4 we can drop in `MemWalProvider` behind this
  * same interface without touching the chat surface or the memory view. Today the
- * default implementation is `ManualProvider` (Walrus + client-side encryption +
- * the on-chain `memory::Memory` object).
+ * default implementation is `ManualProvider` (Walrus + server-side per-user
+ * encryption + the on-chain `memory::Memory` object).
  */
 
 import type { MemoryEntry, RememberResult, RecallHit } from "./types";

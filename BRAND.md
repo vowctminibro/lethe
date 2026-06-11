@@ -15,6 +15,7 @@ Lethe — Named after the river of forgetting. Built so nothing is.
 - **Solution:** Lethe writes your agent's memory to Walrus as objects you own: any agent you authorize knows you instantly, every entry is verifiable on-chain, and revoking access makes it forget — live.
 - **Closing lines:** "Lethe is the wedge." / "Memory infrastructure for the agentic web — a 10-year category." / "Built solo. Live on testnet today."
 - **Walrus integration note:** encrypted memory blobs (AES-256-GCM, HKDF per owner) on Walrus; on-chain BlobRefs in an owned MemoryVault on Sui. MemWal integration attempted day-5 post-launch; blocked by SDK/relayer version gap (BLOCKERS.md B16); provider abstraction in place to adopt @mysten/memwal the day ≥0.0.4 publishes.
+- **Encryption honesty rule (copy guardrail):** never claim "only you can decrypt" / "we can't read your memories". Honest framing: encrypted per-user at rest on Walrus; access enforced by grants you control on-chain (plus server checks); the per-owner key currently derives from a server-held secret. Seal threshold encryption on the roadmap removes the server from decryption entirely — aligned with Walrus Memory's model.
 
 ---
 

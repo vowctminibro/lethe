@@ -1,7 +1,8 @@
 /**
  * ManualProvider — the default MemoryProvider.
  *
- * "Manual" = we drive the data plane ourselves (Walrus + client-side encryption +
+ * "Manual" = we drive the data plane ourselves (Walrus + server-side per-user
+ * encryption keyed from a server-held secret — see encryptor.ts — plus
  * the owned `memory::Memory` object) rather than the MemWal relayer, which is
  * gated on an unpublished SDK (see REAIM.md §3). It formalizes the MemWalManual
  * approach behind the MemoryProvider contract.

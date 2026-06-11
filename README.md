@@ -36,6 +36,7 @@ No wallet needed. ~2 minutes.
 
 - **Every memory is an encrypted blob on Walrus** — fetchable from any aggregator, so storage is verifiable, not a claim.
 - **On-chain `BlobRef`s live in an owned Sui object** — your vault is [`memory::Memory`](contracts/memory/sources/memory.move), package [`0x9dcc482cd7fb5d7fa2a0cf90c7dc1e6efec6f40e817e352c61ed0f63951c1331`](https://suiscan.xyz/testnet/object/0x9dcc482cd7fb5d7fa2a0cf90c7dc1e6efec6f40e817e352c61ed0f63951c1331) on Sui testnet. The chain holds the index and the access list; Walrus holds the data.
+- **Trust model, stated honestly:** memories are encrypted per-user at rest on Walrus (AES-256-GCM, HKDF per owner), but today the per-owner key derives from a server-held secret — access is enforced by the on-chain grants you control plus server-side checks, not by key custody. Seal threshold encryption on the roadmap removes the server from decryption entirely — aligned with Walrus Memory's model.
 - **MemWal:** integrated days after MemWal launched; blocked by the published-SDK (`@mysten/memwal@0.0.2`) vs relayer (≥0.0.4) version gap — documented honestly in [BLOCKERS.md](BLOCKERS.md) (B16). A provider abstraction keeps us one adapter away from adopting `@mysten/memwal` the day it publishes.
 
 ## Architecture
@@ -91,7 +92,7 @@ Sui Move (owned objects) · Walrus · Enoki (zkLogin + sponsored transactions) �
 ## Status & roadmap
 
 - **Live on Sui testnet today** — the full loop (vault birth → encrypted Walrus write → cross-app recall → revoke) works in production.
-- **Q3–Q4 2026** — mainnet; Seal-gated selective sharing (share one memory, not the vault).
+- **Q3–Q4 2026** — mainnet; Seal threshold encryption — removes the server from decryption entirely and gates selective sharing (share one memory, not the vault).
 - **MemWal adapter** ships the day `@mysten/memwal` ≥0.0.4 publishes.
 
 Built solo. Live on testnet today.
