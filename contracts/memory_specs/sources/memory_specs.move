@@ -6,11 +6,14 @@
 /// public accessors (`owner`, `entry_count`, `is_authorized`, `blob_id_at`).
 ///
 /// Proven invariants:
-///   I1 owner-only writes — add_entry / grant / revoke abort for any
-///      sender that is not the vault owner (and only for the mirrored
-///      abort conditions).
-///   I2 entries are append-only — add_entry grows the log by exactly one,
-///      the new blob id lands at the tail, and no existing index changes.
+///   I1 owner-only writes — add_entry / remove_entry / grant / revoke abort
+///      for any sender that is not the vault owner (and only for the
+///      mirrored abort conditions).
+///   I2 entries change only by owner add or owner remove — add_entry grows
+///      the log by exactly one with the new blob id at the tail and no
+///      existing index changed; remove_entry shrinks it by exactly one,
+///      removing exactly the asserted (index, blob_id) entry while every
+///      other entry survives in order.
 ///   I3 grant/revoke never touch the memory log or the owner.
 ///   I4 a fresh vault belongs to its creator and starts empty.
 module memory_specs::memory_specs;
@@ -65,6 +68,41 @@ public fun add_entry_spec(
     ensures(memory::blob_id_at(m, memory::entry_count(__old)) == blob_id);
     // Append-only: every pre-existing index still holds the same blob id.
     ensures(forall!<u64>(|i| entry_unchanged(m, __old, *i)));
+}
+
+/// True when index `i` of the post-remove log holds the expected survivor:
+/// entries below the removed index keep their slot, entries at or above it
+/// shift down by one. Guards make the helper total for any (m, old, idx, i).
+#[ext(pure)]
+fun entry_preserved_after_remove(m: &Memory, old: &Memory, removed: u64, i: u64): bool {
+    if (i >= memory::entry_count(m) || i >= memory::entry_count(old)) {
+        // Totality guards only — where this is used, count(m) = count(old) - 1,
+        // so neither fires for a surviving index.
+        true
+    } else if (i < removed) {
+        memory::blob_id_at(m, i) == memory::blob_id_at(old, i)
+    } else if (i + 1 < memory::entry_count(old)) {
+        memory::blob_id_at(m, i) == memory::blob_id_at(old, i + 1)
+    } else {
+        true
+    }
+}
+
+/// I1 + I2 — only the owner can remove; an unknown (index, blob_id) pair
+/// aborts; exactly one entry disappears and every other entry survives in
+/// order.
+#[spec(prove, target = memory::remove_entry)]
+public fun remove_entry_spec(m: &mut Memory, index: u64, blob_id: String, ctx: &TxContext) {
+    let __old = clone!(m);
+    asserts(memory::owner(m) == ctx.sender());
+    asserts(index < memory::entry_count(m));
+    asserts(memory::blob_id_at(m, index) == blob_id);
+    memory::remove_entry(m, index, blob_id, ctx);
+    ensures(memory::owner(m) == memory::owner(__old));
+    ensures(memory::entry_count(m) == memory::entry_count(__old) - 1);
+    // Every surviving index holds the expected entry (below: same slot,
+    // at/above: shifted down by one) — nothing else was touched.
+    ensures(forall!<u64>(|i| entry_preserved_after_remove(m, __old, index, *i)));
 }
 
 /// I1 + I3 — only the owner can grant, double-grant aborts, the app is
