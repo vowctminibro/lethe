@@ -870,3 +870,14 @@ Prod screenshots: design/screens/prod/{landing-desktop,landing-mobile,chat-unaut
 Blockers: none new — B16 (MemWal SDK 0.0.2 < relayer min 0.0.4) unchanged per block rules, FALLBACK ManualProvider live. Two transient Vercel /v2/files 500s worked around via .vercelignore. GROQ/GEMINI keys still empty (free redundancy waiting on Vow)
 Recommended next: (1) Vow does the ONE live browser pass on PROD now that it's the new app: Google sign-in → vault birth → chat → /memory → grant Pulse → /pulse → revoke (only untested seam, now testable on the public URL). (2) 90s demo video against lethe-gold.vercel.app + judge-facing README with the brand-v2 story and Suiscan/Walrus links. (3) Fill GROQ/GEMINI free keys → instant 4-deep chain.
 === END REPORT ===
+
+---
+
+## 2026-06-11 — BLOCK 3A: JUDGE-FACING REPO
+
+=== LETHE BLOCK 3A REPORT ===
+README: 129f27f | links verified: https://lethe-gold.vercel.app (200) · Suiscan package 0x9dcc482cd7fb5d7fa2a0cf90c7dc1e6efec6f40e817e352c61ed0f63951c1331 (page 200 + package object readable via fullnode RPC) · all relative paths (contracts/memory/sources/memory.move, apps/web/src/lib/memory/provider.ts, apps/web/scripts/{hero,pulse,gasless}-e2e.mjs, PROGRESS.md, BLOCKERS.md) exist. Facts corrected vs template: Move entry fns are create/add_entry/grant/revoke (no create_vault), vault object is memory::Memory, stack is Next.js 16 (16.2.6) not 15. No license claimed (no LICENSE file in repo — old README's "Apache 2.0" line was unbacked; flag for Vow if judges expect one).
+Repo meta: YES — description "User-owned memory for AI agents — encrypted on Walrus, anchored on Sui. Sui Overflow 2026 · Walrus track.", homepage https://lethe-gold.vercel.app, topics {sui, walrus, ai-agents, ai-memory, zklogin, move, sui-overflow} — verified via gh repo view.
+Stale sweep (ac96a86): fixed/annotated — README.md (rewritten), docs/ARCHITECTURE.md + docs/HERO_FLOW.md (LEGACY superseded headers, NPC-SDK era), brand-assets/BRAND.md (LEGACY header, art-collectibles v1 → points to root BRAND.md v2), packages/sdk/README.md + apps/memory-service/README.md + research/legacy/README.md (created, 3-line LEGACY notes). contracts/legacy/README.md already had a proper legacy note — untouched. Left alone deliberately: BLOCK2_PROMPT.md/HERMES_HANDOFF.md/OVERNIGHT-BRIEFING.md/SUI_PILOT_NOTES.md (dated process history, NPC mentions are historical narration), apps/web/next.config.ts (comment documents the re-aim, current), research/*.md (dated research notes), pnpm-lock.yaml (lockfile).
+Anything judge-visible still stale: none on the front page or docs/. Minor: no LICENSE file (README intentionally silent); REAIM.md/BATTLE_DESIGN.md describe pivot history by design.
+=== END REPORT ===
