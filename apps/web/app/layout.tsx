@@ -1,23 +1,28 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Inter, JetBrains_Mono } from "next/font/google";
+import { Fraunces, Instrument_Sans, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 
 export const dynamic = "force-dynamic";
 
+// "Letterpress on water" — Fraunces carries the voice (italic + optical
+// sizing), Instrument Sans does the reading, IBM Plex Mono stamps every
+// on-chain id. See BRAND.md "Visual identity".
 const fraunces = Fraunces({
   subsets: ["latin"],
   variable: "--font-fraunces",
-  weight: ["300", "400", "500", "600"],
+  weight: "variable",
+  style: ["normal", "italic"],
+  axes: ["opsz"],
 });
-const inter = Inter({
+const instrument = Instrument_Sans({
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-instrument",
   weight: ["400", "500", "600"],
 });
-const jetbrains = JetBrains_Mono({
+const plexMono = IBM_Plex_Mono({
   subsets: ["latin"],
-  variable: "--font-jetbrains",
+  variable: "--font-plex-mono",
   weight: ["400", "500"],
 });
 
@@ -52,7 +57,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="en"
-      className={`${fraunces.variable} ${inter.variable} ${jetbrains.variable}`}
+      className={`${fraunces.variable} ${instrument.variable} ${plexMono.variable}`}
     >
       <body className="min-h-screen antialiased bg-[var(--bg)] text-[var(--text)]">
         <Providers>{children}</Providers>

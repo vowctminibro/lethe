@@ -14,28 +14,49 @@
 
   /* ── Font families ── */
   --font-display: var(--font-fraunces), Georgia, serif;
-  --font-sans:    var(--font-inter), system-ui, sans-serif;
-  --font-mono:    var(--font-jetbrains), monospace;
+  --font-sans:    var(--font-instrument), system-ui, sans-serif;
+  --font-mono:    var(--font-plex-mono), monospace;
+
+  /* ── Shape law: letterpress corners — 2-4px everywhere ──
+     Overriding the radius scale retunes every rounded-* utility in the app. */
+  --radius-xs:   2px;
+  --radius-sm:   2px;
+  --radius-md:   3px;
+  --radius-lg:   3px;
+  --radius-xl:   4px;
+  --radius-2xl:  4px;
+  --radius-3xl:  4px;
+  --radius-4xl:  4px;
 }
 
-/* ── Light mode (default) ── */
+/* ── Light mode (default) — paper ── */
 :root {
   color-scheme: light;
-  --bg:         #EFF5F4;
+  --bg:         #EFF5F4;  /* Fog = paper */
   --bg-panel:   #FFFFFF;
-  --text:       #1A3A4A;
-  --text-dim:   #5A8A9E;
-  --accent:     #E8B894;
+  --text:       #1A3A4A;  /* Ink */
+  --text-dim:   #5A8A9E;  /* Mist */
+  --accent:     #E8B894;  /* Coral — RESERVED: memory events, proof links, remembrance */
   --accent-h:   #C4946E;
+  --border:     rgba(26, 58, 74, 0.12);  /* hairline */
+  --shadow-ambient: 0 0 0 1px var(--border), 0 2px 12px rgba(26, 58, 74, 0.05);
 }
 
 html, body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-sans);
+  font-size: 15.5px;
+  line-height: 1.6;
 }
 
-/* ── Dark mode ── */
+/* Focus = coral, the color of remembrance — keyboard users see the same law. */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ── Dark mode — candlelit library ── */
 .dark {
   color-scheme: dark;
   --bg:         #0A1628;
@@ -44,6 +65,89 @@ html, body {
   --text-dim:   #6B9BD1;
   --accent:     #D4A574;
   --accent-h:   #C4946E;
+  --border:     rgba(232, 223, 208, 0.14);
+  --shadow-ambient: 0 0 0 1px var(--border), 0 2px 12px rgba(0, 0, 0, 0.25);
+}
+
+/* ── Type voice ─────────────────────────────────────────────────────── */
+
+/* Landing display — Fraunces italic, set like verse. */
+.lethe-display {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(3.5rem, 7.5vw, 5.5rem); /* 56 → 88px */
+  line-height: 1.04;
+  letter-spacing: -0.015em;
+}
+
+/* Section heads — upright Fraunces, 28-36px. */
+.lethe-head {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(1.75rem, 3vw, 2.25rem);
+  line-height: 1.15;
+}
+
+/* Every on-chain id/hash — engraved mono plate type. */
+.lethe-id {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  letter-spacing: 0.08em;
+}
+
+/* ── Surface law ────────────────────────────────────────────────────── */
+
+.lethe-hairline { border: 1px solid var(--border); }
+
+/* Confirmed memory chips — letterpress inset, as if pressed into the paper. */
+.lethe-letterpress {
+  box-shadow:
+    inset 0 1px 2px rgba(26, 58, 74, 0.16),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.55);
+}
+.dark .lethe-letterpress {
+  box-shadow:
+    inset 0 1px 3px rgba(0, 0, 0, 0.5),
+    inset 0 -1px 0 rgba(232, 223, 208, 0.08);
+}
+
+/* ── Water line-work — hero + section dividers ONLY ─────────────────── */
+
+/* Contour lines in Mist at ≤6% opacity, drifting like slow water.
+   Apply to a positioned container; the pattern lives on ::before. */
+.lethe-water {
+  position: relative;
+}
+.lethe-water::before {
+  content: "";
+  position: absolute;
+  inset: -40% -10%;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='220' viewBox='0 0 420 220'%3E%3Cg fill='none' stroke='%235A8A9E' stroke-width='1'%3E%3Cpath d='M0 28 C 70 12, 140 44, 210 28 S 350 12, 420 28'/%3E%3Cpath d='M0 66 C 70 50, 140 82, 210 66 S 350 50, 420 66'/%3E%3Cpath d='M0 104 C 70 88, 140 120, 210 104 S 350 88, 420 104'/%3E%3Cpath d='M0 142 C 70 126, 140 158, 210 142 S 350 126, 420 142'/%3E%3Cpath d='M0 180 C 70 164, 140 196, 210 180 S 350 164, 420 180'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 420px 220px;
+  opacity: 0.06;
+  animation: lethe-drift 75s linear infinite alternate;
+}
+@keyframes lethe-drift {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(-210px, -55px, 0); }
+}
+
+/* A single contour divider between sections. */
+.lethe-divider {
+  height: 56px;
+  overflow: hidden;
+  position: relative;
+}
+.lethe-divider::before {
+  content: "";
+  position: absolute;
+  inset: 0 -10%;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='56' viewBox='0 0 420 56'%3E%3Cg fill='none' stroke='%235A8A9E' stroke-width='1'%3E%3Cpath d='M0 20 C 70 6, 140 34, 210 20 S 350 6, 420 20'/%3E%3Cpath d='M0 38 C 70 24, 140 52, 210 38 S 350 24, 420 38'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 420px 56px;
+  opacity: 0.06;
+  animation: lethe-drift 90s linear infinite alternate;
 }
 
 ::selection { background: #E8B894; color: #0A1628; }
@@ -85,6 +189,42 @@ html, body {
 }
 .lethe-card-in { animation: lethe-card-in 0.4s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
 
+/* ── Memory chip lifecycle — extract → lift → glide → anchor ───────── */
+
+/* A fact lifting out of the conversation with a soft coral glow. */
+@keyframes lethe-chip-lift {
+  0%   { opacity: 0; transform: translateY(14px) scale(0.96); box-shadow: 0 0 0 rgba(232, 184, 148, 0); }
+  45%  { opacity: 1; transform: translateY(-3px) scale(1.01); box-shadow: 0 4px 18px rgba(232, 184, 148, 0.35); }
+  100% { opacity: 1; transform: translateY(0) scale(1); box-shadow: 0 0 0 rgba(232, 184, 148, 0); }
+}
+.lethe-chip-lift { animation: lethe-chip-lift 0.55s cubic-bezier(0.22, 0.8, 0.3, 1) both; }
+
+/* The stamp on on-chain confirm — pressed once, then it belongs to the page. */
+@keyframes lethe-stamp {
+  0%   { transform: scale(1.06); }
+  55%  { transform: scale(0.985); }
+  100% { transform: scale(1); }
+}
+.lethe-stamp { animation: lethe-stamp 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.2) both; }
+
+/* Forget = ink-wash dissolve — the entry blurs and washes off the ledger. */
+@keyframes lethe-inkwash {
+  0%   { opacity: 1; filter: blur(0); transform: translateX(0); }
+  100% { opacity: 0; filter: blur(6px); transform: translateX(14px); }
+}
+.lethe-inkwash { animation: lethe-inkwash 0.5s ease-in both; }
+
+/* Vault-birth: the L mark draws itself. */
+@keyframes lethe-draw { to { stroke-dashoffset: 0; } }
+.lethe-draw {
+  stroke-dasharray: 300;
+  stroke-dashoffset: 300;
+  animation: lethe-draw 0.9s ease-out 0.15s both;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .lethe-shimmer, .lethe-fade-in, .lethe-reveal, .lethe-overlay-in, .lethe-card-in { animation: none; }
+  .lethe-shimmer, .lethe-fade-in, .lethe-reveal, .lethe-overlay-in, .lethe-card-in,
+  .lethe-chip-lift, .lethe-stamp, .lethe-inkwash, .lethe-draw { animation: none; }
+  .lethe-water::before, .lethe-divider::before { animation: none; }
+  .lethe-draw { stroke-dashoffset: 0; }
 }
