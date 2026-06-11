@@ -137,3 +137,49 @@ console.log("blobId:      ", ref.blobId);
 console.log("aggregator:  ", aggUrl);
 console.log("suiscan obj: ", `https://suiscan.xyz/testnet/object/${memId}`);
 console.log("suiscan tx:  ", `https://suiscan.xyz/testnet/tx/${finalDigest}`);
+
+// [6] SESSION B — fresh "app instance": on-chain refs → recall → personalized
+// greeting must reference the fact written in session A (cross-session memory).
+console.log("\n[6] session B: fresh recall → greet…");
+const objB = await client.getObject({ id: memId, options: { showContent: true } });
+const refsB = (objB.data?.content?.fields?.entries ?? []).map((e) => {
+  const f = e.fields ?? e;
+  return { blobId: f.blob_id, namespace: f.namespace, kind: f.kind, createdAtMs: Number(f.created_at_ms) };
+});
+const recB = await fetch(`${BASE}/api/memory/recall`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ ownerAddress: SENDER, query: "", refs: refsB, limit: 12 }),
+});
+if (!recB.ok) throw new Error(`session-B recall failed: ${recB.status} ${await recB.text()}`);
+const { hits: hitsB } = await recB.json();
+const digestB = hitsB
+  .slice()
+  .sort((a, b) => b.createdAtMs - a.createdAtMs)
+  .map((h) => h.text.slice(0, 160));
+console.log(`    recalled ${digestB.length} memories (newest: "${digestB[0]}")`);
+
+const greetRes = await fetch(`${BASE}/api/chat`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ greet: true, context: digestB }),
+});
+if (!greetRes.ok) throw new Error(`greet failed: ${greetRes.status} ${await greetRes.text()}`);
+let greeting = "";
+const gReader = greetRes.body.getReader();
+while (true) {
+  const { done, value } = await gReader.read();
+  if (done) break;
+  greeting += dec.decode(value, { stream: true });
+}
+console.log(`    greeting (${greetRes.headers.get("x-provider")}): ${greeting.trim()}`);
+
+// The session-A fact is about a strict 5% position-size cap — the greeting
+// must reference it (any of these tokens counts as a reference).
+const referenced = /5\s*%|position[- ]?siz|cap/i.test(greeting);
+console.log(`    references session-A fact: ${referenced ? "YES" : "NO"}`);
+if (!referenced) {
+  console.error("SESSION-B GATE FAILED — greeting did not reference the stored fact");
+  process.exit(1);
+}
+console.log("\n=== CROSS-SESSION GATE PASSED — second session knew the user ===");

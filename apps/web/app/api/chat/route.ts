@@ -5,14 +5,25 @@ export const runtime = "nodejs";
 export const maxDuration = 60;
 
 /**
- * POST { messages: {role,content}[], context?: string[], walletContext?: string[] }
+ * POST { messages: {role,content}[], context?: string[], walletContext?: string[], greet?: boolean }
  *   -> token stream (text/plain), model id in the `x-provider` header.
  *
  * The Lethe reply plane. Recalled memories (`context`) ground the reply;
  * `walletContext` is the optional read-only snapshot of a linked wallet,
  * injected as flavor. Durable-fact extraction is a separate call
  * (/api/chat/extract) so the reply can stream token-by-token.
+ *
+ * `greet: true` is the returning-user opener: `messages` may be empty and the
+ * reply is a short personal greeting woven from 1–2 remembered facts.
  */
+
+const GREET_INSTRUCTION = [
+  "The user just opened the chat, and you DO remember them. Greet them back in",
+  "1–2 warm sentences, naturally weaving in one or two of the remembered facts —",
+  "the way a friend who remembers would. Never enumerate or list the memories,",
+  "never say \"according to my memory\", never mention storage mechanics. End with",
+  "a short nudge or question that invites them to continue.",
+].join(" ");
 
 function systemPrompt(context: string[], wallet: string[]): string {
   const memo =
@@ -46,22 +57,28 @@ function systemPrompt(context: string[], wallet: string[]): string {
 
 export async function POST(req: NextRequest) {
   try {
-    const { messages, context, walletContext } = await req.json();
-    if (!Array.isArray(messages) || messages.length === 0) {
+    const { messages, context, walletContext, greet } = await req.json();
+    const greeting = greet === true;
+    if (!greeting && (!Array.isArray(messages) || messages.length === 0)) {
       return NextResponse.json({ error: "missing messages[]" }, { status: 400 });
     }
     const ctx: string[] = Array.isArray(context) ? context.filter((c) => typeof c === "string") : [];
     const wallet: string[] = Array.isArray(walletContext)
       ? walletContext.filter((c) => typeof c === "string")
       : [];
+    if (greeting && ctx.length === 0) {
+      return NextResponse.json({ error: "greet requires context" }, { status: 400 });
+    }
 
-    const turns: ChatMessage[] = (messages as ChatMessage[])
-      .filter((m) => m && (m.role === "user" || m.role === "assistant") && typeof m.content === "string")
-      .map((m) => ({ role: m.role, content: m.content }));
+    const turns: ChatMessage[] = greeting
+      ? [{ role: "user", content: GREET_INSTRUCTION }]
+      : (messages as ChatMessage[])
+          .filter((m) => m && (m.role === "user" || m.role === "assistant") && typeof m.content === "string")
+          .map((m) => ({ role: m.role, content: m.content }));
 
     const { stream, provider } = await streamComplete(
       [{ role: "system", content: systemPrompt(ctx, wallet) }, ...turns],
-      { temperature: 0.5, maxTokens: 500 },
+      { temperature: greeting ? 0.7 : 0.5, maxTokens: greeting ? 160 : 500 },
     );
 
     const encoder = new TextEncoder();

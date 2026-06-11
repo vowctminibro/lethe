@@ -54,10 +54,49 @@ export default function ChatPage() {
     },
   ]);
   const endRef = useRef<HTMLDivElement>(null);
+  // Compact digest of every owned memory, kept in context for the whole chat.
+  const digestRef = useRef<string[]>([]);
+  // One personalized greeting per page load, and only before the user types.
+  const greetedRef = useRef(false);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [msgs, rail]);
+
+  // ── returning user: replace the canned opener with a woven greeting ──────
+  const streamGreeting = useCallback(async (context: string[]) => {
+    if (greetedRef.current || context.length === 0) return;
+    greetedRef.current = true;
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ greet: true, context }),
+      });
+      if (!res.ok || !res.body) return; // keep the default opener
+      const provider = res.headers.get("x-provider") ?? undefined;
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let text = "";
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        text += decoder.decode(value, { stream: true });
+        const sofar = text;
+        // Only ever rewrite the untouched opener — bail if the user typed.
+        setMsgs((m) =>
+          m.length === 1 && m[0].role === "lethe"
+            ? [{ role: "lethe", text: sofar, provider, streaming: true }]
+            : m,
+        );
+      }
+      setMsgs((m) =>
+        m.length === 1 && m[0].role === "lethe" ? [{ ...m[0], streaming: false }] : m,
+      );
+    } catch {
+      /* greeting is sugar — the default opener stands */
+    }
+  }, []);
 
   // ── seed the rail from the on-chain vault ────────────────────────────────
   const loadRail = useCallback(async () => {
@@ -69,19 +108,21 @@ export default function ChatPage() {
       if (owned && owned.entries.length > 0) {
         // recall("") decrypts everything; map to confirmed chips, newest first.
         const hits = await memory.recall("");
+        const newestFirst = hits.slice().sort((a, b) => b.createdAtMs - a.createdAtMs);
+        // Digest stays in the system prompt for the whole conversation.
+        digestRef.current = newestFirst.slice(0, 12).map((h) => h.text.slice(0, 160));
         setRail(
-          hits
-            .slice()
-            .sort((a, b) => b.createdAtMs - a.createdAtMs)
-            .map((h) => ({
-              id: `chain-${h.blobId}`,
-              kind: h.kind,
-              summary: h.text,
-              status: "confirmed" as const,
-              createdAtMs: h.createdAtMs,
-              blobId: h.blobId,
-            })),
+          newestFirst.map((h) => ({
+            id: `chain-${h.blobId}`,
+            kind: h.kind,
+            summary: h.text,
+            status: "confirmed" as const,
+            createdAtMs: h.createdAtMs,
+            blobId: h.blobId,
+          })),
         );
+        // Returning user: greet personally instead of the canned opener.
+        void streamGreeting(digestRef.current);
       } else {
         setRail([]);
       }
@@ -91,7 +132,7 @@ export default function ChatPage() {
     } finally {
       setRailLoading(false);
     }
-  }, [account, memory, client]);
+  }, [account, memory, client, streamGreeting]);
 
   useEffect(() => {
     void loadRail();
@@ -131,7 +172,8 @@ export default function ChatPage() {
     setBusy(true);
 
     try {
-      // 1) RAG: recall the most relevant owned memories to ground the reply.
+      // 1) RAG: most-relevant recall first, then the load-time digest fills
+      // the rest — memories stay in context for the whole conversation.
       let context: string[] = [];
       try {
         const hits = await memory.recall(text, { limit: 5 });
@@ -139,6 +181,7 @@ export default function ChatPage() {
       } catch {
         /* recall is enrichment — stream the reply regardless */
       }
+      context = [...new Set([...context, ...digestRef.current])].slice(0, 12);
 
       // 2) Stream the reply token-by-token into a growing bubble.
       const res = await fetch("/api/chat", {
