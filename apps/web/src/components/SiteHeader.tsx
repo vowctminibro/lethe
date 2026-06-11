@@ -9,6 +9,7 @@ import {
 } from "@mysten/dapp-kit";
 import { isGoogleWallet } from "@mysten/enoki";
 import { Logo } from "./Logo";
+import { isEnokiConfigured } from "@/src/lib/enoki";
 import { DEMO_MOCK, MOCK_ADDRESS } from "@/src/lib/demo/mock";
 
 const short = (a: string) => `${a.slice(0, 6)}…${a.slice(-4)}`;
@@ -59,9 +60,20 @@ export function SignIn() {
         >
           {isPending ? "Connecting…" : "Sign in with Google"}
         </button>
+      ) : isEnokiConfigured() ? (
+        // Enoki key present — the Google wallet just hasn't finished
+        // registering yet. Render the real button in a waiting state so the
+        // header never flashes a scary status.
+        <button
+          disabled
+          className="h-9 px-4 rounded-md text-sm font-semibold opacity-60"
+          style={{ background: "var(--text)", color: "var(--accent)" }}
+        >
+          Sign in with Google
+        </button>
       ) : (
-        <span className="text-xs" style={{ color: "var(--text-dim)" }} title="Set NEXT_PUBLIC_ENOKI_API_KEY">
-          sign-in offline
+        <span className="text-xs" style={{ color: "var(--text-dim)" }} title="Sign-in disabled: set NEXT_PUBLIC_ENOKI_API_KEY + NEXT_PUBLIC_GOOGLE_CLIENT_ID">
+          Sign in to start
         </span>
       )}
       {slush && (

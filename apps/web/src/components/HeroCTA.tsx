@@ -13,6 +13,7 @@
 import Link from "next/link";
 import { useConnectWallet, useWallets } from "@mysten/dapp-kit";
 import { isGoogleWallet } from "@mysten/enoki";
+import { isEnokiConfigured } from "@/src/lib/enoki";
 import { useVaultBirth } from "@/src/lib/memory/vault";
 import { useLetheAccount } from "@/src/lib/demo/mock";
 
@@ -52,13 +53,21 @@ export function HeroCTA() {
             >
               {isPending ? "Connecting…" : "Sign in with Google"}
             </button>
+          ) : isEnokiConfigured() ? (
+            <button
+              disabled
+              className="h-12 px-7 rounded-md text-base font-semibold opacity-60 shadow-sm"
+              style={{ background: "var(--text)", color: "var(--accent)", fontFamily: "var(--font-sans)" }}
+            >
+              Sign in with Google
+            </button>
           ) : (
             <span
               className="h-12 px-7 rounded-md grid place-items-center text-sm border"
               style={{ borderColor: "var(--border)", color: "var(--text-dim)" }}
-              title="Set NEXT_PUBLIC_ENOKI_API_KEY"
+              title="Sign-in disabled: set NEXT_PUBLIC_ENOKI_API_KEY + NEXT_PUBLIC_GOOGLE_CLIENT_ID"
             >
-              Sign-in is offline — missing Enoki key
+              Sign in to start
             </span>
           )}
           <span className="text-xs" style={{ color: "var(--text-dim)" }}>
