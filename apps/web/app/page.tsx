@@ -77,9 +77,11 @@ export default function Home() {
             SUI OVERFLOW 2026
           </span>
         </div>
-        <Link href="/memory" className="text-sm hover:opacity-70 transition" style={{ color: "var(--text-dim)" }}>
-          Your Memory
-        </Link>
+        <div className="flex items-center gap-5 text-sm" style={{ color: "var(--text-dim)" }}>
+          <a href="#pricing" className="hidden sm:inline hover:opacity-70 transition">Pricing</a>
+          <Link href="/docs" className="hover:opacity-70 transition">Docs</Link>
+          <Link href="/memory" className="hover:opacity-70 transition">Your Memory</Link>
+        </div>
       </nav>
 
       {/* ── Hero — asymmetric: verse left, constellation right ── */}
@@ -130,6 +132,112 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ── Why Walrus needs Lethe — the track thesis, three beats ── */}
+      <div className="lethe-divider" aria-hidden="true" />
+      <section id="why-walrus" className="max-w-6xl mx-auto w-full px-6 py-14">
+        <h2 className="text-2xl" style={{ fontFamily: "var(--font-display)", fontWeight: 500 }}>
+          Why Walrus needs Lethe
+        </h2>
+        <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-0 sm:divide-x" style={{ borderColor: "var(--border)" }}>
+          {[
+            {
+              n: "01",
+              k: "Memories renew forever",
+              v: "Archives pay for storage once. Memories renew every epoch — recurring demand per user, not a one-time deal.",
+            },
+            {
+              n: "02",
+              k: "Highest value per byte",
+              v: "A memory is a few hundred bytes that knows you. People pay for identity, not gigabytes.",
+            },
+            {
+              n: "03",
+              k: "The Web2 door is built",
+              v: "Google login, no wallet, no gas — the only Walrus write path a normal person can walk through. Live today.",
+            },
+          ].map((c) => (
+            <div key={c.k} className="px-0 sm:px-8 py-6 sm:py-2 first:pl-0 last:pr-0" style={{ borderColor: "var(--border)" }}>
+              <div className="lethe-id" style={{ color: "var(--text-dim)" }}>{c.n}</div>
+              <div className="mt-2 text-lg" style={{ fontFamily: "var(--font-display)", fontWeight: 500 }}>{c.k}</div>
+              <p className="mt-2 text-sm leading-relaxed" style={{ color: "var(--text-dim)" }}>{c.v}</p>
+            </div>
+          ))}
+        </div>
+        <p className="mt-10 text-base max-w-2xl italic" style={{ fontFamily: "var(--font-display)", color: "var(--text)" }}>
+          &ldquo;Remove Walrus and Lethe breaks. Ship Lethe and Walrus gets what it&rsquo;s
+          missing: users who come back.&rdquo;
+        </p>
+      </section>
+
+      {/* ── Pricing — principles first, tiers second ── */}
+      <div className="lethe-divider" aria-hidden="true" />
+      <section id="pricing" className="max-w-6xl mx-auto w-full px-6 py-14">
+        <h2 className="text-2xl" style={{ fontFamily: "var(--font-display)", fontWeight: 500 }}>
+          Pricing
+        </h2>
+        <div className="mt-4 max-w-2xl space-y-1">
+          <p className="text-sm italic" style={{ fontFamily: "var(--font-display)", color: "var(--text)" }}>
+            &ldquo;Your memory is free forever. We charge for the intelligence on top.&rdquo;
+          </p>
+          <p className="text-sm italic" style={{ fontFamily: "var(--font-display)", color: "var(--text)" }}>
+            &ldquo;We lock you in with value, not custody — export and leave any day.&rdquo;
+          </p>
+        </div>
+        <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px lethe-hairline rounded overflow-hidden" style={{ background: "var(--border)" }}>
+          {[
+            {
+              k: "Free",
+              tag: "live today",
+              v: "Full memory features forever — derive, grant, revoke, forget, export. Free models with daily limits.",
+            },
+            {
+              k: "BYOK",
+              tag: "coming",
+              v: "Bring your own model keys; your memory plane stays exactly the same.",
+            },
+            {
+              k: "Pro",
+              tag: "planned · ~$5–8/mo",
+              v: "Premium models and higher limits. The memory itself is never behind the paywall.",
+            },
+            {
+              k: "SDK for apps",
+              tag: "pilot pricing",
+              v: "“Continue with Lethe” — warm-start your users with memory they already own.",
+            },
+          ].map((t) => (
+            <div key={t.k} className="p-6" style={{ background: "var(--bg)" }}>
+              <div className="flex items-baseline justify-between gap-2">
+                <span className="text-lg" style={{ fontFamily: "var(--font-display)", fontWeight: 500 }}>{t.k}</span>
+                <span className="lethe-id uppercase" style={{ color: "var(--accent-h)" }}>{t.tag}</span>
+              </div>
+              <p className="mt-3 text-sm leading-relaxed" style={{ color: "var(--text-dim)" }}>{t.v}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── Roadmap — mirrors README status & roadmap ── */}
+      <div className="lethe-divider" aria-hidden="true" />
+      <section id="roadmap" className="max-w-6xl mx-auto w-full px-6 py-14">
+        <h2 className="text-2xl" style={{ fontFamily: "var(--font-display)", fontWeight: 500 }}>
+          Roadmap
+        </h2>
+        <ul className="mt-6 space-y-3 max-w-2xl">
+          {[
+            ["now", "Live on Sui testnet — vault birth, Seal-encrypted writes, cross-app recall, revoke, export. Formally verified (19/19)."],
+            ["Q3–Q4 2026", "Mainnet. Seal-gated selective sharing — share one memory, not the vault."],
+            ["Q3–Q4 2026", "Shared-registry policy: third-party apps run their own decrypt sessions."],
+            ["later", "Memory editing; MemWal adapter the day @mysten/memwal ≥0.0.4 publishes."],
+          ].map(([when, what], i) => (
+            <li key={i} className="flex gap-4 text-sm leading-relaxed">
+              <span className="lethe-id uppercase shrink-0 w-24 pt-0.5" style={{ color: "var(--accent-h)" }}>{when}</span>
+              <span style={{ color: "var(--text-dim)" }}>{what}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+
       {/* ── Colophon — set like the last page of a book ── */}
       <footer className="w-full" style={{ borderTop: "1px solid var(--border)" }}>
         <div className="max-w-2xl mx-auto px-6 py-12 text-center flex flex-col items-center gap-4">
@@ -150,12 +258,19 @@ export default function Home() {
             <a
               className="underline decoration-dotted underline-offset-4 hover:opacity-70 transition"
               style={{ color: "var(--accent-h)" }}
-              href="https://suiscan.xyz/testnet/object/0x06b5c99940b5de954b2b37cd1198f421921986eabd57b35fe3fd4cc39169ba95"
+              href="https://suiscan.xyz/testnet/object/0x0c79fd944a51153e4d668a4f53a280fe5d0ab6d4db0a572a2f85c11ac5fc2f6c"
               target="_blank"
               rel="noreferrer"
             >
               the vault contract ↗
             </a>
+            <Link
+              className="underline decoration-dotted underline-offset-4 hover:opacity-70 transition"
+              style={{ color: "var(--text-dim)" }}
+              href="/docs"
+            >
+              docs
+            </Link>
             <a
               className="underline decoration-dotted underline-offset-4 hover:opacity-70 transition"
               style={{ color: "var(--text-dim)" }}

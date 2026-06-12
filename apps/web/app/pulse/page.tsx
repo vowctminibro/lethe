@@ -190,6 +190,9 @@ export default function PulsePage() {
             <span className="lethe-id hidden sm:inline" style={{ color: C.dim, opacity: 0.75 }}>
               {PULSE_TAGLINE.toUpperCase()}
             </span>
+            <span className="text-xs hidden lg:inline italic" style={{ color: C.dim, opacity: 0.85 }}>
+              Pulse is a demo of what any third-party app can do with your grant.
+            </span>
           </div>
           <div className="flex items-center gap-3 text-xs" style={{ color: C.dim }}>
             {DEMO_MOCK && (
