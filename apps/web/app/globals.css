@@ -279,3 +279,44 @@ html, body {
 }
 .lethe-docs pre code { background: none; border: none; padding: 0; }
 .lethe-docs .dim { color: var(--text-dim); }
+
+/* ── Block 10: section rhythm tokens ───────────────────────────────────── */
+/* One scale for every landing section — kills the "appended text" drift.   */
+.lethe-section {
+  padding-top: 3.5rem;
+  padding-bottom: 3.5rem;
+}
+@media (min-width: 768px) {
+  .lethe-section {
+    padding-top: 6rem;
+    padding-bottom: 6rem;
+  }
+}
+/* Mono uppercase micro-label in Coral, set above each section heading. */
+.lethe-eyebrow {
+  font-family: var(--font-plex-mono), monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-h);
+}
+/* Display-size section heading — Fraunces, ~2x the old text-2xl. */
+.lethe-section-head {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(2rem, 4.5vw, 3rem);
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+  margin-top: 0.6rem;
+}
+/* Full-width typographic pull quote — hairline above/below. */
+.lethe-pullquote {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  line-height: 1.35;
+  text-align: center;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 3rem 1.5rem;
+}

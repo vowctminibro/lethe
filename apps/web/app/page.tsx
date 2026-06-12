@@ -66,6 +66,18 @@ function Constellation() {
   );
 }
 
+const ROADMAP: { when: string; what: string; now: boolean }[] = [
+  { when: "now", what: "Live on Sui testnet — vault birth, Seal-encrypted writes, cross-app recall, revoke, export. Formally verified (19/19).", now: true },
+  { when: "Q3–Q4 2026", what: "Mainnet. Seal-gated selective sharing — share one memory, not the vault.", now: false },
+  { when: "Q3–Q4 2026", what: "Shared-registry policy: third-party apps run their own decrypt sessions.", now: false },
+  { when: "later", what: "Memory editing; MemWal adapter the day @mysten/memwal \u22650.0.4 publishes.", now: false },
+];
+
+// Placeholder until Phase 2 captures land — renders nothing.
+function ProductFrames() {
+  return null;
+}
+
 export default function Home() {
   return (
     <main className="min-h-screen flex flex-col" style={{ background: "var(--bg)", color: "var(--text)" }}>
@@ -115,12 +127,12 @@ export default function Home() {
       {/* ── Section divider — water line-work ── */}
       <div className="lethe-divider" aria-hidden="true" />
 
-      {/* ── Three pillars — editorial margin notes, not cards ── */}
-      <section className="max-w-6xl mx-auto w-full px-6 py-14">
+      {/* ── Three pillars — editorial margin notes, not cards (light) ── */}
+      <section className="max-w-6xl mx-auto w-full px-6 lethe-section" style={{ paddingTop: "2.5rem" }}>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-0 sm:divide-x" style={{ borderColor: "var(--border)" }}>
           {[
             { n: "01", k: "Remembers", v: "Tell Lethe your crypto style. It remembers across sessions, not just this chat." },
-            { n: "02", k: "You own it", v: "Every memory is Seal-encrypted end-to-end on Walrus — even Lethe\u2019s servers can\u2019t read it. Decryption needs on-chain approval you control." },
+            { n: "02", k: "You own it", v: "Every memory is Seal-encrypted end-to-end on Walrus \u2014 even Lethe\u2019s servers can\u2019t read it. Decryption needs on-chain approval you control." },
             { n: "03", k: "Portable", v: "Your memory is not trapped in one app. Open another Lethe agent and it already knows you." },
           ].map((c) => (
             <div key={c.k} className="px-0 sm:px-8 py-6 sm:py-2 first:pl-0 last:pr-0" style={{ borderColor: "var(--border)" }}>
@@ -132,99 +144,144 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── Why Walrus needs Lethe — the track thesis, three beats ── */}
+      <ProductFrames />
+
+      {/* ── Why Walrus needs Lethe — asymmetric editorial (NOT the grid) ── */}
       <div className="lethe-divider" aria-hidden="true" />
-      <section id="why-walrus" className="max-w-6xl mx-auto w-full px-6 py-14">
-        <h2 className="text-2xl" style={{ fontFamily: "var(--font-display)", fontWeight: 500 }}>
-          Why Walrus needs Lethe
-        </h2>
-        <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-0 sm:divide-x" style={{ borderColor: "var(--border)" }}>
-          {[
-            {
-              n: "01",
-              k: "Memories renew forever",
-              v: "Archives pay for storage once. Memories renew every epoch — recurring demand per user, not a one-time deal.",
-            },
-            {
-              n: "02",
-              k: "Highest value per byte",
-              v: "A memory is a few hundred bytes that knows you. People pay for identity, not gigabytes.",
-            },
-            {
-              n: "03",
-              k: "The Web2 door is built",
-              v: "Google login, no wallet, no gas — the only Walrus write path a normal person can walk through. Live today.",
-            },
-          ].map((c) => (
-            <div key={c.k} className="px-0 sm:px-8 py-6 sm:py-2 first:pl-0 last:pr-0" style={{ borderColor: "var(--border)" }}>
-              <div className="lethe-id" style={{ color: "var(--text-dim)" }}>{c.n}</div>
-              <div className="mt-2 text-lg" style={{ fontFamily: "var(--font-display)", fontWeight: 500 }}>{c.k}</div>
-              <p className="mt-2 text-sm leading-relaxed" style={{ color: "var(--text-dim)" }}>{c.v}</p>
-            </div>
-          ))}
+      <section id="why-walrus" className="max-w-6xl mx-auto w-full px-6 lethe-section">
+        <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-10 md:gap-16">
+          <div>
+            <div className="lethe-eyebrow">The thesis</div>
+            <h2 className="lethe-section-head">Why Walrus needs Lethe</h2>
+          </div>
+          <div>
+            {[
+              {
+                k: "Memories renew forever",
+                v: "Archives pay for storage once. Memories renew every epoch — recurring demand per user, not a one-time deal.",
+              },
+              {
+                k: "Highest value per byte",
+                v: "A memory is a few hundred bytes that knows you. People pay for identity, not gigabytes.",
+              },
+              {
+                k: "The Web2 door is built",
+                v: "Google login, no wallet, no gas — the only Walrus write path a normal person can walk through. Live today.",
+              },
+            ].map((c, i) => (
+              <div key={c.k} className="py-6" style={{ borderTop: i > 0 ? "1px solid var(--border)" : "none" }}>
+                <div className="text-lg" style={{ fontFamily: "var(--font-display)", fontWeight: 600 }}>{c.k}</div>
+                <p className="mt-1.5 text-sm leading-relaxed max-w-xl" style={{ color: "var(--text-dim)" }}>{c.v}</p>
+              </div>
+            ))}
+          </div>
         </div>
-        <p className="mt-10 text-base max-w-2xl italic" style={{ fontFamily: "var(--font-display)", color: "var(--text)" }}>
+        <blockquote className="lethe-pullquote mt-14 max-w-4xl mx-auto" style={{ color: "var(--text)" }}>
           &ldquo;Remove Walrus and Lethe breaks. Ship Lethe and Walrus gets what it&rsquo;s
           missing: users who come back.&rdquo;
-        </p>
+        </blockquote>
       </section>
 
-      {/* ── Pricing — principles first, tiers second ── */}
+      {/* ── Pricing — four true cards, principles as typographic moments ── */}
       <div className="lethe-divider" aria-hidden="true" />
-      <section id="pricing" className="max-w-6xl mx-auto w-full px-6 py-14">
-        <h2 className="text-2xl" style={{ fontFamily: "var(--font-display)", fontWeight: 500 }}>
-          Pricing
-        </h2>
-        <div className="mt-4 max-w-2xl space-y-1">
-          <p className="text-sm italic" style={{ fontFamily: "var(--font-display)", color: "var(--text)" }}>
-            &ldquo;Your memory is free forever. We charge for the intelligence on top.&rdquo;
-          </p>
-          <p className="text-sm italic" style={{ fontFamily: "var(--font-display)", color: "var(--text)" }}>
-            &ldquo;We lock you in with value, not custody — export and leave any day.&rdquo;
-          </p>
+      <section id="pricing" className="max-w-6xl mx-auto w-full px-6 lethe-section">
+        <div className="text-center">
+          <div className="lethe-eyebrow">Pricing</div>
+          <h2 className="lethe-section-head">Pricing</h2>
         </div>
-        <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px lethe-hairline rounded overflow-hidden" style={{ background: "var(--border)" }}>
+        <p
+          className="mt-10 text-center italic mx-auto max-w-2xl"
+          style={{ fontFamily: "var(--font-display)", fontSize: "1.25rem", lineHeight: 1.45, color: "var(--text)" }}
+        >
+          &ldquo;Your memory is free forever. We charge for the intelligence on top.&rdquo;
+        </p>
+        <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {[
             {
               k: "Free",
               tag: "live today",
+              price: null as string | null,
               v: "Full memory features forever — derive, grant, revoke, forget, export. Free models with daily limits.",
+              live: true,
             },
             {
               k: "BYOK",
               tag: "coming",
+              price: null as string | null,
               v: "Bring your own model keys; your memory plane stays exactly the same.",
+              live: false,
             },
             {
               k: "Pro",
-              tag: "planned · ~$5–8/mo",
+              tag: "planned",
+              price: "~$5\u20138/mo",
               v: "Premium models and higher limits. The memory itself is never behind the paywall.",
+              live: false,
             },
             {
               k: "SDK for apps",
               tag: "pilot pricing",
-              v: "“Continue with Lethe” — warm-start your users with memory they already own.",
+              price: null as string | null,
+              v: "\u201CContinue with Lethe\u201D — warm-start your users with memory they already own.",
+              live: false,
             },
           ].map((t) => (
-            <div key={t.k} className="p-6" style={{ background: "var(--bg)" }}>
-              <div className="flex items-baseline justify-between gap-2">
-                <span className="text-lg" style={{ fontFamily: "var(--font-display)", fontWeight: 500 }}>{t.k}</span>
-                <span className="lethe-id uppercase" style={{ color: "var(--accent-h)" }}>{t.tag}</span>
-              </div>
+            <div
+              key={t.k}
+              className="rounded border p-6"
+              style={{
+                borderColor: "var(--border)",
+                background: "var(--bg)",
+                borderTopColor: t.live ? "var(--accent-h)" : "var(--border)",
+                borderTopWidth: t.live ? 2 : 1,
+              }}
+            >
+              <div className="text-2xl" style={{ fontFamily: "var(--font-display)", fontWeight: 500 }}>{t.k}</div>
+              <div className="lethe-id uppercase mt-1.5" style={{ color: "var(--accent-h)" }}>{t.tag}</div>
+              {t.price && <div className="mt-2 text-sm" style={{ color: "var(--text)" }}>{t.price}</div>}
               <p className="mt-3 text-sm leading-relaxed" style={{ color: "var(--text-dim)" }}>{t.v}</p>
             </div>
           ))}
         </div>
+        <p
+          className="mt-10 text-center italic mx-auto max-w-2xl"
+          style={{ fontFamily: "var(--font-display)", fontSize: "1.25rem", lineHeight: 1.45, color: "var(--text)" }}
+        >
+          &ldquo;We lock you in with value, not custody — export and leave any day.&rdquo;
+        </p>
+      </section>
 
-        {/* ── Proof of Demand — committed policy, mechanism only ── */}
-        <div className="mt-10 max-w-2xl lethe-hairline rounded p-6" style={{ background: "var(--bg-panel)" }}>
-          <div className="lethe-id uppercase" style={{ color: "var(--accent-h)" }}>Proof of demand</div>
-          <p className="mt-3 text-sm leading-relaxed" style={{ color: "var(--text)" }}>
+      {/* ── Proof of Demand — the page\u2019s single DARK inverted panel ── */}
+      <section className="max-w-6xl mx-auto w-full px-6 lethe-section" style={{ paddingTop: 0 }}>
+        <div className="rounded px-8 py-12 md:px-14 md:py-14" style={{ background: "var(--text)", color: "var(--bg)" }}>
+          <div className="lethe-eyebrow">Proof of demand</div>
+          <p className="mt-4 text-base md:text-lg leading-relaxed max-w-3xl" style={{ color: "var(--bg)" }}>
             Lethe&rsquo;s unit economics are denominated in WAL and SUI by design: every user
             action is gas Lethe pays in SUI (sponsored), every memory is storage Lethe pays in
             WAL.
           </p>
-          <p className="mt-3 text-sm leading-relaxed" style={{ color: "var(--text-dim)" }}>
+          <div className="mt-8 flex flex-col md:flex-row items-stretch gap-3">
+            {[
+              "Revenue covers costs",
+              "WAL storage & renewals for all users",
+              "Monthly WAL buy-and-burn — public address",
+            ].map((step, i) => (
+              <div key={step} className="flex flex-col md:flex-row md:items-center gap-3 md:flex-1">
+                <div
+                  className="rounded border px-4 py-3 text-sm leading-snug w-full"
+                  style={{ borderColor: "rgba(239,245,244,0.25)", color: "var(--bg)" }}
+                >
+                  {step}
+                </div>
+                {i < 2 && (
+                  <span className="lethe-id self-center shrink-0 rotate-90 md:rotate-0" style={{ color: "var(--accent-h)" }} aria-hidden="true">
+                    \u2192
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
+          <p className="mt-8 text-sm leading-relaxed max-w-3xl" style={{ color: "rgba(239,245,244,0.7)" }}>
             Committed policy, executing from first revenue: revenue covers costs → funds WAL
             storage and renewals for all users → the remainder goes to a monthly WAL
             buy-and-burn via a public burn address — published, on-chain, verifiable by anyone.
@@ -232,22 +289,30 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── Roadmap — mirrors README status & roadmap ── */}
-      <div className="lethe-divider" aria-hidden="true" />
-      <section id="roadmap" className="max-w-6xl mx-auto w-full px-6 py-14">
-        <h2 className="text-2xl" style={{ fontFamily: "var(--font-display)", fontWeight: 500 }}>
-          Roadmap
-        </h2>
-        <ul className="mt-6 space-y-3 max-w-2xl">
-          {[
-            ["now", "Live on Sui testnet — vault birth, Seal-encrypted writes, cross-app recall, revoke, export. Formally verified (19/19)."],
-            ["Q3–Q4 2026", "Mainnet. Seal-gated selective sharing — share one memory, not the vault."],
-            ["Q3–Q4 2026", "Shared-registry policy: third-party apps run their own decrypt sessions."],
-            ["later", "Memory editing; MemWal adapter the day @mysten/memwal ≥0.0.4 publishes."],
-          ].map(([when, what], i) => (
-            <li key={i} className="flex gap-4 text-sm leading-relaxed">
-              <span className="lethe-id uppercase shrink-0 w-24 pt-0.5" style={{ color: "var(--accent-h)" }}>{when}</span>
-              <span style={{ color: "var(--text-dim)" }}>{what}</span>
+      {/* ── Roadmap — vertical timeline ── */}
+      <section id="roadmap" className="max-w-6xl mx-auto w-full px-6 lethe-section" style={{ paddingTop: 0 }}>
+        <div className="lethe-eyebrow">Roadmap</div>
+        <h2 className="lethe-section-head">Roadmap</h2>
+        <ul className="mt-10 max-w-2xl">
+          {ROADMAP.map((r, i) => (
+            <li key={i} className="relative flex gap-5 pb-8 last:pb-0">
+              <span className="relative flex flex-col items-center shrink-0 w-3" aria-hidden="true">
+                <span
+                  className="mt-1 block w-3 h-3 rounded-full shrink-0"
+                  style={
+                    r.now
+                      ? { background: "var(--accent-h)" }
+                      : { background: "transparent", border: "1.5px solid #5A8A9E" }
+                  }
+                />
+                {i < ROADMAP.length - 1 && <span className="flex-1 w-px mt-1" style={{ background: "var(--border)" }} />}
+              </span>
+              <div className="flex flex-col sm:flex-row gap-1 sm:gap-5 -mt-0.5">
+                <span className="lethe-id uppercase shrink-0 sm:w-24 pt-1" style={{ color: r.now ? "var(--accent-h)" : "var(--text-dim)" }}>
+                  {r.when}
+                </span>
+                <span className="text-sm leading-relaxed" style={{ color: "var(--text-dim)" }}>{r.what}</span>
+              </div>
             </li>
           ))}
         </ul>
