@@ -1,1 +1,0 @@
-accumulator::emit_deposit_event

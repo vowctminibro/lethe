@@ -1,1 +1,0 @@
-funds_accumulator::withdraw_from_accumulator_address

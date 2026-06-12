@@ -1,1 +1,0 @@
-object::record_new_uid

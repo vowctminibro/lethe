@@ -1,1 +1,0 @@
-funds_accumulator::add_to_accumulator_address

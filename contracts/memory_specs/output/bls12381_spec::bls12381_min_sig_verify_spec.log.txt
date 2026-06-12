@@ -1,1 +1,0 @@
-bls12381::bls12381_min_sig_verify

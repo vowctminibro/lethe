@@ -1,1 +1,0 @@
-transfer::party_transfer_impl

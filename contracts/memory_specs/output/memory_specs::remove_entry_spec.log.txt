@@ -1,1 +1,0 @@
-memory::remove_entry

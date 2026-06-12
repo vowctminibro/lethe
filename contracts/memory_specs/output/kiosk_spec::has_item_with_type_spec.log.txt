@@ -1,1 +1,0 @@
-kiosk::has_item_with_type
