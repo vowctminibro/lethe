@@ -68,49 +68,106 @@ function Constellation() {
 
 interface GrowthPhase {
   tag: string;
-  claim: string;
-  unlocks: string;
+  live: React.ReactNode;
+  unlock?: React.ReactNode;
+  revenue: React.ReactNode;
+  closing?: string;
   sub: string;
   footnote?: string;
   now: boolean;
 }
 
-// Block 11 growth map — copy locked by the founder, milestone sub-lines kept
-// verbatim from the old roadmap.
+// Block 11.5 receipts anatomy — every ring leads with what is ALREADY LIVE,
+// then the single unlock left, then that ring's revenue switch. Copy locked
+// by the founder; milestone sub-lines unchanged since Block 10.
 const GROWTH: GrowthPhase[] = [
   {
-    tag: "CORE \u2014 NOW \u00b7 live on testnet",
-    claim:
-      "One person, one vault. Memory derived from your chain life, your chats, even your ChatGPT past \u2014 portable to a second app, revocable by proof.",
-    unlocks:
-      "Unlocks \u2192 proof that the demand archetype exists. Every memory is already a paid Walrus write.",
-    sub: "Live on Sui testnet \u2014 vault birth, Seal-encrypted writes, cross-app recall, revoke, export. Formally verified (19/19).",
+    tag: "CORE — TODAY",
+    live: (
+      <>
+        The whole loop — Google sign-in, memory derived from your chain, your chats, your
+        ChatGPT past; Seal-encrypted, portable to Pulse, revocable by proof, exportable.{" "}
+        <a href="/docs/security" className="underline decoration-dotted underline-offset-2 hover:opacity-70">
+          Formally verified (19/19)
+        </a>
+        .
+      </>
+    ),
+    revenue: (
+      <>
+        <a href="#pricing" className="underline decoration-dotted underline-offset-2 hover:opacity-70">Free</a>{" "}
+        — live today.
+      </>
+    ),
+    closing: "This ring is finished — it is the proof the others stand on.",
+    sub: "Live on Sui testnet — vault birth, Seal-encrypted writes, cross-app recall, revoke, export. Formally verified (19/19).",
     now: true,
   },
   {
-    tag: "PHASE 1 \u2014 THE WEDGE \u00b7 mainnet, Q3\u2013Q4 2026",
-    claim:
-      "Crypto-native consumers first \u2014 the only people whose wallets can introduce them. First revenue switches on the Proof of Demand waterfall.",
-    unlocks: "Unlocks \u2192 recurring WAL demand that scales per user, verifiable on-chain.",
-    sub: "Mainnet. Seal-gated selective sharing \u2014 share one memory, not the vault.",
+    tag: "PHASE 1 — THE WEDGE",
+    live: <>the product crypto-natives can already use, end to end, on testnet.</>,
+    unlock: (
+      <>
+        mainnet (Q3–Q4 2026) —{" "}
+        <a href="#pricing" className="underline decoration-dotted underline-offset-2 hover:opacity-70">Pro and BYOK</a>{" "}
+        switch on, and first revenue starts the Proof of Demand waterfall: WAL storage, renewals,
+        the monthly burn.
+      </>
+    ),
+    revenue: (
+      <>
+        <a href="#pricing" className="underline decoration-dotted underline-offset-2 hover:opacity-70">
+          Pro ~$5–8/mo + BYOK
+        </a>
+        .
+      </>
+    ),
+    sub: "Mainnet. Seal-gated selective sharing — share one memory, not the vault.",
     now: false,
   },
   {
-    tag: "PHASE 2 \u2014 THE NETWORK \u00b7 shared-registry policy",
-    claim: "\u201CContinue with Lethe\u201D kills the cold start for any Sui app.",
-    unlocks:
-      "Unlocks \u2192 the flywheel: apps bring users, users bring apps. Demand compounds by design.",
+    tag: "PHASE 2 — THE NETWORK",
+    live: (
+      <>
+        <a href="/docs/sdk" className="underline decoration-dotted underline-offset-2 hover:opacity-70">the SDK</a>{" "}
+        wraps the exact paths Pulse already runs in production — cross-app memory works now.
+      </>
+    ),
+    unlock: (
+      <>
+        the shared-registry policy lets any app run its own decrypt sessions. “Continue with
+        Lethe” kills the cold start for every Sui app.
+      </>
+    ),
+    revenue: (
+      <>
+        <a href="#pricing" className="underline decoration-dotted underline-offset-2 hover:opacity-70">SDK pilots</a>.
+      </>
+    ),
     sub: "Shared-registry policy: third-party apps run their own decrypt sessions.",
     now: false,
   },
   {
-    tag: "PHASE 3 \u2014 THE OPEN DOOR \u00b7 Web2",
-    claim:
-      "No wallet needed: Google login is live, ChatGPT import is live, BYOK brings any frontier model. Memory derived from usage, not just chains.",
-    unlocks:
-      "Unlocks \u2192 the first Walrus write path a normal person can walk through \u2014 at category scale.",
+    tag: "PHASE 3 — THE OPEN DOOR",
+    live: (
+      <>Google login (no wallet) and ChatGPT import — a normal person can walk in right now.</>
+    ),
+    unlock: (
+      <>
+        BYOK brings any frontier model; memory derived from usage, not just chains — the
+        first Walrus write path for everyone.
+      </>
+    ),
+    revenue: (
+      <>
+        <a href="#pricing" className="underline decoration-dotted underline-offset-2 hover:opacity-70">
+          category-scale subscriptions
+        </a>
+        .
+      </>
+    ),
     sub: "",
-    footnote: "Memory editing; MemWal adapter the day @mysten/memwal \u22650.0.4 publishes.",
+    footnote: "Memory editing; MemWal adapter the day @mysten/memwal ≥0.0.4 publishes.",
     now: false,
   },
 ];
@@ -138,17 +195,17 @@ const FRAMES: { src: string; alt: string; caption: string }[] = [
   {
     src: "/screens/frame-chat.webp",
     alt: "Lethe chat with the memory rail",
-    caption: "/chat \u2014 a fact settles into the rail, Seal-encrypted, with live Walrus and Suiscan links.",
+    caption: "/chat — a fact settles into the rail, Seal-encrypted, with live Walrus and Suiscan links.",
   },
   {
     src: "/screens/frame-memory.webp",
     alt: "The /memory ownership surface",
-    caption: "/memory \u2014 the ownership surface: verify on-chain, import, export, grant, revoke.",
+    caption: "/memory — the ownership surface: verify on-chain, import, export, grant, revoke.",
   },
   {
     src: "/screens/frame-pulse.webp",
     alt: "Pulse reading the same memory",
-    caption: "/pulse \u2014 a second app that already knows you. Revoke and it forgets \u2014 live.",
+    caption: "/pulse — a second app that already knows you. Revoke and it forgets — live.",
   },
 ];
 
@@ -231,7 +288,7 @@ export default function Home() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-0 sm:divide-x" style={{ borderColor: "var(--border)" }}>
           {[
             { n: "01", k: "Remembers", v: "Tell Lethe your crypto style. It remembers across sessions, not just this chat." },
-            { n: "02", k: "You own it", v: "Every memory is Seal-encrypted end-to-end on Walrus \u2014 even Lethe\u2019s servers can\u2019t read it. Decryption needs on-chain approval you control." },
+            { n: "02", k: "You own it", v: "Every memory is Seal-encrypted end-to-end on Walrus — even Lethe’s servers can’t read it. Decryption needs on-chain approval you control." },
             { n: "03", k: "Portable", v: "Your memory is not trapped in one app. Open another Lethe agent and it already knows you." },
           ].map((c) => (
             <div key={c.k} className="px-0 sm:px-8 py-6 sm:py-2 first:pl-0 last:pr-0" style={{ borderColor: "var(--border)" }}>
@@ -313,7 +370,7 @@ export default function Home() {
             {
               k: "Pro",
               tag: "planned",
-              price: "~$5\u20138/mo",
+              price: "~$5–8/mo",
               v: "Premium models and higher limits. The memory itself is never behind the paywall.",
               live: false,
             },
@@ -321,7 +378,7 @@ export default function Home() {
               k: "SDK for apps",
               tag: "pilot pricing",
               price: null as string | null,
-              v: "\u201CContinue with Lethe\u201D — warm-start your users with memory they already own.",
+              v: "“Continue with Lethe” — warm-start your users with memory they already own.",
               live: false,
             },
           ].map((t) => (
@@ -350,7 +407,7 @@ export default function Home() {
         </p>
       </section>
 
-      {/* ── Proof of Demand — the page\u2019s single DARK inverted panel ── */}
+      {/* ── Proof of Demand — the page’s single DARK inverted panel ── */}
       <section className="max-w-6xl mx-auto w-full px-6 lethe-section" style={{ paddingTop: 0 }}>
         <div className="rounded px-8 py-12 md:px-14 md:py-14" style={{ background: "var(--text)", color: "var(--bg)" }}>
           <div className="lethe-eyebrow">Proof of demand</div>
@@ -374,7 +431,7 @@ export default function Home() {
                 </div>
                 {i < 2 && (
                   <span className="lethe-id self-center shrink-0 rotate-90 md:rotate-0" style={{ color: "var(--accent-h)" }} aria-hidden="true">
-                    \u2192
+                    →
                   </span>
                 )}
               </div>
@@ -392,6 +449,9 @@ export default function Home() {
       <section id="roadmap" className="max-w-6xl mx-auto w-full px-6 lethe-section" style={{ paddingTop: 0 }}>
         <div className="lethe-eyebrow">How this grows</div>
         <h2 className="lethe-section-head">Three rings around one vault</h2>
+        <p className="mt-3 text-sm" style={{ color: "var(--text-dim)" }}>
+          Most roadmaps ask you to believe. This one is mostly receipts — verify any line.
+        </p>
 
         <div className="mt-10 grid grid-cols-1 lg:grid-cols-[2fr_3fr] gap-10 lg:gap-16 items-center">
           {/* rings — desktop only; mobile gets the small motif below */}
@@ -405,18 +465,29 @@ export default function Home() {
           <div>
             {GROWTH.map((g, i) => (
               <div key={g.tag} className="py-6" style={{ borderTop: i > 0 ? "1px solid var(--border)" : "none" }}>
-                <div className="lethe-id" style={{ color: g.now ? "var(--accent-h)" : "var(--text-dim)" }}>
+                <div className="lethe-id uppercase" style={{ color: g.now ? "var(--accent-h)" : "var(--text-dim)" }}>
                   {g.tag}
                 </div>
-                <p className="mt-2 text-base leading-relaxed" style={{ fontFamily: "var(--font-display)", fontWeight: 500, color: "var(--text)" }}>
-                  {g.claim}
-                </p>
-                <p className="mt-1.5 text-sm leading-relaxed" style={{ color: "var(--text-dim)" }}>{g.unlocks}</p>
+                <div className="mt-3 grid grid-cols-1 sm:grid-cols-[130px_1fr] gap-x-4 gap-y-2.5">
+                  <span className="lethe-id uppercase pt-0.5" style={{ color: "var(--accent-h)" }}>Live today</span>
+                  <p className="text-sm leading-relaxed" style={{ color: "var(--text)" }}>{g.live}</p>
+                  {g.unlock && (
+                    <>
+                      <span className="lethe-id uppercase pt-0.5" style={{ color: "#5A8A9E" }}>One unlock away</span>
+                      <p className="text-sm leading-relaxed" style={{ color: "var(--text)" }}>{g.unlock}</p>
+                    </>
+                  )}
+                  <span className="lethe-id uppercase pt-0.5" style={{ color: "#5A8A9E" }}>Revenue</span>
+                  <p className="text-sm leading-relaxed" style={{ color: "var(--text)" }}>{g.revenue}</p>
+                </div>
+                {g.closing && (
+                  <p className="mt-2.5 text-sm italic" style={{ color: "var(--text-dim)" }}>{g.closing}</p>
+                )}
                 {g.sub && (
-                  <p className="lethe-id mt-2.5 leading-relaxed" style={{ color: "var(--text-dim)" }}>{g.sub}</p>
+                  <p className="lethe-id mt-3 leading-relaxed" style={{ color: "var(--text-dim)" }}>{g.sub}</p>
                 )}
                 {g.footnote && (
-                  <p className="lethe-id mt-2.5 leading-relaxed" style={{ color: "var(--text-dim)", opacity: 0.8 }}>{g.footnote}</p>
+                  <p className="lethe-id mt-3 leading-relaxed" style={{ color: "var(--text-dim)", opacity: 0.8 }}>{g.footnote}</p>
                 )}
               </div>
             ))}
@@ -427,7 +498,8 @@ export default function Home() {
           className="mt-12 text-center italic mx-auto max-w-2xl"
           style={{ fontFamily: "var(--font-display)", fontSize: "1.25rem", lineHeight: 1.45, color: "var(--text)" }}
         >
-          Each phase is a bigger ring around the same vault you already own today.
+          The inner ring is the biggest one — and it already shipped, solo. The rings
+          ahead are smaller.
         </p>
       </section>
 
