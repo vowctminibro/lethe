@@ -1,17 +1,16 @@
 {
   "name": "@lethe/sdk",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "license": "Apache-2.0",
   "private": true,
   "type": "module",
   "main": "src/index.ts",
   "types": "src/index.ts",
   "scripts": {
-    "build": "tsc",
-    "clean": "rm -rf dist"
+    "example": "node examples/read-vault.mjs"
   },
   "dependencies": {
-    "@lethe/shared": "workspace:*"
+    "@mysten/sui": "^2.17.0"
   },
   "devDependencies": {
     "typescript": "^5.6"

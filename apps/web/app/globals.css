@@ -228,3 +228,54 @@ html, body {
   .lethe-water::before, .lethe-divider::before { animation: none; }
   .lethe-draw { stroke-dashoffset: 0; }
 }
+
+/* ── docs typography — plain, readable, brand-consistent ── */
+.lethe-docs h1 {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  margin-bottom: 0.75rem;
+}
+.lethe-docs h2 {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 500;
+  margin-top: 2.25rem;
+  margin-bottom: 0.5rem;
+}
+.lethe-docs p,
+.lethe-docs li {
+  font-size: 0.925rem;
+  line-height: 1.65;
+  color: var(--text);
+}
+.lethe-docs p { margin-bottom: 0.75rem; }
+.lethe-docs ul, .lethe-docs ol { margin: 0.5rem 0 1rem 1.25rem; }
+.lethe-docs ul { list-style: disc; }
+.lethe-docs ol { list-style: decimal; }
+.lethe-docs li { margin-bottom: 0.35rem; }
+.lethe-docs a { text-decoration: underline; text-underline-offset: 2px; text-decoration-style: dotted; }
+.lethe-docs a:hover { opacity: 0.7; }
+.lethe-docs code {
+  font-family: var(--font-plex-mono), monospace;
+  font-size: 0.8em;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 0.1em 0.35em;
+  word-break: break-all;
+}
+.lethe-docs pre {
+  font-family: var(--font-plex-mono), monospace;
+  font-size: 0.78rem;
+  line-height: 1.55;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.9rem 1rem;
+  overflow-x: auto;
+  margin: 0.75rem 0 1rem;
+}
+.lethe-docs pre code { background: none; border: none; padding: 0; }
+.lethe-docs .dim { color: var(--text-dim); }
