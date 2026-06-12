@@ -938,3 +938,5 @@ Commits: ddc1598 · c675d60 · 7362b64 · 5dbb8b9 · 07589f2 · 760bb76 · 7faca
 === END REPORT ===
 
 2026-06-11: HERO PASS (human) — Vow completed the full 9-step flow on prod (incognito, secondary Google account): sign-in, vault birth, chat+chip, proof links, grant→/pulse knows, revoke→forgets, re-login same vault. PASSED.
+
+2026-06-12: history rewritten to purge twitter-growth/ (privacy hygiene; audit confirmed zero credentials ever exposed). SHAs above this line refer to pre-rewrite history.
