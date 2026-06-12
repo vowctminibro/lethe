@@ -73,9 +73,49 @@ const ROADMAP: { when: string; what: string; now: boolean }[] = [
   { when: "later", what: "Memory editing; MemWal adapter the day @mysten/memwal \u22650.0.4 publishes.", now: false },
 ];
 
-// Placeholder until Phase 2 captures land — renders nothing.
+// The loop, in three frames — real product captures (DEMO_MOCK populated
+// states, representative data only). The landing finally shows the product.
+const FRAMES: { src: string; alt: string; caption: string }[] = [
+  {
+    src: "/screens/frame-chat.webp",
+    alt: "Lethe chat with the memory rail",
+    caption: "/chat \u2014 a fact settles into the rail, Seal-encrypted, with live Walrus and Suiscan links.",
+  },
+  {
+    src: "/screens/frame-memory.webp",
+    alt: "The /memory ownership surface",
+    caption: "/memory \u2014 the ownership surface: verify on-chain, import, export, grant, revoke.",
+  },
+  {
+    src: "/screens/frame-pulse.webp",
+    alt: "Pulse reading the same memory",
+    caption: "/pulse \u2014 a second app that already knows you. Revoke and it forgets \u2014 live.",
+  },
+];
+
 function ProductFrames() {
-  return null;
+  return (
+    <section className="max-w-6xl mx-auto w-full px-6 lethe-section" style={{ paddingTop: 0 }}>
+      <div className="lethe-eyebrow">The loop</div>
+      <h2 className="lethe-section-head">The loop, in three frames</h2>
+      <div className="mt-10 grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {FRAMES.map((f, i) => (
+          <figure key={f.src} className={i === 1 ? "lg:mt-10" : undefined}>
+            <div
+              className="rounded border overflow-hidden"
+              style={{ borderColor: "var(--border)", boxShadow: "var(--shadow-ambient)" }}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={f.src} alt={f.alt} className="w-full h-auto block" loading="lazy" />
+            </div>
+            <figcaption className="lethe-id mt-3 leading-relaxed" style={{ color: "var(--text-dim)" }}>
+              {f.caption}
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+    </section>
+  );
 }
 
 export default function Home() {
