@@ -176,7 +176,11 @@ export async function readActivity(
     activity.moveCalls = [...callCounts.keys()].slice(0, 20);
 
     const protos = new Set<string>();
-    const haystack = activity.moveCalls.join(" ");
+    // Fingerprint recent move-calls AND owned-object types: a wallet whose
+    // recent txs are quiet still shows what it HOLDS (NFTs, LP positions,
+    // staking receipts) — same hints, no new logic.
+    const haystack =
+      activity.moveCalls.join(" ") + " " + activity.objectTypes.map(([t]) => t).join(" ");
     for (const { match, label } of PROTOCOL_HINTS) {
       if (match.test(haystack)) protos.add(label);
     }

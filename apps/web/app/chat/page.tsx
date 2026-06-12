@@ -76,6 +76,8 @@ export default function ChatPage() {
   const [suggestions, setSuggestions] = useState<
     { id: string; text: string; kind: string; status: "pending" | "saving" | "saved" | "dismissed" }[]
   >([]);
+  // Protocol names the activity reader fingerprinted (presentation only).
+  const [derivedProtocols, setDerivedProtocols] = useState<string[]>([]);
   const [msgs, setMsgs] = useState<Msg[]>([
     {
       role: "lethe",
@@ -342,11 +344,13 @@ export default function ChatPage() {
         const err = await res.json().catch(() => ({}));
         throw new Error((err as { error?: string })?.error ?? "on-chain analysis failed");
       }
-      const { entries, provider, inactive } = (await res.json()) as {
+      const { entries, provider, inactive, protocols } = (await res.json()) as {
         entries: { text: string; kind: string }[];
         provider: string;
         inactive?: boolean;
+        protocols?: string[];
       };
+      setDerivedProtocols(Array.isArray(protocols) ? protocols : []);
 
       if (inactive || entries.length === 0) {
         setMsgs((m) => [
@@ -360,12 +364,16 @@ export default function ChatPage() {
         return;
       }
 
+      const protoLead =
+        Array.isArray(protocols) && protocols.length > 0
+          ? `Derived from your ${protocols.slice(0, 3).join(", ")} activity. `
+          : "";
       setMsgs((m) => [
         ...m,
         {
           role: "lethe",
           provider,
-          text: `Here's what your on-chain activity suggests — you didn't tell me any of this. These are only suggestions: nothing is saved until YOU say so. Review the cards below.`,
+          text: `${protoLead}Here's what your on-chain activity suggests — you didn't tell me any of this. These are only suggestions: nothing is saved until YOU say so. Review the cards below.`,
         },
       ]);
       setSuggestions((s) => [
@@ -572,6 +580,21 @@ export default function ChatPage() {
             {/* ── suggested trait cards — saved only on explicit [Save] ── */}
             {suggestions.some((s) => s.status !== "dismissed") && (
               <div className="self-start w-full max-w-xl flex flex-col gap-2" data-testid="suggestion-cards">
+                {derivedProtocols.length > 0 && (
+                  <div className="flex items-center gap-1.5 flex-wrap" data-testid="protocol-chips">
+                    <span className="lethe-id uppercase" style={{ color: "var(--text-dim)" }}>seen on-chain:</span>
+                    {derivedProtocols.map((p) => (
+                      <span
+                        key={p}
+                        data-testid="protocol-chip"
+                        className="text-[11px] px-2 py-0.5 rounded-full border"
+                        style={{ borderColor: "var(--accent-h)", color: "var(--text-dim)", background: "var(--bg-panel)" }}
+                      >
+                        {p}
+                      </span>
+                    ))}
+                  </div>
+                )}
                 {suggestions
                   .filter((s) => s.status !== "dismissed")
                   .map((s) => (

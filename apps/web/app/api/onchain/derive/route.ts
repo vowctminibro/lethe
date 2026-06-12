@@ -82,10 +82,12 @@ export async function POST(req: NextRequest) {
     }
 
     if (entries.length === 0) {
-      return NextResponse.json({ summary, entries, inactive: true, provider });
+      return NextResponse.json({ summary, entries, inactive: true, provider, protocols: activity.protocols });
     }
 
-    return NextResponse.json({ summary, entries, inactive: false, provider });
+    // Presentation only: the protocol names the reader already inferred,
+    // surfaced so the UI can show judge-readable chips ("DeepBook", "NFTs").
+    return NextResponse.json({ summary, entries, inactive: false, provider, protocols: activity.protocols });
   } catch (e) {
     const message = e instanceof Error ? e.message : "derive failed";
     return NextResponse.json({ error: message }, { status: 500 });
