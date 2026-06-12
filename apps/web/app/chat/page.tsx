@@ -35,6 +35,26 @@ type Msg = {
 type ModelOption = { key: string; id: string; label: string };
 const MODEL_LS_KEY = "lethe-model";
 
+// Per-session LLM message cap (judge-proofing). ONLY chat sends count —
+// memory features (view/derive/grant/revoke/export) are never capped.
+const SESSION_CAP = Number(process.env.NEXT_PUBLIC_SESSION_MESSAGE_CAP) || 30;
+const CAP_LS_KEY = "lethe-session-msgs";
+
+function sessionMsgCount(): number {
+  try {
+    return Number(window.sessionStorage.getItem(CAP_LS_KEY)) || 0;
+  } catch {
+    return 0;
+  }
+}
+function bumpSessionMsgCount() {
+  try {
+    window.sessionStorage.setItem(CAP_LS_KEY, String(sessionMsgCount() + 1));
+  } catch {
+    /* private mode — cap simply doesn't persist */
+  }
+}
+
 let railUid = 0;
 const nextRailId = () => `rail-${++railUid}`;
 
@@ -200,6 +220,19 @@ export default function ChatPage() {
   async function send() {
     const text = input.trim();
     if (!text || !memory || busy) return;
+    if (sessionMsgCount() >= SESSION_CAP) {
+      setMsgs((m) => [
+        ...m,
+        { role: "you", text },
+        {
+          role: "lethe",
+          text: "Free demo limit for this session reached — memory features keep working: view, export, grant and revoke on /memory anytime. Refresh the tab for a new session.",
+        },
+      ]);
+      setInput("");
+      return;
+    }
+    bumpSessionMsgCount();
     setInput("");
     const history = [...msgs, { role: "you" as const, text }];
     setMsgs(history);
@@ -225,6 +258,7 @@ export default function ChatPage() {
           context,
           walletContext: linkedWallet?.lines ?? [],
           model: model || undefined,
+          address: account?.address,
           messages: history.map((m) => ({
             role: m.role === "you" ? "user" : "assistant",
             content: m.text,

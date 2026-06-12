@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { streamComplete, type ChatMessage } from "@/src/lib/llm";
+import { takeToken } from "@/src/lib/rate-limit";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -57,8 +58,21 @@ function systemPrompt(context: string[], wallet: string[]): string {
 
 export async function POST(req: NextRequest) {
   try {
-    const { messages, context, walletContext, greet, model } = await req.json();
+    const { messages, context, walletContext, greet, model, address } = await req.json();
     const prefer = typeof model === "string" && model ? model : undefined;
+
+    // Soft per-address (fallback: per-IP) limit on the LLM plane only —
+    // memory routes are never limited. See src/lib/rate-limit.ts.
+    const limitKey =
+      (typeof address === "string" && address) ||
+      req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      "anon";
+    if (!takeToken(limitKey)) {
+      return NextResponse.json(
+        { error: "Easy there — chat is rate-limited on the free demo. Your memory features all still work; try again in a minute." },
+        { status: 429 },
+      );
+    }
     const greeting = greet === true;
     if (!greeting && (!Array.isArray(messages) || messages.length === 0)) {
       return NextResponse.json({ error: "missing messages[]" }, { status: 400 });
