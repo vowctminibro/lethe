@@ -89,6 +89,40 @@ export default function MemoryPage() {
     }
   }
 
+  // Export = exit: every entry, already decrypted CLIENT-SIDE by the owner's
+  // Seal session (the server can't read Seal blobs), downloaded as a file the
+  // user keeps. Ownership means you can leave with your data any day.
+  function exportMemory() {
+    if (!account || !chain || !hits || hits.length === 0) return;
+    const agg = process.env.NEXT_PUBLIC_WALRUS_AGGREGATOR_URL ?? "";
+    const payload = {
+      note: "Exported from Lethe — your memory, your file.",
+      exportedAt: new Date().toISOString(),
+      owner: account.address,
+      vaultId: chain.objectId,
+      vaultUrl: `https://suiscan.xyz/testnet/object/${chain.objectId}`,
+      entries: hits.map((h) => ({
+        text: h.text,
+        kind: h.kind,
+        createdAtMs: h.createdAtMs,
+        blobId: h.blobId,
+        walrusUrl: `${agg}/v1/blobs/${encodeURIComponent(h.blobId)}`,
+        suiscanObjectUrl: `https://suiscan.xyz/testnet/object/${chain.objectId}`,
+      })),
+    };
+    const date = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+    const name = `lethe-memory-${account.address.slice(2, 8)}-${date}.json`;
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = name;
+    a.click();
+    URL.revokeObjectURL(url);
+    setToast({ text: `Exported ${hits.length} ${hits.length === 1 ? "memory" : "memories"} → ${name}` });
+    setTimeout(() => setToast(null), 6000);
+  }
+
   // Forget one entry: confirm → optimistic row-out → gasless remove_entry →
   // toast with the Suiscan tx. On failure the row comes back.
   async function confirmForget() {
@@ -325,7 +359,18 @@ export default function MemoryPage() {
             <section className="lethe-hairline rounded overflow-hidden" style={{ background: "var(--bg-panel)" }}>
               <div className="px-4 py-2.5 flex items-center justify-between" style={{ borderBottom: "1px solid var(--border)" }}>
                 <span className="lethe-id uppercase" style={{ color: "var(--text-dim)" }}>Ledger — {hits.length} {hits.length === 1 ? "entry" : "entries"}</span>
-                <span className="lethe-id" style={{ color: "var(--text-dim)" }}>NEWEST FIRST</span>
+                <span className="flex items-center gap-3">
+                  <button
+                    onClick={exportMemory}
+                    data-testid="export-memory"
+                    className="lethe-id uppercase underline decoration-dotted underline-offset-2 hover:opacity-70 transition"
+                    style={{ color: "var(--accent-h)" }}
+                    title="Decrypts in your browser and downloads a JSON file — your memory, your file"
+                  >
+                    Export memory ↓
+                  </button>
+                  <span className="lethe-id" style={{ color: "var(--text-dim)" }}>NEWEST FIRST</span>
+                </span>
               </div>
               <ul>
                 {hits.map((h) => (
