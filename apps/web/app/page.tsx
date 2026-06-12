@@ -66,12 +66,71 @@ function Constellation() {
   );
 }
 
-const ROADMAP: { when: string; what: string; now: boolean }[] = [
-  { when: "now", what: "Live on Sui testnet — vault birth, Seal-encrypted writes, cross-app recall, revoke, export. Formally verified (19/19).", now: true },
-  { when: "Q3–Q4 2026", what: "Mainnet. Seal-gated selective sharing — share one memory, not the vault.", now: false },
-  { when: "Q3–Q4 2026", what: "Shared-registry policy: third-party apps run their own decrypt sessions.", now: false },
-  { when: "later", what: "Memory editing; MemWal adapter the day @mysten/memwal \u22650.0.4 publishes.", now: false },
+interface GrowthPhase {
+  tag: string;
+  claim: string;
+  unlocks: string;
+  sub: string;
+  footnote?: string;
+  now: boolean;
+}
+
+// Block 11 growth map — copy locked by the founder, milestone sub-lines kept
+// verbatim from the old roadmap.
+const GROWTH: GrowthPhase[] = [
+  {
+    tag: "CORE \u2014 NOW \u00b7 live on testnet",
+    claim:
+      "One person, one vault. Memory derived from your chain life, your chats, even your ChatGPT past \u2014 portable to a second app, revocable by proof.",
+    unlocks:
+      "Unlocks \u2192 proof that the demand archetype exists. Every memory is already a paid Walrus write.",
+    sub: "Live on Sui testnet \u2014 vault birth, Seal-encrypted writes, cross-app recall, revoke, export. Formally verified (19/19).",
+    now: true,
+  },
+  {
+    tag: "PHASE 1 \u2014 THE WEDGE \u00b7 mainnet, Q3\u2013Q4 2026",
+    claim:
+      "Crypto-native consumers first \u2014 the only people whose wallets can introduce them. First revenue switches on the Proof of Demand waterfall.",
+    unlocks: "Unlocks \u2192 recurring WAL demand that scales per user, verifiable on-chain.",
+    sub: "Mainnet. Seal-gated selective sharing \u2014 share one memory, not the vault.",
+    now: false,
+  },
+  {
+    tag: "PHASE 2 \u2014 THE NETWORK \u00b7 shared-registry policy",
+    claim: "\u201CContinue with Lethe\u201D kills the cold start for any Sui app.",
+    unlocks:
+      "Unlocks \u2192 the flywheel: apps bring users, users bring apps. Demand compounds by design.",
+    sub: "Shared-registry policy: third-party apps run their own decrypt sessions.",
+    now: false,
+  },
+  {
+    tag: "PHASE 3 \u2014 THE OPEN DOOR \u00b7 Web2",
+    claim:
+      "No wallet needed: Google login is live, ChatGPT import is live, BYOK brings any frontier model. Memory derived from usage, not just chains.",
+    unlocks:
+      "Unlocks \u2192 the first Walrus write path a normal person can walk through \u2014 at category scale.",
+    sub: "",
+    footnote: "Memory editing; MemWal adapter the day @mysten/memwal \u22650.0.4 publishes.",
+    now: false,
+  },
 ];
+
+/** Concentric rings — core solid Coral dot, hairline Mist rings (dashed = future). */
+function GrowthRings({ size = 380 }: { size?: number }) {
+  const c = size / 2;
+  return (
+    <svg viewBox={`0 0 ${size} ${size}`} width="100%" aria-hidden="true">
+      <circle cx={c} cy={c} r={size * 0.18} fill="none" stroke="#5A8A9E" strokeWidth="1" strokeDasharray="3 5" opacity="0.7" />
+      <circle cx={c} cy={c} r={size * 0.31} fill="none" stroke="#5A8A9E" strokeWidth="1" strokeDasharray="3 5" opacity="0.5" />
+      <circle cx={c} cy={c} r={size * 0.44} fill="none" stroke="#5A8A9E" strokeWidth="1" strokeDasharray="3 5" opacity="0.35" />
+      <circle cx={c} cy={c} r={7} fill="#E8B894" />
+      <text x={c} y={c + 26} textAnchor="middle" fontFamily="var(--font-plex-mono), monospace" fontSize="9" letterSpacing="0.12em" fill="#5A8A9E">
+        ONE VAULT
+      </text>
+    </svg>
+  );
+}
+
 
 // The loop, in three frames — real product captures (DEMO_MOCK populated
 // states, representative data only). The landing finally shows the product.
@@ -329,33 +388,47 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── Roadmap — vertical timeline ── */}
+      {/* ── Growth map — three rings around one vault (same #roadmap slot) ── */}
       <section id="roadmap" className="max-w-6xl mx-auto w-full px-6 lethe-section" style={{ paddingTop: 0 }}>
-        <div className="lethe-eyebrow">Roadmap</div>
-        <h2 className="lethe-section-head">Roadmap</h2>
-        <ul className="mt-10 max-w-2xl">
-          {ROADMAP.map((r, i) => (
-            <li key={i} className="relative flex gap-5 pb-8 last:pb-0">
-              <span className="relative flex flex-col items-center shrink-0 w-3" aria-hidden="true">
-                <span
-                  className="mt-1 block w-3 h-3 rounded-full shrink-0"
-                  style={
-                    r.now
-                      ? { background: "var(--accent-h)" }
-                      : { background: "transparent", border: "1.5px solid #5A8A9E" }
-                  }
-                />
-                {i < ROADMAP.length - 1 && <span className="flex-1 w-px mt-1" style={{ background: "var(--border)" }} />}
-              </span>
-              <div className="flex flex-col sm:flex-row gap-1 sm:gap-5 -mt-0.5">
-                <span className="lethe-id uppercase shrink-0 sm:w-24 pt-1" style={{ color: r.now ? "var(--accent-h)" : "var(--text-dim)" }}>
-                  {r.when}
-                </span>
-                <span className="text-sm leading-relaxed" style={{ color: "var(--text-dim)" }}>{r.what}</span>
+        <div className="lethe-eyebrow">How this grows</div>
+        <h2 className="lethe-section-head">Three rings around one vault</h2>
+
+        <div className="mt-10 grid grid-cols-1 lg:grid-cols-[2fr_3fr] gap-10 lg:gap-16 items-center">
+          {/* rings — desktop only; mobile gets the small motif below */}
+          <div className="hidden lg:block" aria-hidden="true">
+            <GrowthRings />
+          </div>
+          <div className="lg:hidden mx-auto w-24" aria-hidden="true">
+            <GrowthRings size={96} />
+          </div>
+
+          <div>
+            {GROWTH.map((g, i) => (
+              <div key={g.tag} className="py-6" style={{ borderTop: i > 0 ? "1px solid var(--border)" : "none" }}>
+                <div className="lethe-id" style={{ color: g.now ? "var(--accent-h)" : "var(--text-dim)" }}>
+                  {g.tag}
+                </div>
+                <p className="mt-2 text-base leading-relaxed" style={{ fontFamily: "var(--font-display)", fontWeight: 500, color: "var(--text)" }}>
+                  {g.claim}
+                </p>
+                <p className="mt-1.5 text-sm leading-relaxed" style={{ color: "var(--text-dim)" }}>{g.unlocks}</p>
+                {g.sub && (
+                  <p className="lethe-id mt-2.5 leading-relaxed" style={{ color: "var(--text-dim)" }}>{g.sub}</p>
+                )}
+                {g.footnote && (
+                  <p className="lethe-id mt-2.5 leading-relaxed" style={{ color: "var(--text-dim)", opacity: 0.8 }}>{g.footnote}</p>
+                )}
               </div>
-            </li>
-          ))}
-        </ul>
+            ))}
+          </div>
+        </div>
+
+        <p
+          className="mt-12 text-center italic mx-auto max-w-2xl"
+          style={{ fontFamily: "var(--font-display)", fontSize: "1.25rem", lineHeight: 1.45, color: "var(--text)" }}
+        >
+          Each phase is a bigger ring around the same vault you already own today.
+        </p>
       </section>
 
       {/* ── Colophon — set like the last page of a book ── */}
