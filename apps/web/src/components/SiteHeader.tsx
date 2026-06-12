@@ -18,8 +18,6 @@ const short = (a: string) => `${a.slice(0, 6)}…${a.slice(-4)}`;
 const NAV: { href: string; label: string; key: string }[] = [
   { href: "/create", label: "Create", key: "create" },
   { href: "/me", label: "Collection", key: "me" },
-  { href: "/battle", label: "Battle", key: "battle" },
-  { href: "/leaderboard", label: "Leaderboard", key: "leaderboard" },
 ];
 
 export function SignIn() {

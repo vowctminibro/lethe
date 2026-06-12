@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { EnokiClient } from "@mysten/enoki";
 import { MINT_TARGET } from "@/src/lib/sui";
-import { VOTE_TARGET, CREATE_BATTLE_TARGET, RESOLVE_BATTLE_TARGET } from "@/src/lib/battle";
 import {
   CREATE_TARGET as MEMORY_CREATE_TARGET,
   ADD_ENTRY_TARGET as MEMORY_ADD_ENTRY_TARGET,
@@ -50,9 +49,6 @@ export async function POST(req: NextRequest) {
       }
       const allowed = [
         MINT_TARGET,
-        VOTE_TARGET,
-        CREATE_BATTLE_TARGET,
-        RESOLVE_BATTLE_TARGET,
         MEMORY_CREATE_TARGET,
         MEMORY_ADD_ENTRY_TARGET,
         MEMORY_GRANT_TARGET,

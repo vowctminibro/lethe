@@ -436,9 +436,6 @@ export default function CreatePage() {
               <Link href="/me" className="flex-1 h-11 rounded-md font-semibold grid place-items-center" style={{ background: "var(--text)", color: "var(--accent)" }}>
                 View in My Collection →
               </Link>
-              <Link href="/battle" className="flex-1 h-11 rounded-md font-semibold grid place-items-center border" style={{ borderColor: "var(--border)", color: "var(--text)" }}>
-                Enter a battle →
-              </Link>
             </div>
           </div>
         </div>

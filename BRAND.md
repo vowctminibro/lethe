@@ -10,12 +10,12 @@
 Lethe — Named after the river of forgetting. Built so nothing is.
 
 - **Tagline:** "Memory you own."
-- **One-liner:** Lethe is user-owned memory for AI agents — stored on Walrus, anchored on Sui, portable across every app.
+- **One-liner:** Lethe is user-owned memory for AI agents — derived from your real on-chain life, Seal-encrypted end-to-end on Walrus, anchored on Sui, portable across every app.
 - **Problem:** Every AI agent you talk to locks what it learns about you inside someone else's server — switch apps, start from zero.
-- **Solution:** Lethe writes your agent's memory to Walrus as objects you own: any agent you authorize knows you instantly, every entry is verifiable on-chain, and revoking access makes it forget — live.
+- **Solution:** Lethe writes your agent's memory to Walrus as objects you own — encrypted in your browser with Seal threshold encryption, derived from what you say AND what your wallet has actually done. Any agent you authorize knows you instantly, every entry is verifiable on-chain, and revoking access makes it forget — live, enforced by the key servers (machine-proven, 19/19).
 - **Closing lines:** "Lethe is the wedge." / "Memory infrastructure for the agentic web — a 10-year category." / "Built solo. Live on testnet today."
 - **Walrus integration note:** encrypted memory blobs (AES-256-GCM, HKDF per owner) on Walrus; on-chain BlobRefs in an owned MemoryVault on Sui. MemWal integration attempted day-5 post-launch; blocked by SDK/relayer version gap (BLOCKERS.md B16); provider abstraction in place to adopt @mysten/memwal the day ≥0.0.4 publishes.
-- **Encryption honesty rule (copy guardrail):** never claim "only you can decrypt" / "we can't read your memories". Honest framing: encrypted per-user at rest on Walrus; access enforced by grants you control on-chain (plus server checks); the per-owner key currently derives from a server-held secret. Seal threshold encryption on the roadmap removes the server from decryption entirely — aligned with Walrus Memory's model.
+- **Encryption honesty rule (copy guardrail, updated Block 8):** "even Lethe's servers can't read your memories" is now TRUE for Seal-mode entries and safe to use. Keep two disclosures wherever depth allows: (1) pre-Seal legacy entries used server-side AES until re-written; (2) third-party apps read via the server-mediated grant gate until the shared-registry policy ships (B17). Never claim independent app decrypt sessions exist today.
 - **Memory economics (deck line):** today each fact is a sponsored Walrus blob; Walrus prices storage at a fixed $0.023/GB/month (~5× erasure coding; sub-10MB blobs are dominated by fixed per-blob metadata — our exact shape). Designed (not yet built): batch facts via Walrus Quilt — per-patch IDs keep individual recall, amortized overhead makes a lifetime of memories pennies per month. Roadmap: vault-funded renewal — your WAL, your memory, your call to extend or expire. Source: docs.wal.app/docs/system-overview/storage-costs
 
 ---
