@@ -47,6 +47,43 @@ export function configuredProviders(): LLMProvider[] {
   return providers().filter((p) => p.isConfigured());
 }
 
+/** Honest user-facing labels — model first, host second. Keyed by id prefix. */
+const MODEL_LABELS: Record<string, string> = {
+  minimax: "MiniMax-Text-01 · MiniMax",
+  "nvidia-nim": "Llama 3.3 70B · NVIDIA NIM",
+  groq: "Llama 3.3 70B · Groq",
+  gemini: "Gemini 2.0 Flash · Google",
+};
+
+export interface AvailableModel {
+  /** Stable selector key: the provider id's first segment, e.g. "minimax". */
+  key: string;
+  /** Full provider id, e.g. "minimax/MiniMax-Text-01". */
+  id: string;
+  /** Honest display label. */
+  label: string;
+}
+
+/** Models the user can pick from RIGHT NOW (configured providers only). */
+export function availableModels(): AvailableModel[] {
+  return configuredProviders().map((p) => {
+    const key = p.id.split("/")[0];
+    return { key, id: p.id, label: MODEL_LABELS[key] ?? p.id };
+  });
+}
+
+/**
+ * The chain with the user's preferred provider moved to the front. Unknown or
+ * unconfigured keys leave the default order — selection can never brick chat.
+ */
+function chainPreferring(prefer?: string): LLMProvider[] {
+  const chain = configuredProviders();
+  if (!prefer) return chain;
+  const i = chain.findIndex((p) => p.id.split("/")[0] === prefer);
+  if (i <= 0) return chain;
+  return [chain[i], ...chain.slice(0, i), ...chain.slice(i + 1)];
+}
+
 /**
  * Run one provider attempt under the per-attempt timeout, chained to the
  * caller's signal. The timer is cleared as soon as the attempt resolves, so a
@@ -91,7 +128,7 @@ export async function complete(
   messages: ChatMessage[],
   opts?: CompleteOptions,
 ): Promise<CompletionResult> {
-  const chain = configuredProviders();
+  const chain = chainPreferring(opts?.prefer);
   if (chain.length === 0) throw new Error(SETUP_HINT);
 
   let lastErr: unknown;
@@ -124,7 +161,7 @@ export async function streamComplete(
   messages: ChatMessage[],
   opts?: CompleteOptions,
 ): Promise<StreamResult> {
-  const chain = configuredProviders();
+  const chain = chainPreferring(opts?.prefer);
   if (chain.length === 0) throw new Error(SETUP_HINT);
 
   let lastErr: unknown;

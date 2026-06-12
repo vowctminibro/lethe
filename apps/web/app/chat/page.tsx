@@ -24,11 +24,16 @@ import { DEMO_MOCK, getMockOwnedMemory, useLetheAccount } from "@/src/lib/demo/m
 type Msg = {
   role: "you" | "lethe";
   text: string;
-  /** which model produced this reply, e.g. "groq/llama-3.3-70b-versatile" */
+  /** which model produced this reply, e.g. "minimax/MiniMax-Text-01" */
   provider?: string;
+  /** quiet failover note, e.g. "MiniMax unavailable — answered with Llama" */
+  note?: string;
   /** true while tokens are still arriving */
   streaming?: boolean;
 };
+
+type ModelOption = { key: string; id: string; label: string };
+const MODEL_LS_KEY = "lethe-model";
 
 let railUid = 0;
 const nextRailId = () => `rail-${++railUid}`;
@@ -58,6 +63,31 @@ export default function ChatPage() {
     },
   ]);
   const endRef = useRef<HTMLDivElement>(null);
+  // Model selector — the chain still falls back on failure; this only sets
+  // which configured provider goes FIRST. Persisted across sessions.
+  const [models, setModels] = useState<ModelOption[]>([]);
+  const [model, setModel] = useState<string>("");
+  useEffect(() => {
+    fetch("/api/chat/models")
+      .then((r) => r.json())
+      .then(({ models: m }: { models: ModelOption[] }) => {
+        setModels(m);
+        const saved = window.localStorage.getItem(MODEL_LS_KEY);
+        if (saved && m.some((x) => x.key === saved)) setModel(saved);
+        else if (m.length > 0) setModel(m[0].key);
+      })
+      .catch(() => {/* selector is sugar — chat works on the default chain */});
+  }, []);
+  const pickModel = (key: string) => {
+    setModel(key);
+    try {
+      window.localStorage.setItem(MODEL_LS_KEY, key);
+    } catch {/* private mode */}
+  };
+  const labelOf = useCallback(
+    (key: string) => models.find((m) => m.key === key)?.label.split(" · ")[0] ?? key,
+    [models],
+  );
   // Compact digest of every owned memory, kept in context for the whole chat.
   const digestRef = useRef<string[]>([]);
   // One personalized greeting per page load, and only before the user types.
@@ -194,6 +224,7 @@ export default function ChatPage() {
         body: JSON.stringify({
           context,
           walletContext: linkedWallet?.lines ?? [],
+          model: model || undefined,
           messages: history.map((m) => ({
             role: m.role === "you" ? "user" : "assistant",
             content: m.text,
@@ -205,8 +236,14 @@ export default function ChatPage() {
         throw new Error((err as { error?: string })?.error ?? "chat failed");
       }
       const provider = res.headers.get("x-provider") ?? undefined;
+      // Preferred model didn't answer → say so quietly, never fail the chat.
+      const answeredBy = provider?.split("/")[0];
+      const note =
+        model && answeredBy && answeredBy !== model
+          ? `${labelOf(model)} unavailable right now — answered with ${labelOf(answeredBy)}`
+          : undefined;
 
-      setMsgs((m) => [...m, { role: "lethe", text: "", provider, streaming: true }]);
+      setMsgs((m) => [...m, { role: "lethe", text: "", provider, note, streaming: true }]);
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       let reply = "";
@@ -411,6 +448,22 @@ export default function ChatPage() {
             </Link>
           </div>
           <div className="flex items-center gap-3">
+            {models.length > 0 && (
+              <select
+                value={model}
+                onChange={(e) => pickModel(e.target.value)}
+                className="text-xs h-7 px-1.5 rounded border outline-none cursor-pointer max-w-[180px]"
+                style={{ background: "var(--bg)", borderColor: "var(--border)", color: "var(--text-dim)" }}
+                title="Pick the model that answers — your memory works with all of them"
+                aria-label="Model"
+              >
+                {models.map((m) => (
+                  <option key={m.key} value={m.key}>
+                    {m.label}
+                  </option>
+                ))}
+              </select>
+            )}
             {DEMO_MOCK && (
               <span className="hidden sm:inline-block text-[10px] px-2 py-0.5 rounded border uppercase tracking-wide" style={{ borderColor: "var(--accent-h)", color: "var(--accent-h)" }}>
                 demo mock
@@ -463,8 +516,13 @@ export default function ChatPage() {
                       )}
                     </div>
                     {m.provider && !m.streaming && (
-                      <div className="lethe-id mt-1.5" style={{ color: "var(--text-dim)" }} title="The free LLM that produced this reply">
+                      <div className="lethe-id mt-1.5" style={{ color: "var(--text-dim)" }} title="The model that actually produced this reply">
                         via {m.provider}
+                      </div>
+                    )}
+                    {m.note && !m.streaming && (
+                      <div className="text-[11px] mt-1 italic" style={{ color: "var(--accent-h)" }}>
+                        {m.note}
                       </div>
                     )}
                   </div>

@@ -23,6 +23,12 @@ export interface CompleteOptions {
   temperature?: number;
   /** Ask the provider for a strict JSON object back (best-effort across providers). */
   json?: boolean;
+  /**
+   * Provider key the user picked (e.g. "minimax", "nvidia-nim") — moved to
+   * the FRONT of the chain, everything else stays as fallback. Unknown or
+   * unconfigured keys are ignored, so a stale selection never bricks chat.
+   */
+  prefer?: string;
   signal?: AbortSignal;
 }
 

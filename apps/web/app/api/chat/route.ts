@@ -57,7 +57,8 @@ function systemPrompt(context: string[], wallet: string[]): string {
 
 export async function POST(req: NextRequest) {
   try {
-    const { messages, context, walletContext, greet } = await req.json();
+    const { messages, context, walletContext, greet, model } = await req.json();
+    const prefer = typeof model === "string" && model ? model : undefined;
     const greeting = greet === true;
     if (!greeting && (!Array.isArray(messages) || messages.length === 0)) {
       return NextResponse.json({ error: "missing messages[]" }, { status: 400 });
@@ -78,7 +79,7 @@ export async function POST(req: NextRequest) {
 
     const { stream, provider } = await streamComplete(
       [{ role: "system", content: systemPrompt(ctx, wallet) }, ...turns],
-      { temperature: greeting ? 0.7 : 0.5, maxTokens: greeting ? 160 : 500 },
+      { temperature: greeting ? 0.7 : 0.5, maxTokens: greeting ? 160 : 500, prefer },
     );
 
     const encoder = new TextEncoder();
