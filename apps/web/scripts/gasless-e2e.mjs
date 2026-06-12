@@ -9,7 +9,7 @@ import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
 import { toBase64, fromBase64 } from "@mysten/sui/utils";
 
 // Latest package version (call target) vs original defining package (type filter).
-const PKG = "0x06b5c99940b5de954b2b37cd1198f421921986eabd57b35fe3fd4cc39169ba95";
+const PKG = "0x0c79fd944a51153e4d668a4f53a280fe5d0ab6d4db0a572a2f85c11ac5fc2f6c";
 const TYPE_PKG = "0x9dcc482cd7fb5d7fa2a0cf90c7dc1e6efec6f40e817e352c61ed0f63951c1331";
 const BASE = "http://localhost:3010";
 

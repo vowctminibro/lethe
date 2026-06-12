@@ -118,7 +118,7 @@ export default function Home() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-0 sm:divide-x" style={{ borderColor: "var(--border)" }}>
           {[
             { n: "01", k: "Remembers", v: "Tell Lethe your crypto style. It remembers across sessions, not just this chat." },
-            { n: "02", k: "You own it", v: "Every memory is a Walrus blob, referenced by a Sui object you control. Verify or revoke anytime." },
+            { n: "02", k: "You own it", v: "Every memory is Seal-encrypted end-to-end on Walrus — even Lethe\u2019s servers can\u2019t read it. Decryption needs on-chain approval you control." },
             { n: "03", k: "Portable", v: "Your memory is not trapped in one app. Open another Lethe agent and it already knows you." },
           ].map((c) => (
             <div key={c.k} className="px-0 sm:px-8 py-6 sm:py-2 first:pl-0 last:pr-0" style={{ borderColor: "var(--border)" }}>

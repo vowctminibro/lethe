@@ -1,0 +1,1 @@
+transfer::share_object_impl

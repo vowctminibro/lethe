@@ -291,7 +291,7 @@ export default function MemoryPage() {
             )}
 
             <p className="mt-3 text-[11px]" style={{ color: "var(--text-dim)" }}>
-              Encrypted at rest on Walrus · access enforced by your on-chain grants · Seal threshold encryption on the roadmap.
+              End-to-end encrypted with Seal threshold encryption — even Lethe's servers can't read your memories. Decryption requires on-chain policy approval; revoke a grant and it stops, live.
             </p>
           </section>
         )}

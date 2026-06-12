@@ -1,0 +1,1 @@
+tx_context::native_gas_budget

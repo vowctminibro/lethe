@@ -15,7 +15,7 @@ User-owned memory for AI agents — stored on Walrus, anchored on Sui, portable 
 ## The 90-second story
 
 1. **Sign in with Google** (zkLogin) → a memory vault is born on Sui — gasless, no wallet, no seed phrase.
-2. **Chat with Lethe** → durable facts are extracted, encrypted (AES-256-GCM, HKDF-derived key per owner), stored as blobs on Walrus, and referenced on-chain in a vault **you** own.
+2. **Chat with Lethe** → durable facts are extracted, encrypted **in your browser with [Seal](https://seal-docs.wal.app) threshold encryption** (Mysten infrastructure, like Walrus and zkLogin), stored as blobs on Walrus, and referenced on-chain in a vault **you** own.
 3. **Open Pulse** — a second, separate agent — it already knows you. Same memory, different app.
 4. **Revoke access** → Pulse forgets you, live. Enforced server-side, provable on-chain.
 
@@ -36,7 +36,7 @@ No wallet needed. ~2 minutes.
 
 - **Every memory is an encrypted blob on Walrus** — fetchable from any aggregator, so storage is verifiable, not a claim.
 - **On-chain `BlobRef`s live in an owned Sui object** — your vault is [`memory::Memory`](contracts/memory/sources/memory.move), package [`0x06b5c99940b5de954b2b37cd1198f421921986eabd57b35fe3fd4cc39169ba95`](https://suiscan.xyz/testnet/object/0x06b5c99940b5de954b2b37cd1198f421921986eabd57b35fe3fd4cc39169ba95) on Sui testnet (v2, upgraded in place — existing vaults from [v1](https://suiscan.xyz/testnet/object/0x9dcc482cd7fb5d7fa2a0cf90c7dc1e6efec6f40e817e352c61ed0f63951c1331) keep working). The chain holds the index and the access list; Walrus holds the data.
-- **Trust model, stated honestly:** memories are encrypted per-user at rest on Walrus (AES-256-GCM, HKDF per owner), but today the per-owner key derives from a server-held secret — access is enforced by the on-chain grants you control plus server-side checks, not by key custody. Seal threshold encryption on the roadmap removes the server from decryption entirely — aligned with Walrus Memory's model.
+- **End-to-end encrypted with Seal threshold encryption:** even Lethe's servers can't read your memories — encryption happens in your browser, and decryption requires on-chain policy approval (`memory_policy::seal_approve`: vault owner or an app with an active grant) from a decentralized committee of key servers. Revoke a grant and the key servers stop approving — live. (A legacy `manual` provider mode — server-side AES — remains as a fallback flag and still decrypts pre-Seal entries.)
 - **MemWal:** integrated days after MemWal launched; blocked by the published-SDK (`@mysten/memwal@0.0.2`) vs relayer (≥0.0.4) version gap — documented honestly in [BLOCKERS.md](docs/BLOCKERS.md) (B16). A provider abstraction keeps us one adapter away from adopting `@mysten/memwal` the day it publishes.
 
 ### Memory economics
@@ -69,11 +69,12 @@ No wallet needed. ~2 minutes.
 The vault's core invariants are machine-checked with [sui-prover](https://github.com/asymptotic-code/sui-prover) (v1.5.3) — specs live in [`contracts/memory_specs`](contracts/memory_specs), the production module stays prover-free:
 
 - **Owner-only writes** — `add_entry` / `remove_entry` / `grant` / `revoke` abort for any sender that is not the vault owner, and *only* under the specified conditions (double-grant, unknown-revoke, and unknown-entry removal abort too).
+- **Seal policy denies every outsider** — `memory_policy::seal_approve` (the function Seal key servers dry-run before releasing decryption keys) provably aborts for **every** sender that is neither the vault owner nor currently granted, for **all** identities — so revoke = the key servers stop approving, by proof, not by promise.
 - **Entries change only by owner add or owner remove** — `add_entry` grows the log by exactly one with the new blob id at the tail and every pre-existing index proven unchanged; `remove_entry` shrinks it by exactly one, removing exactly the asserted entry while every other entry survives in order (universal quantification, not sampling).
 - **Access control never touches the log** — `grant` / `revoke` leave the owner and every entry intact.
 - **A fresh vault** belongs to its creator and starts empty.
 
-Reproduce (all 16 checks pass):
+Reproduce (all 19 checks pass):
 
 ```bash
 brew install asymptotic-code/sui-prover/sui-prover
@@ -82,7 +83,7 @@ cd contracts/memory_specs && sui-prover
 
 ## Security
 
-- **Formally verified** — 16/16 sui-prover checks on the vault's invariants (section above; reproduce: `cd contracts/memory_specs && sui-prover`).
+- **Formally verified** — 19/19 sui-prover checks on the vault's invariants (section above; reproduce: `cd contracts/memory_specs && sui-prover`).
 - **Dependency licenses audited** — every third-party production dependency is MIT / Apache-2.0 / BSD / ISC; no copyleft, no unknowns.
 - **Independent audit pre-mainnet** — shortlist from Sui Foundation audit-partner firms.
 
@@ -91,7 +92,7 @@ cd contracts/memory_specs && sui-prover
 | What | Where |
 |---|---|
 | Move module — `create` / `add_entry` / `remove_entry` / `grant` / `revoke` | [`contracts/memory/sources/memory.move`](contracts/memory/sources/memory.move) |
-| Formal specs (sui-prover, 16/16 green) | [`contracts/memory_specs/sources/memory_specs.move`](contracts/memory_specs/sources/memory_specs.move) |
+| Formal specs (sui-prover, 19/19 green) | [`contracts/memory_specs/sources/memory_specs.move`](contracts/memory_specs/sources/memory_specs.move) |
 | App — chat + memory rail, `/memory` proof view, `/pulse` second agent | [`apps/web`](apps/web) |
 | MemoryStore provider abstraction (Walrus today, MemWal-ready) | [`apps/web/src/lib/memory/provider.ts`](apps/web/src/lib/memory/provider.ts) |
 | End-to-end scripts (hero flow, portability, gasless) | [`apps/web/scripts/hero-e2e.mjs`](apps/web/scripts/hero-e2e.mjs) · [`pulse-e2e.mjs`](apps/web/scripts/pulse-e2e.mjs) · [`gasless-e2e.mjs`](apps/web/scripts/gasless-e2e.mjs) |
@@ -105,7 +106,7 @@ Sui Move (owned objects) · Walrus · Enoki (zkLogin + sponsored transactions) �
 ## Status & roadmap
 
 - **Live on Sui testnet today** — the full loop (vault birth → encrypted Walrus write → cross-app recall → revoke) works in production.
-- **Q3–Q4 2026** — mainnet; Seal threshold encryption — removes the server from decryption entirely and gates selective sharing (share one memory, not the vault).
+- **Q3–Q4 2026** — mainnet; Seal-gated selective sharing (share one memory, not the vault); shared-registry policy so granted apps can run their own decrypt sessions.
 - **MemWal adapter** ships the day `@mysten/memwal` ≥0.0.4 publishes.
 
 Built solo. Live on testnet today.

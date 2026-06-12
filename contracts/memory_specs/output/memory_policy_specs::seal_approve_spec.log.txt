@@ -1,0 +1,4 @@
+memory_policy::seal_approve
+└── memory_policy::check_policy
+   ├── memory::owner
+   └── memory::is_authorized

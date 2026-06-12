@@ -1,0 +1,271 @@
+2026-06-12T13:44:03.559862Z DEBUG sui_prover: Sui-Prover CLI version: 1.5.3
+2026-06-12T13:44:05.792070Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_policy_specs
+2026-06-12T13:44:05.793900Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_specs
+2026-06-12T13:44:05.850641Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_policy_specs
+2026-06-12T13:44:05.852341Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_specs
+2026-06-12T13:44:44.824249Z DEBUG sui_prover: Sui-Prover CLI version: 1.5.3
+2026-06-12T13:44:46.745396Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_policy_specs
+2026-06-12T13:44:46.747298Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_specs
+2026-06-12T13:44:46.804261Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_policy_specs
+2026-06-12T13:44:46.806001Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_specs
+2026-06-12T13:44:46.865415Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: generating verification conditions for 259 module(s)
+2026-06-12T13:44:46.878506Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: 82 verification conditions
+2026-06-12T13:44:46.885597Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_policy_specs
+2026-06-12T13:44:46.887364Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_specs
+2026-06-12T13:44:46.941965Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: generating verification conditions for 259 module(s)
+2026-06-12T13:44:46.955159Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: 82 verification conditions
+2026-06-12T13:44:46.962132Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_policy_specs
+2026-06-12T13:44:46.963894Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_specs
+2026-06-12T13:44:47.017762Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: generating verification conditions for 259 module(s)
+2026-06-12T13:44:47.030323Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: 82 verification conditions
+2026-06-12T13:44:47.030347Z DEBUG move_prover_boogie_backend::generator: writing boogie to `output/memory_policy_specs::seal_approve_spec_Check.bpl`
+2026-06-12T13:44:47.030806Z  INFO move_prover_boogie_backend::boogie_backend::boogie_wrapper: running solver
+2026-06-12T13:44:47.030809Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: command line: /opt/homebrew/Cellar/sui-prover/2.8.6/bin/boogie -enhancedErrorMessages:1 -proverOpt:O:model_validate=true -vcsCores:4 -infer:j output/memory_policy_specs::seal_approve_spec_Check.bpl -inferModifies -proverOpt:PROVER_PATH=/opt/homebrew/opt/z3/bin/z3 -printModel:1 -printVerifiedProceduresCount:0 -proverOpt:O:smt.QI.EAGER_THRESHOLD=10 -proverOpt:O:smt.QI.LAZY_THRESHOLD=100
+2026-06-12T13:44:47.450300Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: analyzing boogie output
+2026-06-12T13:44:47.450759Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: writing boogie log to output/memory_policy_specs::seal_approve_spec_Check.bpl.log
+2026-06-12T13:44:47.451009Z DEBUG move_prover_boogie_backend::generator: writing boogie to `output/memory_policy_specs::seal_approve_spec_Assume.bpl`
+2026-06-12T13:44:47.451121Z  INFO move_prover_boogie_backend::boogie_backend::boogie_wrapper: running solver
+2026-06-12T13:44:47.451123Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: command line: /opt/homebrew/Cellar/sui-prover/2.8.6/bin/boogie -printModel:1 -proverOpt:O:smt.QI.LAZY_THRESHOLD=100 -proverOpt:O:model_validate=true -proverOpt:O:smt.QI.EAGER_THRESHOLD=10 -infer:j -printVerifiedProceduresCount:0 -inferModifies -enhancedErrorMessages:1 -vcsCores:4 -proverOpt:PROVER_PATH=/opt/homebrew/opt/z3/bin/z3 output/memory_policy_specs::seal_approve_spec_Assume.bpl
+2026-06-12T13:44:47.875790Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: analyzing boogie output
+2026-06-12T13:44:47.876598Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: writing boogie log to output/memory_policy_specs::seal_approve_spec_Assume.bpl.log
+2026-06-12T13:44:47.880759Z DEBUG move_prover_boogie_backend::generator: writing boogie to `output/memory_policy_specs::seal_approve_spec_SpecNoAbortCheck.bpl`
+2026-06-12T13:44:47.880861Z  INFO move_prover_boogie_backend::boogie_backend::boogie_wrapper: running solver
+2026-06-12T13:44:47.880864Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: command line: /opt/homebrew/Cellar/sui-prover/2.8.6/bin/boogie -infer:j -proverOpt:PROVER_PATH=/opt/homebrew/opt/z3/bin/z3 -proverOpt:O:smt.QI.EAGER_THRESHOLD=10 -vcsCores:4 output/memory_policy_specs::seal_approve_spec_SpecNoAbortCheck.bpl -enhancedErrorMessages:1 -printVerifiedProceduresCount:0 -inferModifies -proverOpt:O:smt.QI.LAZY_THRESHOLD=100 -printModel:1 -proverOpt:O:model_validate=true
+2026-06-12T13:44:48.282703Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: analyzing boogie output
+2026-06-12T13:44:48.282737Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: writing boogie log to output/memory_policy_specs::seal_approve_spec_SpecNoAbortCheck.bpl.log
+2026-06-12T13:44:48.283113Z  INFO move_prover_boogie_backend::generator: 0.000s building, 1.545s verification
+2026-06-12T13:45:11.513031Z DEBUG sui_prover: Sui-Prover CLI version: 1.5.3
+2026-06-12T13:45:13.374521Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_policy_specs
+2026-06-12T13:45:13.376348Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_specs
+2026-06-12T13:45:13.432232Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_policy_specs
+2026-06-12T13:45:13.433909Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_specs
+2026-06-12T13:45:13.489396Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: generating verification conditions for 259 module(s)
+2026-06-12T13:45:13.502110Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: 82 verification conditions
+2026-06-12T13:45:13.508934Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_policy_specs
+2026-06-12T13:45:13.510619Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_specs
+2026-06-12T13:45:13.563549Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: generating verification conditions for 259 module(s)
+2026-06-12T13:45:13.576383Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: 82 verification conditions
+2026-06-12T13:45:13.583125Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_policy_specs
+2026-06-12T13:45:13.584813Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_specs
+2026-06-12T13:45:13.638587Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: generating verification conditions for 259 module(s)
+2026-06-12T13:45:13.650849Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: 82 verification conditions
+2026-06-12T13:45:13.650875Z DEBUG move_prover_boogie_backend::generator: writing boogie to `output/memory_policy_specs::seal_approve_spec_Check.bpl`
+2026-06-12T13:45:13.651092Z  INFO move_prover_boogie_backend::boogie_backend::boogie_wrapper: running solver
+2026-06-12T13:45:13.651094Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: command line: /opt/homebrew/Cellar/sui-prover/2.8.6/bin/boogie -printModel:1 -printVerifiedProceduresCount:0 -inferModifies -enhancedErrorMessages:1 -infer:j -proverOpt:O:smt.QI.EAGER_THRESHOLD=10 -vcsCores:4 -proverOpt:O:model_validate=true output/memory_policy_specs::seal_approve_spec_Check.bpl -proverOpt:PROVER_PATH=/opt/homebrew/opt/z3/bin/z3 -proverOpt:O:smt.QI.LAZY_THRESHOLD=100
+2026-06-12T13:45:14.026074Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: analyzing boogie output
+2026-06-12T13:45:14.026314Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: writing boogie log to output/memory_policy_specs::seal_approve_spec_Check.bpl.log
+2026-06-12T13:45:14.026793Z DEBUG move_prover_boogie_backend::generator: writing boogie to `output/memory_policy_specs::seal_approve_spec_Assume.bpl`
+2026-06-12T13:45:14.026920Z  INFO move_prover_boogie_backend::boogie_backend::boogie_wrapper: running solver
+2026-06-12T13:45:14.026922Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: command line: /opt/homebrew/Cellar/sui-prover/2.8.6/bin/boogie -proverOpt:PROVER_PATH=/opt/homebrew/opt/z3/bin/z3 -proverOpt:O:smt.QI.EAGER_THRESHOLD=10 -inferModifies -proverOpt:O:model_validate=true -proverOpt:O:smt.QI.LAZY_THRESHOLD=100 -enhancedErrorMessages:1 -vcsCores:4 -printModel:1 -infer:j output/memory_policy_specs::seal_approve_spec_Assume.bpl -printVerifiedProceduresCount:0
+2026-06-12T13:45:14.420187Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: analyzing boogie output
+2026-06-12T13:45:14.421112Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: writing boogie log to output/memory_policy_specs::seal_approve_spec_Assume.bpl.log
+2026-06-12T13:45:14.426263Z DEBUG move_prover_boogie_backend::generator: writing boogie to `output/memory_policy_specs::seal_approve_spec_SpecNoAbortCheck.bpl`
+2026-06-12T13:45:14.427880Z  INFO move_prover_boogie_backend::boogie_backend::boogie_wrapper: running solver
+2026-06-12T13:45:14.427882Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: command line: /opt/homebrew/Cellar/sui-prover/2.8.6/bin/boogie -printModel:1 -printVerifiedProceduresCount:0 -enhancedErrorMessages:1 -proverOpt:PROVER_PATH=/opt/homebrew/opt/z3/bin/z3 -proverOpt:O:model_validate=true -infer:j output/memory_policy_specs::seal_approve_spec_SpecNoAbortCheck.bpl -proverOpt:O:smt.QI.EAGER_THRESHOLD=10 -proverOpt:O:smt.QI.LAZY_THRESHOLD=100 -inferModifies -vcsCores:4
+2026-06-12T13:45:14.812512Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: analyzing boogie output
+2026-06-12T13:45:14.812536Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: writing boogie log to output/memory_policy_specs::seal_approve_spec_SpecNoAbortCheck.bpl.log
+2026-06-12T13:45:14.813085Z  INFO move_prover_boogie_backend::generator: 0.000s building, 1.446s verification
+2026-06-12T13:46:12.717664Z DEBUG sui_prover: Sui-Prover CLI version: 1.5.3
+2026-06-12T13:46:14.576594Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_policy_specs
+2026-06-12T13:46:14.578378Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_specs
+2026-06-12T13:46:14.634536Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_policy_specs
+2026-06-12T13:46:14.636275Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_specs
+2026-06-12T13:46:14.690979Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: generating verification conditions for 259 module(s)
+2026-06-12T13:46:14.702501Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: 82 verification conditions
+2026-06-12T13:46:14.709466Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_policy_specs
+2026-06-12T13:46:14.711166Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_specs
+2026-06-12T13:46:14.763055Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: generating verification conditions for 259 module(s)
+2026-06-12T13:46:14.774791Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: 82 verification conditions
+2026-06-12T13:46:14.781793Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_policy_specs
+2026-06-12T13:46:14.783508Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_specs
+2026-06-12T13:46:14.836024Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: generating verification conditions for 259 module(s)
+2026-06-12T13:46:14.847499Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: 82 verification conditions
+2026-06-12T13:46:14.847526Z DEBUG move_prover_boogie_backend::generator: writing boogie to `output/memory_policy_specs::seal_approve_spec_Check.bpl`
+2026-06-12T13:46:14.847755Z  INFO move_prover_boogie_backend::boogie_backend::boogie_wrapper: running solver
+2026-06-12T13:46:14.847758Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: command line: /opt/homebrew/Cellar/sui-prover/2.8.6/bin/boogie -printVerifiedProceduresCount:0 -proverOpt:PROVER_PATH=/opt/homebrew/opt/z3/bin/z3 -enhancedErrorMessages:1 -infer:j output/memory_policy_specs::seal_approve_spec_Check.bpl -proverOpt:O:model_validate=true -proverOpt:O:smt.QI.LAZY_THRESHOLD=100 -printModel:1 -inferModifies -proverOpt:O:smt.QI.EAGER_THRESHOLD=10 -vcsCores:4
+2026-06-12T13:46:15.210359Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: analyzing boogie output
+2026-06-12T13:46:15.210604Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: writing boogie log to output/memory_policy_specs::seal_approve_spec_Check.bpl.log
+2026-06-12T13:46:15.211089Z DEBUG move_prover_boogie_backend::generator: writing boogie to `output/memory_policy_specs::seal_approve_spec_Assume.bpl`
+2026-06-12T13:46:15.211213Z  INFO move_prover_boogie_backend::boogie_backend::boogie_wrapper: running solver
+2026-06-12T13:46:15.211216Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: command line: /opt/homebrew/Cellar/sui-prover/2.8.6/bin/boogie -proverOpt:O:model_validate=true -infer:j -inferModifies -printModel:1 -proverOpt:PROVER_PATH=/opt/homebrew/opt/z3/bin/z3 -proverOpt:O:smt.QI.EAGER_THRESHOLD=10 -proverOpt:O:smt.QI.LAZY_THRESHOLD=100 -vcsCores:4 -enhancedErrorMessages:1 -printVerifiedProceduresCount:0 output/memory_policy_specs::seal_approve_spec_Assume.bpl
+2026-06-12T13:46:15.567107Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: analyzing boogie output
+2026-06-12T13:46:15.567131Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: writing boogie log to output/memory_policy_specs::seal_approve_spec_Assume.bpl.log
+2026-06-12T13:46:15.567593Z DEBUG move_prover_boogie_backend::generator: writing boogie to `output/memory_policy_specs::seal_approve_spec_SpecNoAbortCheck.bpl`
+2026-06-12T13:46:15.567695Z  INFO move_prover_boogie_backend::boogie_backend::boogie_wrapper: running solver
+2026-06-12T13:46:15.567698Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: command line: /opt/homebrew/Cellar/sui-prover/2.8.6/bin/boogie -enhancedErrorMessages:1 -printModel:1 -infer:j -inferModifies -proverOpt:PROVER_PATH=/opt/homebrew/opt/z3/bin/z3 -printVerifiedProceduresCount:0 -proverOpt:O:model_validate=true -proverOpt:O:smt.QI.LAZY_THRESHOLD=100 -proverOpt:O:smt.QI.EAGER_THRESHOLD=10 -vcsCores:4 output/memory_policy_specs::seal_approve_spec_SpecNoAbortCheck.bpl
+2026-06-12T13:46:15.939511Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: analyzing boogie output
+2026-06-12T13:46:15.939537Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: writing boogie log to output/memory_policy_specs::seal_approve_spec_SpecNoAbortCheck.bpl.log
+2026-06-12T13:46:15.940042Z  INFO move_prover_boogie_backend::generator: 0.000s building, 1.371s verification
+2026-06-12T13:46:24.890507Z DEBUG sui_prover: Sui-Prover CLI version: 1.5.3
+2026-06-12T13:46:26.756153Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_policy_specs
+2026-06-12T13:46:26.757969Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_specs
+2026-06-12T13:46:26.815383Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: generating verification conditions for 259 module(s)
+2026-06-12T13:46:26.825575Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: 0 verification conditions
+2026-06-12T13:46:26.825579Z DEBUG move_prover_boogie_backend::generator: writing boogie to `output/funs_abort_check.bpl`
+2026-06-12T13:46:26.826628Z  INFO move_prover_boogie_backend::boogie_backend::boogie_wrapper: running solver
+2026-06-12T13:46:26.826631Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: command line: /opt/homebrew/Cellar/sui-prover/2.8.6/bin/boogie -inferModifies -proverOpt:O:smt.QI.LAZY_THRESHOLD=100 -printModel:1 -proverOpt:PROVER_PATH=/opt/homebrew/opt/z3/bin/z3 -proverOpt:O:smt.QI.EAGER_THRESHOLD=10 -infer:j -vcsCores:4 -printVerifiedProceduresCount:0 -proverOpt:O:model_validate=true -enhancedErrorMessages:1 output/funs_abort_check.bpl
+2026-06-12T13:46:27.229016Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: analyzing boogie output
+2026-06-12T13:46:27.229254Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: writing boogie log to output/funs_abort_check.bpl.log
+2026-06-12T13:46:27.236838Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_policy_specs
+2026-06-12T13:46:27.238562Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_specs
+2026-06-12T13:46:27.293744Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: generating verification conditions for 259 module(s)
+2026-06-12T13:46:27.305623Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: 82 verification conditions
+2026-06-12T13:46:27.312625Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_policy_specs
+2026-06-12T13:46:27.314347Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_specs
+2026-06-12T13:46:27.370327Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: generating verification conditions for 259 module(s)
+2026-06-12T13:46:27.385524Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: 86 verification conditions
+2026-06-12T13:46:27.392564Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_policy_specs
+2026-06-12T13:46:27.394289Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_specs
+2026-06-12T13:46:27.450239Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: generating verification conditions for 259 module(s)
+2026-06-12T13:46:27.464454Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: 86 verification conditions
+2026-06-12T13:46:27.471451Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_policy_specs
+2026-06-12T13:46:27.473177Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_specs
+2026-06-12T13:46:27.528101Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: generating verification conditions for 259 module(s)
+2026-06-12T13:46:27.542078Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: 86 verification conditions
+2026-06-12T13:46:27.548901Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_policy_specs
+2026-06-12T13:46:27.550601Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_specs
+2026-06-12T13:46:27.606956Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: generating verification conditions for 259 module(s)
+2026-06-12T13:46:27.622153Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: 86 verification conditions
+2026-06-12T13:46:27.629091Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_policy_specs
+2026-06-12T13:46:27.630810Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_specs
+2026-06-12T13:46:27.686682Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: generating verification conditions for 259 module(s)
+2026-06-12T13:46:27.700728Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: 86 verification conditions
+2026-06-12T13:46:27.707756Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_policy_specs
+2026-06-12T13:46:27.709478Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_specs
+2026-06-12T13:46:27.761206Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: generating verification conditions for 259 module(s)
+2026-06-12T13:46:27.772991Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: 82 verification conditions
+2026-06-12T13:46:27.779836Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_policy_specs
+2026-06-12T13:46:27.781510Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_specs
+2026-06-12T13:46:27.834213Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: generating verification conditions for 259 module(s)
+2026-06-12T13:46:27.850325Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: 86 verification conditions
+2026-06-12T13:46:27.857280Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_policy_specs
+2026-06-12T13:46:27.859000Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_specs
+2026-06-12T13:46:27.910236Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: generating verification conditions for 259 module(s)
+2026-06-12T13:46:27.925459Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: 86 verification conditions
+2026-06-12T13:46:27.932483Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_policy_specs
+2026-06-12T13:46:27.934231Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_specs
+2026-06-12T13:46:27.985268Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: generating verification conditions for 259 module(s)
+2026-06-12T13:46:27.999202Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: 86 verification conditions
+2026-06-12T13:46:28.006298Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_policy_specs
+2026-06-12T13:46:28.008057Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_specs
+2026-06-12T13:46:28.062350Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: generating verification conditions for 259 module(s)
+2026-06-12T13:46:28.079165Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: 86 verification conditions
+2026-06-12T13:46:28.086184Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_policy_specs
+2026-06-12T13:46:28.087919Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_specs
+2026-06-12T13:46:28.140774Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: generating verification conditions for 259 module(s)
+2026-06-12T13:46:28.155953Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: 86 verification conditions
+2026-06-12T13:46:28.162902Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_policy_specs
+2026-06-12T13:46:28.164624Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_specs
+2026-06-12T13:46:28.216373Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: generating verification conditions for 259 module(s)
+2026-06-12T13:46:28.227761Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: 82 verification conditions
+2026-06-12T13:46:28.234730Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_policy_specs
+2026-06-12T13:46:28.236454Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_specs
+2026-06-12T13:46:28.289263Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: generating verification conditions for 259 module(s)
+2026-06-12T13:46:28.304707Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: 86 verification conditions
+2026-06-12T13:46:28.311605Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_policy_specs
+2026-06-12T13:46:28.313314Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_specs
+2026-06-12T13:46:28.364781Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: generating verification conditions for 259 module(s)
+2026-06-12T13:46:28.379404Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: 86 verification conditions
+2026-06-12T13:46:28.386496Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_policy_specs
+2026-06-12T13:46:28.388228Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_specs
+2026-06-12T13:46:28.439618Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: generating verification conditions for 259 module(s)
+2026-06-12T13:46:28.454151Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: 86 verification conditions
+2026-06-12T13:46:28.460914Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_policy_specs
+2026-06-12T13:46:28.462599Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_specs
+2026-06-12T13:46:28.515807Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: generating verification conditions for 259 module(s)
+2026-06-12T13:46:28.531002Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: 86 verification conditions
+2026-06-12T13:46:28.537964Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_policy_specs
+2026-06-12T13:46:28.539651Z  INFO move_prover_boogie_backend::generator: preparing module 0x0::memory_specs
+2026-06-12T13:46:28.591679Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: generating verification conditions for 259 module(s)
+2026-06-12T13:46:28.605565Z  INFO move_prover_boogie_backend::boogie_backend::bytecode_translator: 86 verification conditions
+2026-06-12T13:46:28.605590Z DEBUG move_prover_boogie_backend::generator: writing boogie to `output/memory_policy_specs::seal_approve_spec_Check.bpl`
+2026-06-12T13:46:28.605775Z  INFO move_prover_boogie_backend::boogie_backend::boogie_wrapper: running solver
+2026-06-12T13:46:28.605777Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: command line: /opt/homebrew/Cellar/sui-prover/2.8.6/bin/boogie -proverOpt:O:model_validate=true -printModel:1 -proverOpt:O:smt.QI.LAZY_THRESHOLD=100 -printVerifiedProceduresCount:0 output/memory_policy_specs::seal_approve_spec_Check.bpl -proverOpt:O:smt.QI.EAGER_THRESHOLD=10 -vcsCores:4 -enhancedErrorMessages:1 -inferModifies -infer:j -proverOpt:PROVER_PATH=/opt/homebrew/opt/z3/bin/z3
+2026-06-12T13:46:28.965630Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: analyzing boogie output
+2026-06-12T13:46:28.965653Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: writing boogie log to output/memory_policy_specs::seal_approve_spec_Check.bpl.log
+2026-06-12T13:46:28.966127Z DEBUG move_prover_boogie_backend::generator: writing boogie to `output/memory_specs::add_entry_spec_Check.bpl`
+2026-06-12T13:46:28.966235Z  INFO move_prover_boogie_backend::boogie_backend::boogie_wrapper: running solver
+2026-06-12T13:46:28.966238Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: command line: /opt/homebrew/Cellar/sui-prover/2.8.6/bin/boogie output/memory_specs::add_entry_spec_Check.bpl -printModel:1 -vcsCores:4 -printVerifiedProceduresCount:0 -enhancedErrorMessages:1 -proverOpt:O:model_validate=true -proverOpt:O:smt.QI.EAGER_THRESHOLD=10 -proverOpt:PROVER_PATH=/opt/homebrew/opt/z3/bin/z3 -infer:j -inferModifies -proverOpt:O:smt.QI.LAZY_THRESHOLD=100
+2026-06-12T13:46:29.336121Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: analyzing boogie output
+2026-06-12T13:46:29.336145Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: writing boogie log to output/memory_specs::add_entry_spec_Check.bpl.log
+2026-06-12T13:46:29.336625Z DEBUG move_prover_boogie_backend::generator: writing boogie to `output/memory_specs::grant_spec_Check.bpl`
+2026-06-12T13:46:29.336760Z  INFO move_prover_boogie_backend::boogie_backend::boogie_wrapper: running solver
+2026-06-12T13:46:29.336763Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: command line: /opt/homebrew/Cellar/sui-prover/2.8.6/bin/boogie -printModel:1 -proverOpt:O:model_validate=true -infer:j -printVerifiedProceduresCount:0 -enhancedErrorMessages:1 output/memory_specs::grant_spec_Check.bpl -proverOpt:O:smt.QI.EAGER_THRESHOLD=10 -proverOpt:PROVER_PATH=/opt/homebrew/opt/z3/bin/z3 -vcsCores:4 -inferModifies -proverOpt:O:smt.QI.LAZY_THRESHOLD=100
+2026-06-12T13:46:29.709421Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: analyzing boogie output
+2026-06-12T13:46:29.709444Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: writing boogie log to output/memory_specs::grant_spec_Check.bpl.log
+2026-06-12T13:46:29.709943Z DEBUG move_prover_boogie_backend::generator: writing boogie to `output/memory_specs::new_spec_Check.bpl`
+2026-06-12T13:46:29.710041Z  INFO move_prover_boogie_backend::boogie_backend::boogie_wrapper: running solver
+2026-06-12T13:46:29.710044Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: command line: /opt/homebrew/Cellar/sui-prover/2.8.6/bin/boogie -proverOpt:O:smt.QI.LAZY_THRESHOLD=100 -proverOpt:O:model_validate=true output/memory_specs::new_spec_Check.bpl -inferModifies -enhancedErrorMessages:1 -infer:j -printModel:1 -proverOpt:PROVER_PATH=/opt/homebrew/opt/z3/bin/z3 -vcsCores:4 -printVerifiedProceduresCount:0 -proverOpt:O:smt.QI.EAGER_THRESHOLD=10
+2026-06-12T13:46:30.074358Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: analyzing boogie output
+2026-06-12T13:46:30.074382Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: writing boogie log to output/memory_specs::new_spec_Check.bpl.log
+2026-06-12T13:46:30.074895Z DEBUG move_prover_boogie_backend::generator: writing boogie to `output/memory_specs::remove_entry_spec_Check.bpl`
+2026-06-12T13:46:30.075017Z  INFO move_prover_boogie_backend::boogie_backend::boogie_wrapper: running solver
+2026-06-12T13:46:30.075020Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: command line: /opt/homebrew/Cellar/sui-prover/2.8.6/bin/boogie -proverOpt:PROVER_PATH=/opt/homebrew/opt/z3/bin/z3 -printModel:1 -enhancedErrorMessages:1 -proverOpt:O:model_validate=true -inferModifies -printVerifiedProceduresCount:0 -vcsCores:4 output/memory_specs::remove_entry_spec_Check.bpl -infer:j -proverOpt:O:smt.QI.EAGER_THRESHOLD=10 -proverOpt:O:smt.QI.LAZY_THRESHOLD=100
+2026-06-12T13:46:30.460502Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: analyzing boogie output
+2026-06-12T13:46:30.460525Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: writing boogie log to output/memory_specs::remove_entry_spec_Check.bpl.log
+2026-06-12T13:46:30.461021Z DEBUG move_prover_boogie_backend::generator: writing boogie to `output/memory_specs::revoke_spec_Check.bpl`
+2026-06-12T13:46:30.461118Z  INFO move_prover_boogie_backend::boogie_backend::boogie_wrapper: running solver
+2026-06-12T13:46:30.461121Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: command line: /opt/homebrew/Cellar/sui-prover/2.8.6/bin/boogie -enhancedErrorMessages:1 -proverOpt:O:smt.QI.LAZY_THRESHOLD=100 -printVerifiedProceduresCount:0 -proverOpt:O:smt.QI.EAGER_THRESHOLD=10 output/memory_specs::revoke_spec_Check.bpl -proverOpt:PROVER_PATH=/opt/homebrew/opt/z3/bin/z3 -printModel:1 -proverOpt:O:model_validate=true -vcsCores:4 -infer:j -inferModifies
+2026-06-12T13:46:30.839742Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: analyzing boogie output
+2026-06-12T13:46:30.839765Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: writing boogie log to output/memory_specs::revoke_spec_Check.bpl.log
+2026-06-12T13:46:30.840315Z DEBUG move_prover_boogie_backend::generator: writing boogie to `output/memory_policy_specs::seal_approve_spec_Assume.bpl`
+2026-06-12T13:46:30.840443Z  INFO move_prover_boogie_backend::boogie_backend::boogie_wrapper: running solver
+2026-06-12T13:46:30.840446Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: command line: /opt/homebrew/Cellar/sui-prover/2.8.6/bin/boogie -printModel:1 -enhancedErrorMessages:1 -vcsCores:4 -infer:j -proverOpt:O:smt.QI.LAZY_THRESHOLD=100 -proverOpt:PROVER_PATH=/opt/homebrew/opt/z3/bin/z3 -inferModifies -proverOpt:O:model_validate=true output/memory_policy_specs::seal_approve_spec_Assume.bpl -printVerifiedProceduresCount:0 -proverOpt:O:smt.QI.EAGER_THRESHOLD=10
+2026-06-12T13:46:31.199395Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: analyzing boogie output
+2026-06-12T13:46:31.199419Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: writing boogie log to output/memory_policy_specs::seal_approve_spec_Assume.bpl.log
+2026-06-12T13:46:31.199960Z DEBUG move_prover_boogie_backend::generator: writing boogie to `output/memory_specs::add_entry_spec_Assume.bpl`
+2026-06-12T13:46:31.200095Z  INFO move_prover_boogie_backend::boogie_backend::boogie_wrapper: running solver
+2026-06-12T13:46:31.200098Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: command line: /opt/homebrew/Cellar/sui-prover/2.8.6/bin/boogie -proverOpt:O:smt.QI.EAGER_THRESHOLD=10 -proverOpt:O:smt.QI.LAZY_THRESHOLD=100 -vcsCores:4 -inferModifies -infer:j -printVerifiedProceduresCount:0 -printModel:1 -proverOpt:O:model_validate=true output/memory_specs::add_entry_spec_Assume.bpl -enhancedErrorMessages:1 -proverOpt:PROVER_PATH=/opt/homebrew/opt/z3/bin/z3
+2026-06-12T13:46:31.579983Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: analyzing boogie output
+2026-06-12T13:46:31.580007Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: writing boogie log to output/memory_specs::add_entry_spec_Assume.bpl.log
+2026-06-12T13:46:31.580524Z DEBUG move_prover_boogie_backend::generator: writing boogie to `output/memory_specs::grant_spec_Assume.bpl`
+2026-06-12T13:46:31.580653Z  INFO move_prover_boogie_backend::boogie_backend::boogie_wrapper: running solver
+2026-06-12T13:46:31.580656Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: command line: /opt/homebrew/Cellar/sui-prover/2.8.6/bin/boogie -printModel:1 -printVerifiedProceduresCount:0 -infer:j -proverOpt:O:smt.QI.EAGER_THRESHOLD=10 -proverOpt:PROVER_PATH=/opt/homebrew/opt/z3/bin/z3 output/memory_specs::grant_spec_Assume.bpl -vcsCores:4 -enhancedErrorMessages:1 -proverOpt:O:model_validate=true -inferModifies -proverOpt:O:smt.QI.LAZY_THRESHOLD=100
+2026-06-12T13:46:31.974285Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: analyzing boogie output
+2026-06-12T13:46:31.974306Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: writing boogie log to output/memory_specs::grant_spec_Assume.bpl.log
+2026-06-12T13:46:31.974815Z DEBUG move_prover_boogie_backend::generator: writing boogie to `output/memory_specs::new_spec_Assume.bpl`
+2026-06-12T13:46:31.974908Z  INFO move_prover_boogie_backend::boogie_backend::boogie_wrapper: running solver
+2026-06-12T13:46:31.974912Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: command line: /opt/homebrew/Cellar/sui-prover/2.8.6/bin/boogie -proverOpt:O:smt.QI.EAGER_THRESHOLD=10 -inferModifies -proverOpt:O:smt.QI.LAZY_THRESHOLD=100 -infer:j -printVerifiedProceduresCount:0 -proverOpt:O:model_validate=true -enhancedErrorMessages:1 -printModel:1 -proverOpt:PROVER_PATH=/opt/homebrew/opt/z3/bin/z3 output/memory_specs::new_spec_Assume.bpl -vcsCores:4
+2026-06-12T13:46:32.237181Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: analyzing boogie output
+2026-06-12T13:46:32.237207Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: writing boogie log to output/memory_specs::new_spec_Assume.bpl.log
+2026-06-12T13:46:32.237670Z DEBUG move_prover_boogie_backend::generator: writing boogie to `output/memory_specs::remove_entry_spec_Assume.bpl`
+2026-06-12T13:46:32.237793Z  INFO move_prover_boogie_backend::boogie_backend::boogie_wrapper: running solver
+2026-06-12T13:46:32.237796Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: command line: /opt/homebrew/Cellar/sui-prover/2.8.6/bin/boogie -printModel:1 -infer:j -vcsCores:4 -enhancedErrorMessages:1 -printVerifiedProceduresCount:0 -proverOpt:O:model_validate=true -proverOpt:PROVER_PATH=/opt/homebrew/opt/z3/bin/z3 -proverOpt:O:smt.QI.EAGER_THRESHOLD=10 -proverOpt:O:smt.QI.LAZY_THRESHOLD=100 -inferModifies output/memory_specs::remove_entry_spec_Assume.bpl
+2026-06-12T13:46:32.621229Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: analyzing boogie output
+2026-06-12T13:46:32.621250Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: writing boogie log to output/memory_specs::remove_entry_spec_Assume.bpl.log
+2026-06-12T13:46:32.621750Z DEBUG move_prover_boogie_backend::generator: writing boogie to `output/memory_specs::revoke_spec_Assume.bpl`
+2026-06-12T13:46:32.621852Z  INFO move_prover_boogie_backend::boogie_backend::boogie_wrapper: running solver
+2026-06-12T13:46:32.621855Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: command line: /opt/homebrew/Cellar/sui-prover/2.8.6/bin/boogie output/memory_specs::revoke_spec_Assume.bpl -printModel:1 -printVerifiedProceduresCount:0 -inferModifies -proverOpt:O:model_validate=true -proverOpt:O:smt.QI.LAZY_THRESHOLD=100 -vcsCores:4 -proverOpt:PROVER_PATH=/opt/homebrew/opt/z3/bin/z3 -infer:j -proverOpt:O:smt.QI.EAGER_THRESHOLD=10 -enhancedErrorMessages:1
+2026-06-12T13:46:32.998703Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: analyzing boogie output
+2026-06-12T13:46:32.998725Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: writing boogie log to output/memory_specs::revoke_spec_Assume.bpl.log
+2026-06-12T13:46:32.999249Z DEBUG move_prover_boogie_backend::generator: writing boogie to `output/memory_policy_specs::seal_approve_spec_SpecNoAbortCheck.bpl`
+2026-06-12T13:46:32.999362Z  INFO move_prover_boogie_backend::boogie_backend::boogie_wrapper: running solver
+2026-06-12T13:46:32.999365Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: command line: /opt/homebrew/Cellar/sui-prover/2.8.6/bin/boogie output/memory_policy_specs::seal_approve_spec_SpecNoAbortCheck.bpl -proverOpt:PROVER_PATH=/opt/homebrew/opt/z3/bin/z3 -proverOpt:O:smt.QI.EAGER_THRESHOLD=10 -inferModifies -proverOpt:O:model_validate=true -enhancedErrorMessages:1 -infer:j -proverOpt:O:smt.QI.LAZY_THRESHOLD=100 -printVerifiedProceduresCount:0 -vcsCores:4 -printModel:1
+2026-06-12T13:46:33.356155Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: analyzing boogie output
+2026-06-12T13:46:33.356180Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: writing boogie log to output/memory_policy_specs::seal_approve_spec_SpecNoAbortCheck.bpl.log
+2026-06-12T13:46:33.356621Z DEBUG move_prover_boogie_backend::generator: writing boogie to `output/memory_specs::add_entry_spec_SpecNoAbortCheck.bpl`
+2026-06-12T13:46:33.356743Z  INFO move_prover_boogie_backend::boogie_backend::boogie_wrapper: running solver
+2026-06-12T13:46:33.356746Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: command line: /opt/homebrew/Cellar/sui-prover/2.8.6/bin/boogie -inferModifies -proverOpt:O:model_validate=true output/memory_specs::add_entry_spec_SpecNoAbortCheck.bpl -infer:j -enhancedErrorMessages:1 -vcsCores:4 -printModel:1 -printVerifiedProceduresCount:0 -proverOpt:PROVER_PATH=/opt/homebrew/opt/z3/bin/z3 -proverOpt:O:smt.QI.LAZY_THRESHOLD=100 -proverOpt:O:smt.QI.EAGER_THRESHOLD=10
+2026-06-12T13:46:33.731698Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: analyzing boogie output
+2026-06-12T13:46:33.731722Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: writing boogie log to output/memory_specs::add_entry_spec_SpecNoAbortCheck.bpl.log
+2026-06-12T13:46:33.732202Z DEBUG move_prover_boogie_backend::generator: writing boogie to `output/memory_specs::grant_spec_SpecNoAbortCheck.bpl`
+2026-06-12T13:46:33.732303Z  INFO move_prover_boogie_backend::boogie_backend::boogie_wrapper: running solver
+2026-06-12T13:46:33.732306Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: command line: /opt/homebrew/Cellar/sui-prover/2.8.6/bin/boogie -proverOpt:PROVER_PATH=/opt/homebrew/opt/z3/bin/z3 -proverOpt:O:model_validate=true -printVerifiedProceduresCount:0 -inferModifies -proverOpt:O:smt.QI.LAZY_THRESHOLD=100 -vcsCores:4 output/memory_specs::grant_spec_SpecNoAbortCheck.bpl -printModel:1 -infer:j -enhancedErrorMessages:1 -proverOpt:O:smt.QI.EAGER_THRESHOLD=10
+2026-06-12T13:46:34.110351Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: analyzing boogie output
+2026-06-12T13:46:34.110373Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: writing boogie log to output/memory_specs::grant_spec_SpecNoAbortCheck.bpl.log
+2026-06-12T13:46:34.110884Z DEBUG move_prover_boogie_backend::generator: writing boogie to `output/memory_specs::new_spec_SpecNoAbortCheck.bpl`
+2026-06-12T13:46:34.110991Z  INFO move_prover_boogie_backend::boogie_backend::boogie_wrapper: running solver
+2026-06-12T13:46:34.110994Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: command line: /opt/homebrew/Cellar/sui-prover/2.8.6/bin/boogie -inferModifies -proverOpt:O:smt.QI.LAZY_THRESHOLD=100 -enhancedErrorMessages:1 -printVerifiedProceduresCount:0 -infer:j -proverOpt:O:smt.QI.EAGER_THRESHOLD=10 -proverOpt:PROVER_PATH=/opt/homebrew/opt/z3/bin/z3 -vcsCores:4 output/memory_specs::new_spec_SpecNoAbortCheck.bpl -proverOpt:O:model_validate=true -printModel:1
+2026-06-12T13:46:34.488870Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: analyzing boogie output
+2026-06-12T13:46:34.488894Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: writing boogie log to output/memory_specs::new_spec_SpecNoAbortCheck.bpl.log
+2026-06-12T13:46:34.489374Z DEBUG move_prover_boogie_backend::generator: writing boogie to `output/memory_specs::remove_entry_spec_SpecNoAbortCheck.bpl`
+2026-06-12T13:46:34.489492Z  INFO move_prover_boogie_backend::boogie_backend::boogie_wrapper: running solver
+2026-06-12T13:46:34.489495Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: command line: /opt/homebrew/Cellar/sui-prover/2.8.6/bin/boogie -infer:j -proverOpt:O:smt.QI.EAGER_THRESHOLD=10 output/memory_specs::remove_entry_spec_SpecNoAbortCheck.bpl -printModel:1 -proverOpt:O:smt.QI.LAZY_THRESHOLD=100 -vcsCores:4 -printVerifiedProceduresCount:0 -inferModifies -enhancedErrorMessages:1 -proverOpt:O:model_validate=true -proverOpt:PROVER_PATH=/opt/homebrew/opt/z3/bin/z3
+2026-06-12T13:46:34.864939Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: analyzing boogie output
+2026-06-12T13:46:34.864963Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: writing boogie log to output/memory_specs::remove_entry_spec_SpecNoAbortCheck.bpl.log
+2026-06-12T13:46:34.865510Z DEBUG move_prover_boogie_backend::generator: writing boogie to `output/memory_specs::revoke_spec_SpecNoAbortCheck.bpl`
+2026-06-12T13:46:34.865628Z  INFO move_prover_boogie_backend::boogie_backend::boogie_wrapper: running solver
+2026-06-12T13:46:34.865631Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: command line: /opt/homebrew/Cellar/sui-prover/2.8.6/bin/boogie output/memory_specs::revoke_spec_SpecNoAbortCheck.bpl -proverOpt:O:smt.QI.EAGER_THRESHOLD=10 -proverOpt:O:model_validate=true -printVerifiedProceduresCount:0 -proverOpt:O:smt.QI.LAZY_THRESHOLD=100 -proverOpt:PROVER_PATH=/opt/homebrew/opt/z3/bin/z3 -printModel:1 -inferModifies -infer:j -enhancedErrorMessages:1 -vcsCores:4
+2026-06-12T13:46:35.234958Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: analyzing boogie output
+2026-06-12T13:46:35.234981Z DEBUG move_prover_boogie_backend::boogie_backend::boogie_wrapper: writing boogie log to output/memory_specs::revoke_spec_SpecNoAbortCheck.bpl.log
+2026-06-12T13:46:35.235476Z  INFO move_prover_boogie_backend::generator: 0.000s building, 8.486s verification

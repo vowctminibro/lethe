@@ -1,0 +1,1 @@
+transfer::freeze_object_impl
