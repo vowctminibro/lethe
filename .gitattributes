@@ -1,0 +1,4 @@
+# GitHub Linguist — ignore generated/prover files in language stats
+contracts/memory_specs/output/** linguist-vendored
+*.bpl linguist-vendored
+sui-prover.log.* linguist-vendored

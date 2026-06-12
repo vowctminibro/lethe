@@ -56,3 +56,9 @@ ALLOWLIST_TARGETS.txt
 
 # Local X/Twitter automation artifacts (Hermes daily job) — never publish
 twitter-growth/
+
+# Sui prover logs (generated)
+sui-prover.log.*
+
+# Sui prover generated output (keep in repo but ignore from tracking)
+contracts/memory_specs/output/
