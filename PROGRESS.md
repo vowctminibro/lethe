@@ -940,3 +940,27 @@ Commits: ddc1598 · c675d60 · 7362b64 · 5dbb8b9 · 07589f2 · 760bb76 · 7faca
 2026-06-11: HERO PASS (human) — Vow completed the full 9-step flow on prod (incognito, secondary Google account): sign-in, vault birth, chat+chip, proof links, grant→/pulse knows, revoke→forgets, re-login same vault. PASSED.
 
 2026-06-12: history rewritten to purge twitter-growth/ (privacy hygiene; audit confirmed zero credentials ever exposed). SHAs above this line refer to pre-rewrite history.
+
+## 2026-06-12 — BLOCK 8, Phase 1 (Seal spike — de-risk)
+
+**VERDICT: SEAL-GO.** Full encrypt → seal_approve → decrypt round-trip on
+testnet, ~25 min into the 3-hr box.
+
+- @mysten/sui compat: installed 2.17.0 ≥ required 2.16.2 — no bump.
+  @mysten/seal@1.1.3 added. `SuiJsonRpcClient` exposes `.core` →
+  SealCompatibleClient OK (no client migration needed).
+- **Key server config (the exact config to reuse):** verified testnet
+  DECENTRALIZED server, objectId
+  `0xb012378c9f3799fb5b1a7083da74a4069e3c3f1c93de0b27212a5799ce1e1e98`,
+  aggregatorUrl `https://seal-aggregator-testnet.mystenlabs.com`, weight 1,
+  threshold 1, `verifyKeyServers: true`, no API key needed. (Committee-mode
+  3-of-5 internally — distributed trust with a single config entry.)
+- Throwaway policy published: contracts/seal_spike →
+  `0x6e79e87b4df03871b088e9eb1dce4db9720e7ca92c72a0f1bafefe8e5972b97b`
+  (owner-only seal_approve; superseded by Phase 2's memory_policy).
+- scripts/seal-spike.mjs: 330 B ciphertext · SessionKey (personal-message
+  sig, ttl 10 min) · decrypt == original · NEGATIVE: stranger keypair →
+  NoAccessError from key servers. Gotcha logged: SealClient caches derived
+  keys after a successful decrypt — negative tests (and any per-user
+  isolation reasoning) need a fresh client; cache is per-client-instance.
+GATE PASSED.

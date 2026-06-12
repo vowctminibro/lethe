@@ -1,0 +1,8 @@
+[package]
+name = "seal_spike"
+edition = "2024.beta"
+
+[dependencies]
+
+[addresses]
+seal_spike = "0x0"
