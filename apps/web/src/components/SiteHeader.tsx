@@ -10,6 +10,7 @@ import {
 import { isGoogleWallet } from "@mysten/enoki";
 import { Logo } from "./Logo";
 import { isEnokiConfigured } from "@/src/lib/enoki";
+import { clearSealSession } from "@/src/lib/memory/seal-session";
 import { DEMO_MOCK, MOCK_ADDRESS } from "@/src/lib/demo/mock";
 
 const short = (a: string) => `${a.slice(0, 6)}…${a.slice(-4)}`;
@@ -43,7 +44,15 @@ export function SignIn() {
     return (
       <div className="flex items-center gap-2 text-xs" style={{ color: "var(--text-dim)" }}>
         <span className="hidden sm:inline">{short(account.address)}</span>
-        <button onClick={() => disconnect()} className="underline hover:opacity-70">sign out</button>
+        <button
+          onClick={() => {
+            clearSealSession(); // decrypt session must not outlive the login
+            disconnect();
+          }}
+          className="underline hover:opacity-70"
+        >
+          sign out
+        </button>
       </div>
     );
   }

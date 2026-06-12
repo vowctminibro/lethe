@@ -3,6 +3,7 @@ import { getSuiClient } from "@/src/lib/sui";
 import { getOwnedMemory } from "@/src/lib/memory/chain";
 import { readBytes } from "@/src/lib/walrus";
 import { getEncryptor } from "@/src/lib/memory/encryptor";
+import { parseSealBlob } from "@/src/lib/memory/seal";
 import { PULSE_APP_ADDRESS } from "@/src/lib/pulse";
 
 export const runtime = "nodejs";
@@ -37,11 +38,19 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Authorized on-chain → decrypt the entries (newest first, best-effort per blob).
+    // Authorized on-chain → decrypt what the server can (legacy AES blobs).
+    // Seal-encrypted blobs CANNOT be decrypted here — that is the point of
+    // Seal mode — so they come back flagged `sealed: true` and the page
+    // decrypts them in the owner's browser session (B17: the owned vault
+    // limits decrypt sessions to the owner; the grant gate above remains
+    // the server-enforced revoke-=-forget moment).
     const encryptor = getEncryptor();
     const settled = await Promise.allSettled(
       vault.entries.map(async (ref) => {
         const bytes = await readBytes(ref.blobId);
+        if (parseSealBlob(bytes)) {
+          return { text: "", sealed: true, kind: ref.kind, blobId: ref.blobId, createdAtMs: ref.createdAtMs };
+        }
         const plain = await encryptor.decrypt(bytes, ownerAddress);
         // Stored payload is { text, kind, createdAtMs }; tolerate older raw text.
         let text = plain;
@@ -51,11 +60,12 @@ export async function POST(req: NextRequest) {
         } catch {
           /* not JSON — treat the whole blob as the text */
         }
-        return { text, kind: ref.kind, blobId: ref.blobId, createdAtMs: ref.createdAtMs };
+        return { text, sealed: false, kind: ref.kind, blobId: ref.blobId, createdAtMs: ref.createdAtMs };
       }),
     );
+    type PulseEntryRow = { text: string; sealed: boolean; kind: string; blobId: string; createdAtMs: number };
     const entries = settled
-      .filter((s): s is PromiseFulfilledResult<{ text: string; kind: string; blobId: string; createdAtMs: number }> => s.status === "fulfilled")
+      .filter((s): s is PromiseFulfilledResult<PulseEntryRow> => s.status === "fulfilled")
       .map((s) => s.value)
       .sort((a, b) => b.createdAtMs - a.createdAtMs);
 

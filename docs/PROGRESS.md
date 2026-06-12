@@ -1015,3 +1015,27 @@ services=1, id prefix == vault) · gasless add_entry
 decrypted the new entry verbatim AND 2 legacy AES entries via fallback.
 `tsc` clean · `pnpm build` GREEN. .env.local → v3 call id + provider=seal
 (local only; prod flips in Phase 5).
+
+## 2026-06-12 — BLOCK 8, Phase 4 (SessionKey UX — signing without killing gasless)
+
+**Signature budget, measured** (seal-session-ux-e2e.mjs): remember = 0
+personal-message signatures (writes never touch the decrypt key — gasless
+sponsor flow unchanged, sponsor ≠ signer verified); recall ×3 (two PARALLEL +
+one sequential) = exactly 1 signature. Mechanics: SessionKey cached in
+sessionStorage (TTL 30 min, export/import) + in-memory fallback for
+storage-blocked contexts + in-flight dedupe so parallel recalls share one
+signing. First run caught a real gap — node/storage-blocked sessions re-signed
+per recall (2 sigs) — fixed with the in-memory layer, re-measured 1.
+
+**UI**: quiet "unlocking your memories…" line in the ink-pool rail while the
+one-time signature lands (useSealUnlocking → useSyncExternalStore over
+seal-session's unlock store, zero Seal knowledge in components). Sign-out now
+clears the cached session key (SiteHeader).
+
+**Pulse in seal mode**: /api/pulse/recall keeps the on-chain grant gate (403
+on revoke unchanged) but returns Seal blobs flagged `sealed: true` instead of
+failing; the page decrypts those with the owner's cached session and merges
+(B17 decision wired). zkLogin signing is silent through the Enoki wallet —
+same plumbing as the proven signTransaction path; the one un-automatable
+browser OAuth pass stays on the known-seam list (Vow's hero pass covers it).
+`tsc` clean · `pnpm build` GREEN.

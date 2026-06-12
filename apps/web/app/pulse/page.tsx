@@ -23,6 +23,8 @@ interface PulseEntry {
   kind: string;
   blobId: string;
   createdAtMs: number;
+  /** Seal-mode: the server returned ciphertext-only; owner session decrypts. */
+  sealed?: boolean;
 }
 
 type State =
@@ -97,7 +99,21 @@ export default function PulsePage() {
         throw new Error(err?.error ?? "Pulse couldn't reach your vault");
       }
       const { entries, vaultId } = (await res.json()) as { entries: PulseEntry[]; vaultId: string };
-      setState({ phase: "granted", entries, vaultId });
+      // Seal mode: the server enforces the grant but can't read Seal blobs —
+      // decrypt those here with the owner's cached session key (B17).
+      let merged = entries;
+      if (entries.some((e) => e.sealed) && memory) {
+        try {
+          const hits = await memory.recall("");
+          const byBlob = new Map(hits.map((h) => [h.blobId, h.text]));
+          merged = entries
+            .map((e) => (e.sealed ? { ...e, text: byBlob.get(e.blobId) ?? "" } : e))
+            .filter((e) => e.text);
+        } catch {
+          merged = entries.filter((e) => !e.sealed); // sealed stay sealed; show the rest
+        }
+      }
+      setState({ phase: "granted", entries: merged, vaultId });
     } catch (e) {
       setState({ phase: "error", message: e instanceof Error ? e.message : "Something went wrong" });
     }

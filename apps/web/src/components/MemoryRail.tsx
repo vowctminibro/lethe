@@ -11,6 +11,7 @@
  */
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useSealUnlocking } from "@/src/lib/memory/use-seal-unlock";
 
 export interface RailEntry {
   id: string;
@@ -116,6 +117,8 @@ export function MemoryRail({
   vaultId: string | null;
   loading: boolean;
 }) {
+  // Quiet one-time state while the per-session Seal decrypt key is signed.
+  const unlocking = useSealUnlocking();
   // Stamp choreography: when a chip flips pending → confirmed, it gets one
   // stamp animation, then settles into its letterpress state.
   const wasPending = useRef<Set<string>>(new Set());
@@ -158,6 +161,11 @@ export function MemoryRail({
       </div>
 
       <div className="flex-1 overflow-y-auto px-3 py-3 flex flex-col gap-2.5">
+        {unlocking && (
+          <div className="lethe-id px-2 py-1 text-center animate-pulse" style={{ color: POOL.dim }}>
+            unlocking your memories…
+          </div>
+        )}
         {loading && (
           <>
             {[0, 1, 2].map((i) => (
