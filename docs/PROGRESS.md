@@ -1133,3 +1133,12 @@ Gates: tsc clean · build green · fixed one self-inflicted console error pre-de
 Blockers: none.
 Recommended next: freeze holds — video/deck days. The growth map gives the deck its "how this gets big" slide for free (crop design/screens/prod/landing-desktop.png).
 === END REPORT ===
+
+## 2026-06-13 — BLOCK 11.5: RECEIPTS UPGRADE (growth map polarity flip)
+
+=== BLOCK 11.5 NOTE ===
+Edited the live "Three rings around one vault" section in place — rings motif, block layout, hairlines, milestone sub-lines, footnote, ring caption all kept. Every ring now leads LIVE TODAY (mono Coral) → ONE UNLOCK AWAY (Mist; absent on CORE by design) → REVENUE (Mist), all founder copy VERBATIM; CORE keeps its closing dim line "This ring is finished — it is the proof the others stand on." Intro receipts line under the heading; closer swapped to "The inner ring is the biggest one — and it already shipped, solo. The rings ahead are smaller."
+Verify links inline: Formally verified (19/19) → /docs/security · the SDK → /docs/sdk · Free / Pro and BYOK / Pro ~$5–8/mo + BYOK / SDK pilots / category-scale subscriptions → #pricing. Suiscan vault link NOT duplicated (already in the colophon). Note: the "uppercase mono-tag fix" referenced in the brief had not actually landed in git — folded it into this patch (tags + anatomy labels render uppercase via CSS, copy strings untouched).
+Build gotcha caught pre-deploy: \uXXXX escapes are valid in JS strings but render LITERALLY in JSX text — converted all 31 to real characters and verified zero leaked into served HTML.
+Gates: tsc + build green · deploy a61cf19 → all routes 200 · new strings + all four milestone sentences + full Block 9/10 frozen list grep=1 on served prod · Venice line intact · #roadmap and #pricing anchors resolve · 390px: 0 overflow, 0 console errors · after-captures design/screens/prod/landing-{desktop,mobile}.png.
+=== END NOTE ===
