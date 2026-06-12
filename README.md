@@ -37,7 +37,7 @@ No wallet needed. ~2 minutes.
 - **Every memory is an encrypted blob on Walrus** — fetchable from any aggregator, so storage is verifiable, not a claim.
 - **On-chain `BlobRef`s live in an owned Sui object** — your vault is [`memory::Memory`](contracts/memory/sources/memory.move), package [`0x06b5c99940b5de954b2b37cd1198f421921986eabd57b35fe3fd4cc39169ba95`](https://suiscan.xyz/testnet/object/0x06b5c99940b5de954b2b37cd1198f421921986eabd57b35fe3fd4cc39169ba95) on Sui testnet (v2, upgraded in place — existing vaults from [v1](https://suiscan.xyz/testnet/object/0x9dcc482cd7fb5d7fa2a0cf90c7dc1e6efec6f40e817e352c61ed0f63951c1331) keep working). The chain holds the index and the access list; Walrus holds the data.
 - **Trust model, stated honestly:** memories are encrypted per-user at rest on Walrus (AES-256-GCM, HKDF per owner), but today the per-owner key derives from a server-held secret — access is enforced by the on-chain grants you control plus server-side checks, not by key custody. Seal threshold encryption on the roadmap removes the server from decryption entirely — aligned with Walrus Memory's model.
-- **MemWal:** integrated days after MemWal launched; blocked by the published-SDK (`@mysten/memwal@0.0.2`) vs relayer (≥0.0.4) version gap — documented honestly in [BLOCKERS.md](BLOCKERS.md) (B16). A provider abstraction keeps us one adapter away from adopting `@mysten/memwal` the day it publishes.
+- **MemWal:** integrated days after MemWal launched; blocked by the published-SDK (`@mysten/memwal@0.0.2`) vs relayer (≥0.0.4) version gap — documented honestly in [BLOCKERS.md](docs/BLOCKERS.md) (B16). A provider abstraction keeps us one adapter away from adopting `@mysten/memwal` the day it publishes.
 
 ### Memory economics
 
@@ -95,8 +95,8 @@ cd contracts/memory_specs && sui-prover
 | App — chat + memory rail, `/memory` proof view, `/pulse` second agent | [`apps/web`](apps/web) |
 | MemoryStore provider abstraction (Walrus today, MemWal-ready) | [`apps/web/src/lib/memory/provider.ts`](apps/web/src/lib/memory/provider.ts) |
 | End-to-end scripts (hero flow, portability, gasless) | [`apps/web/scripts/hero-e2e.mjs`](apps/web/scripts/hero-e2e.mjs) · [`pulse-e2e.mjs`](apps/web/scripts/pulse-e2e.mjs) · [`gasless-e2e.mjs`](apps/web/scripts/gasless-e2e.mjs) |
-| Build log, day by day | [PROGRESS.md](PROGRESS.md) |
-| Honest blockers (incl. B16 MemWal gap) | [BLOCKERS.md](BLOCKERS.md) |
+| Build log, day by day | [PROGRESS.md](docs/PROGRESS.md) |
+| Honest blockers (incl. B16 MemWal gap) | [BLOCKERS.md](docs/BLOCKERS.md) |
 
 ## Stack
 

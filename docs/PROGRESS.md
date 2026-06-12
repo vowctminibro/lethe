@@ -988,3 +988,30 @@ session DENIED at dry-run input resolution → B17 design note (owned vault ⇒
 owner-session decryption everywhere; Pulse keeps server-enforced grants).
 GATE PASSED (tests, package live, e2e proof). Ids propagated next phase
 alongside SealProvider env.
+
+## 2026-06-12 — BLOCK 8, Phase 3 (SealProvider behind the flag)
+
+`SealProvider extends ManualProvider` — grant/revoke/forget + gasless plumbing
+inherited untouched; only the crypto plane overridden:
+- remember: Seal-encrypt CLIENT-SIDE (`[original pkg][vault id][nonce]`) →
+  POST /api/memory/store (new route: pure ciphertext passthrough to Walrus —
+  server never sees plaintext or keys) → gasless add_entry (unchanged).
+- recall: on-chain refs → browser-direct aggregator fetch (CORS verified
+  open) → one batched fetchKeys + decrypt under the cached SessionKey.
+  **Mixed-vault support:** blobs that don't parse as Seal EncryptedObject are
+  legacy AES entries → routed through the existing server recall, so
+  pre-Seal vaults stay fully readable after the flip.
+- Key-server protocol detail: requested identities are read OUT OF THE PTB —
+  batch decrypt = one seal_approve moveCall per id in a single PTB.
+- Flag: NEXT_PUBLIC_MEMORY_PROVIDER=manual(default)|seal|memwal; ManualProvider
+  untouched. New module seal.ts (client, config+helpers), seal-session.ts
+  (SessionKey cache: sessionStorage, TTL 30 min, in-flight dedupe — at most
+  ONE signature per session), seal-provider.ts, /api/memory/store.
+
+**GATE PASSED** (seal-provider-e2e.mjs — the real src modules on testnet):
+blob mRA2FRf9EmFMLdcQGO-lPjoSfRrqQ4ot-q9NGtdeWJ4 (433 B Seal ciphertext,
+services=1, id prefix == vault) · gasless add_entry
+5SYLh9YugYw5EHvTG3RDScBjxY6VkcHngAAp9byndd7G (sponsor ≠ signer) · recall
+decrypted the new entry verbatim AND 2 legacy AES entries via fallback.
+`tsc` clean · `pnpm build` GREEN. .env.local → v3 call id + provider=seal
+(local only; prod flips in Phase 5).
