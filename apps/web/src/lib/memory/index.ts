@@ -10,9 +10,15 @@
 "use client";
 
 import { useMemo } from "react";
-import { useCurrentAccount, useSuiClient, useSignTransaction } from "@mysten/dapp-kit";
+import {
+  useCurrentAccount,
+  useSuiClient,
+  useSignTransaction,
+  useSignPersonalMessage,
+} from "@mysten/dapp-kit";
 import type { MemoryProvider } from "./provider";
 import { ManualProvider, type SignFn } from "./manual-provider";
+import { SealProvider } from "./seal-provider";
 import { MemWalProvider } from "./memwal-provider";
 import { DEMO_MOCK, getMockProvider } from "../demo/mock";
 
@@ -21,12 +27,11 @@ export type { MemoryEntry, RememberResult, RecallHit, BlobRef } from "./types";
 export { getOwnedMemory, MEMORY_PACKAGE_ID, MEMORY_ALLOWLISTED } from "./chain";
 export type { OwnedMemory } from "./chain";
 
-export type ProviderKind = "manual" | "memwal";
+export type ProviderKind = "manual" | "seal" | "memwal";
 
 export function selectedProviderKind(): ProviderKind {
-  return (process.env.NEXT_PUBLIC_MEMORY_PROVIDER ?? "manual") === "memwal"
-    ? "memwal"
-    : "manual";
+  const v = process.env.NEXT_PUBLIC_MEMORY_PROVIDER ?? "manual";
+  return v === "seal" ? "seal" : v === "memwal" ? "memwal" : "manual";
 }
 
 /**
@@ -37,16 +42,25 @@ export function useMemory(namespace?: string): MemoryProvider | null {
   const account = useCurrentAccount();
   const client = useSuiClient();
   const { mutateAsync: signTransaction } = useSignTransaction();
+  const { mutateAsync: signPersonalMessage } = useSignPersonalMessage();
 
   return useMemo(() => {
     if (DEMO_MOCK) return getMockProvider();
     if (!account) return null;
-    if (selectedProviderKind() === "memwal") return new MemWalProvider();
-    return new ManualProvider({
+    const kind = selectedProviderKind();
+    if (kind === "memwal") return new MemWalProvider();
+    const deps = {
       ownerAddress: account.address,
       client,
       signTransaction: signTransaction as SignFn,
       namespace,
-    });
-  }, [account, client, signTransaction, namespace]);
+    };
+    if (kind === "seal") {
+      return new SealProvider({
+        ...deps,
+        signPersonalMessage: (input) => signPersonalMessage(input),
+      });
+    }
+    return new ManualProvider(deps);
+  }, [account, client, signTransaction, signPersonalMessage, namespace]);
 }
