@@ -47,29 +47,47 @@ export function configuredProviders(): LLMProvider[] {
   return providers().filter((p) => p.isConfigured());
 }
 
-/** Honest user-facing labels — model first, host second. Keyed by id prefix. */
-const MODEL_LABELS: Record<string, string> = {
-  minimax: "MiniMax-Text-01 · MiniMax",
-  "nvidia-nim": "Llama 3.3 70B · NVIDIA NIM",
-  groq: "Llama 3.3 70B · Groq",
-  gemini: "Gemini 2.0 Flash · Google",
-};
-
 export interface AvailableModel {
-  /** Stable selector key: the provider id's first segment, e.g. "minimax". */
+  /** Stable selector key: the provider id's first segment, e.g. "groq". */
   key: string;
-  /** Full provider id, e.g. "minimax/MiniMax-Text-01". */
+  /** Full provider id, e.g. "groq/llama-3.3-70b-versatile". */
   id: string;
-  /** Honest display label. */
+  /** Honest display label — model first, host second. */
   label: string;
+  /** Whether the provider has its key and can answer as itself right now. */
+  configured: boolean;
+  /** Whether this entry is the default selection. */
+  isDefault: boolean;
 }
 
-/** Models the user can pick from RIGHT NOW (configured providers only). */
+/**
+ * The PUBLIC selector catalog — free-tier models only. MiniMax is a paid
+ * plan and stays server-side (fallback chain + import-extract); it is never
+ * publicly selectable or default. NIM's Kimi K2 reached end-of-life
+ * (410 — probed 2026-06-13), so the NIM slot is labeled by what it actually
+ * serves. Unconfigured entries still list (the chain answers via fallback,
+ * the UI notes it); the default is the first CONFIGURED entry unless
+ * NEXT_PUBLIC_DEFAULT_MODEL overrides.
+ */
+const FREE_CATALOG: { key: string; id: string; label: string }[] = [
+  { key: "groq", id: "groq/llama-3.3-70b-versatile", label: "Llama 3.3 70B · Groq" },
+  { key: "gemini", id: "gemini/gemini-2.0-flash", label: "Gemini 2.0 Flash · Google" },
+  { key: "nvidia-nim", id: "nvidia-nim/meta/llama-3.3-70b-instruct", label: "Llama 3.3 70B · NVIDIA NIM" },
+];
+
+/** The public model list, default first-configured (env-overridable). */
 export function availableModels(): AvailableModel[] {
-  return configuredProviders().map((p) => {
-    const key = p.id.split("/")[0];
-    return { key, id: p.id, label: MODEL_LABELS[key] ?? p.id };
-  });
+  const configuredKeys = new Set(configuredProviders().map((p) => p.id.split("/")[0]));
+  const envDefault = process.env.NEXT_PUBLIC_DEFAULT_MODEL;
+  const defaultKey =
+    (envDefault && FREE_CATALOG.some((m) => m.key === envDefault) && envDefault) ||
+    FREE_CATALOG.find((m) => configuredKeys.has(m.key))?.key ||
+    FREE_CATALOG[0].key;
+  return FREE_CATALOG.map((m) => ({
+    ...m,
+    configured: configuredKeys.has(m.key),
+    isDefault: m.key === defaultKey,
+  }));
 }
 
 /**

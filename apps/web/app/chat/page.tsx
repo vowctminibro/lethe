@@ -32,7 +32,7 @@ type Msg = {
   streaming?: boolean;
 };
 
-type ModelOption = { key: string; id: string; label: string };
+type ModelOption = { key: string; id: string; label: string; configured: boolean; isDefault: boolean };
 const MODEL_LS_KEY = "lethe-model";
 
 // Per-session LLM message cap (judge-proofing). ONLY chat sends count —
@@ -96,7 +96,7 @@ export default function ChatPage() {
         setModels(m);
         const saved = window.localStorage.getItem(MODEL_LS_KEY);
         if (saved && m.some((x) => x.key === saved)) setModel(saved);
-        else if (m.length > 0) setModel(m[0].key);
+        else setModel(m.find((x) => x.isDefault)?.key ?? m[0]?.key ?? "");
       })
       .catch(() => {/* selector is sugar — chat works on the default chain */});
   }, []);

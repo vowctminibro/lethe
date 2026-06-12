@@ -3,6 +3,20 @@ export default function DocsSecurity() {
     <>
       <h1>Security</h1>
 
+      {/* Bordered proof callout — the number judges should leave with. */}
+      <div className="rounded border p-5 my-6" style={{ borderColor: "var(--border)", background: "var(--bg-panel)" }}>
+        <div className="lethe-eyebrow">Formally verified</div>
+        <div className="mt-1" style={{ fontFamily: "var(--font-display)", fontWeight: 500, fontSize: "2.5rem", lineHeight: 1.1 }}>
+          19/19
+        </div>
+        <p className="mt-2 text-sm" style={{ color: "var(--text-dim)" }}>
+          sui-prover checks on the vault&rsquo;s invariants, including I5 deny-universality.
+        </p>
+        <pre className="mt-3" style={{ margin: 0 }}>
+          <code>cd contracts/memory_specs &amp;&amp; sui-prover</code>
+        </pre>
+      </div>
+
       <h2>Seal threshold encryption</h2>
       <p>
         Memories are encrypted in your browser with{" "}
@@ -14,24 +28,30 @@ export default function DocsSecurity() {
       </p>
 
       <h2>What servers can and cannot see</h2>
-      <ul>
-        <li>
-          <strong>Cannot:</strong> read your memories. The store route pins ciphertext to Walrus;
-          plaintext and key material never reach a Lethe server in Seal mode. Decryption happens
-          in your browser under a session key you sign.
-        </li>
-        <li>
-          <strong>Can:</strong> see the chat messages you send to the LLM during a conversation
-          (that is how any hosted model works), your address, and your vault&rsquo;s public
-          on-chain metadata (entry count, authorized apps — visible to everyone on Suiscan).
-        </li>
-        <li>
-          <strong>Honest caveat:</strong> entries written before the Seal upgrade (legacy mode)
-          were encrypted server-side with AES; those remain readable by the legacy path until
-          re-written. New entries are Seal-encrypted end-to-end. A <code>manual</code> provider
-          flag keeps the legacy mode available as a fallback.
-        </li>
-      </ul>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-px rounded border overflow-hidden my-4" style={{ borderColor: "var(--border)", background: "var(--border)" }}>
+        <div className="p-5" style={{ background: "var(--bg)" }}>
+          <div className="lethe-id uppercase" style={{ color: "var(--text-dim)" }}>Can see</div>
+          <p className="mt-3 text-sm leading-relaxed" style={{ color: "var(--text)" }}>
+            The chat messages you send to the LLM during a conversation (that is how any hosted
+            model works), your address, and your vault&rsquo;s public on-chain metadata — entry
+            count, authorized apps — visible to everyone on Suiscan.
+          </p>
+        </div>
+        <div className="p-5" style={{ background: "var(--bg)" }}>
+          <div className="lethe-id uppercase" style={{ color: "var(--accent-h)" }}>Cannot see</div>
+          <p className="mt-3 text-sm leading-relaxed" style={{ color: "var(--text)" }}>
+            Your memories. The store route pins ciphertext to Walrus; plaintext and key material
+            never reach a Lethe server in Seal mode. Decryption happens in your browser under a
+            session key you sign.
+          </p>
+        </div>
+      </div>
+      <p>
+        <strong>Honest caveat:</strong> entries written before the Seal upgrade (legacy mode)
+        were encrypted server-side with AES; those remain readable by the legacy path until
+        re-written. New entries are Seal-encrypted end-to-end. A <code>manual</code> provider
+        flag keeps the legacy mode available as a fallback.
+      </p>
 
       <h2>Formally verified — 19/19</h2>
       <p>

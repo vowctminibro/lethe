@@ -44,6 +44,14 @@ export default function DocsConcepts() {
         revoking removes it. Both are owner-only transactions you can verify on Suiscan. Apps read
         through a grant-gated path: revoked means zero entries, immediately.
       </p>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-px rounded border overflow-hidden my-4" style={{ borderColor: "var(--border)", background: "var(--border)" }}>
+        {["grant", "app reads", "revoke", "key servers stop approving"].map((step, i) => (
+          <div key={step} className="p-4" style={{ background: "var(--bg)" }}>
+            <div className="lethe-id" style={{ color: "var(--accent-h)" }}>{String(i + 1).padStart(2, "0")}</div>
+            <div className="mt-1.5 text-sm leading-snug" style={{ color: "var(--text)" }}>{step}</div>
+          </div>
+        ))}
+      </div>
 
       <h2>Walrus blobs</h2>
       <p>
