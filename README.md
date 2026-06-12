@@ -29,13 +29,17 @@ No wallet needed. ~2 minutes.
 2. Tell Lethe something durable — *"I'm a momentum trader and I hate leverage"*
 3. Watch the memory rail write it to Walrus in real time
 4. Open **/memory** — every entry links to Suiscan (on-chain ref) and the Walrus aggregator (encrypted blob)
-5. Grant **Pulse** access → open **/pulse** → it already knows your style
-6. Revoke Pulse → ask again → it forgets. Live.
+5. Switch the answering model in the chat header — your memory follows you (model-independent by design)
+6. Grant **Pulse** access → open **/pulse** → it already knows your style
+7. Revoke Pulse → ask again → it forgets. Live.
+8. **/memory → Export memory** — decrypts in your browser, downloads a JSON you keep. Exit is a feature.
+
+Docs live in-app at [/docs](https://lethe-gold.vercel.app/docs) (concepts, SDK, security model).
 
 ## Why Walrus is load-bearing (not decorative)
 
 - **Every memory is an encrypted blob on Walrus** — fetchable from any aggregator, so storage is verifiable, not a claim.
-- **On-chain `BlobRef`s live in an owned Sui object** — your vault is [`memory::Memory`](contracts/memory/sources/memory.move), package [`0x06b5c99940b5de954b2b37cd1198f421921986eabd57b35fe3fd4cc39169ba95`](https://suiscan.xyz/testnet/object/0x06b5c99940b5de954b2b37cd1198f421921986eabd57b35fe3fd4cc39169ba95) on Sui testnet (v2, upgraded in place — existing vaults from [v1](https://suiscan.xyz/testnet/object/0x9dcc482cd7fb5d7fa2a0cf90c7dc1e6efec6f40e817e352c61ed0f63951c1331) keep working). The chain holds the index and the access list; Walrus holds the data.
+- **On-chain `BlobRef`s live in an owned Sui object** — your vault is [`memory::Memory`](contracts/memory/sources/memory.move), package [`0x0c79fd944a51153e4d668a4f53a280fe5d0ab6d4db0a572a2f85c11ac5fc2f6c`](https://suiscan.xyz/testnet/object/0x0c79fd944a51153e4d668a4f53a280fe5d0ab6d4db0a572a2f85c11ac5fc2f6c) on Sui testnet (v3, upgraded in place — existing vaults from [v1](https://suiscan.xyz/testnet/object/0x9dcc482cd7fb5d7fa2a0cf90c7dc1e6efec6f40e817e352c61ed0f63951c1331) keep working). The chain holds the index and the access list; Walrus holds the data.
 - **End-to-end encrypted with Seal threshold encryption:** even Lethe's servers can't read your memories — encryption happens in your browser, and decryption requires on-chain policy approval (`memory_policy::seal_approve`: vault owner or an app with an active grant) from a decentralized committee of key servers. Revoke a grant and the key servers stop approving — live. (A legacy `manual` provider mode — server-side AES — remains as a fallback flag and still decrypts pre-Seal entries.)
 - **MemWal:** integrated days after MemWal launched; blocked by the published-SDK (`@mysten/memwal@0.0.2`) vs relayer (≥0.0.4) version gap — documented honestly in [BLOCKERS.md](docs/BLOCKERS.md) (B16). A provider abstraction keeps us one adapter away from adopting `@mysten/memwal` the day it publishes.
 
@@ -95,6 +99,7 @@ cd contracts/memory_specs && sui-prover
 | Formal specs (sui-prover, 19/19 green) | [`contracts/memory_specs/sources/memory_specs.move`](contracts/memory_specs/sources/memory_specs.move) |
 | App — chat + memory rail, `/memory` proof view, `/pulse` second agent | [`apps/web`](apps/web) |
 | MemoryStore provider abstraction (Walrus today, MemWal-ready) | [`apps/web/src/lib/memory/provider.ts`](apps/web/src/lib/memory/provider.ts) |
+| SDK — "Continue with Lethe" (in-repo, runnable example) | [`packages/sdk`](packages/sdk) |
 | End-to-end scripts (hero flow, portability, gasless) | [`apps/web/scripts/hero-e2e.mjs`](apps/web/scripts/hero-e2e.mjs) · [`pulse-e2e.mjs`](apps/web/scripts/pulse-e2e.mjs) · [`gasless-e2e.mjs`](apps/web/scripts/gasless-e2e.mjs) |
 | Build log, day by day | [PROGRESS.md](docs/PROGRESS.md) |
 | Honest blockers (incl. B16 MemWal gap) | [BLOCKERS.md](docs/BLOCKERS.md) |
