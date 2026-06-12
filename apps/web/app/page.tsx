@@ -215,6 +215,21 @@ export default function Home() {
             </div>
           ))}
         </div>
+
+        {/* ── Proof of Demand — committed policy, mechanism only ── */}
+        <div className="mt-10 max-w-2xl lethe-hairline rounded p-6" style={{ background: "var(--bg-panel)" }}>
+          <div className="lethe-id uppercase" style={{ color: "var(--accent-h)" }}>Proof of demand</div>
+          <p className="mt-3 text-sm leading-relaxed" style={{ color: "var(--text)" }}>
+            Lethe&rsquo;s unit economics are denominated in WAL and SUI by design: every user
+            action is gas Lethe pays in SUI (sponsored), every memory is storage Lethe pays in
+            WAL.
+          </p>
+          <p className="mt-3 text-sm leading-relaxed" style={{ color: "var(--text-dim)" }}>
+            Committed policy, executing from first revenue: revenue covers costs → funds WAL
+            storage and renewals for all users → the remainder goes to a monthly WAL
+            buy-and-burn via a public burn address — published, on-chain, verifiable by anyone.
+          </p>
+        </div>
       </section>
 
       {/* ── Roadmap — mirrors README status & roadmap ── */}

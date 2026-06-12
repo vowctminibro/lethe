@@ -37,6 +37,11 @@ export default function MemoryPage() {
   const [accessError, setAccessError] = useState<string | null>(null);
   const [forgetTarget, setForgetTarget] = useState<RecallHit | null>(null);
   const [forgetBusy, setForgetBusy] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
+  const [importText, setImportText] = useState("");
+  const [importState, setImportState] = useState<
+    { phase: "idle" } | { phase: "extracting" } | { phase: "writing"; done: number; total: number } | { phase: "error"; message: string }
+  >({ phase: "idle" });
   const [leaving, setLeaving] = useState<string | null>(null);
   const [toast, setToast] = useState<{ text: string; href?: string } | null>(null);
 
@@ -86,6 +91,48 @@ export default function MemoryPage() {
       setAccessError(e instanceof Error ? e.message : "revoke failed");
     } finally {
       setAccessBusy(null);
+    }
+  }
+
+  // Import = arrival: paste what another AI remembers about you, split it
+  // into durable facts (LLM extraction, nothing stored server-side), then run
+  // each through the NORMAL remember() loop — Seal-encrypted on Walrus,
+  // referenced on the vault, kind="imported".
+  async function runImport() {
+    const text = importText.trim();
+    if (!memory || !text || importState.phase === "extracting" || importState.phase === "writing") return;
+    setImportState({ phase: "extracting" });
+    try {
+      const res = await fetch("/api/memory/import-extract", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text }),
+      });
+      if (!res.ok) {
+        const err = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(err?.error ?? "extraction failed");
+      }
+      const { facts } = (await res.json()) as { facts: { text: string }[] };
+      if (facts.length === 0) {
+        setImportState({ phase: "error", message: "No durable facts found in that paste — try the full answer from your other AI." });
+        return;
+      }
+      setImportState({ phase: "writing", done: 0, total: facts.length });
+      let done = 0;
+      for (const f of facts) {
+        // Sequential on purpose: each write is a gasless tx on the same vault.
+        await memory.remember({ text: f.text, kind: "imported" });
+        done++;
+        setImportState({ phase: "writing", done, total: facts.length });
+      }
+      setImportOpen(false);
+      setImportText("");
+      setImportState({ phase: "idle" });
+      setToast({ text: `Imported ${done} ${done === 1 ? "memory" : "memories"} — encrypted and yours now.` });
+      setTimeout(() => setToast(null), 6000);
+      setNonce((n) => n + 1); // reload ledger from chain
+    } catch (e) {
+      setImportState({ phase: "error", message: e instanceof Error ? e.message : "import failed" });
     }
   }
 
@@ -351,7 +398,15 @@ export default function MemoryPage() {
 
           {account && !error && hits && hits.length === 0 && (
             <div className="rounded border border-dashed p-12 text-center" style={{ borderColor: "var(--border)", color: "var(--text-dim)" }}>
-              No memories yet. <Link href="/chat" className="underline">Tell Lethe about yourself →</Link>
+              <p>
+                No memories yet. <Link href="/chat" className="underline">Tell Lethe about yourself →</Link>
+              </p>
+              <p className="mt-3 text-xs">
+                Already have an AI that knows you?{" "}
+                <button onClick={() => setImportOpen(true)} className="underline" data-testid="import-memory-empty">
+                  Import memory from another AI ↑
+                </button>
+              </p>
             </div>
           )}
 
@@ -361,13 +416,22 @@ export default function MemoryPage() {
                 <span className="lethe-id uppercase" style={{ color: "var(--text-dim)" }}>Ledger — {hits.length} {hits.length === 1 ? "entry" : "entries"}</span>
                 <span className="flex items-center gap-3">
                   <button
+                    onClick={() => setImportOpen(true)}
+                    data-testid="import-memory"
+                    className="lethe-id uppercase underline decoration-dotted underline-offset-2 hover:opacity-70 transition"
+                    style={{ color: "var(--accent-h)" }}
+                    title="Paste what another AI remembers about you — it becomes yours"
+                  >
+                    Import ↑
+                  </button>
+                  <button
                     onClick={exportMemory}
                     data-testid="export-memory"
                     className="lethe-id uppercase underline decoration-dotted underline-offset-2 hover:opacity-70 transition"
                     style={{ color: "var(--accent-h)" }}
                     title="Decrypts in your browser and downloads a JSON file — your memory, your file"
                   >
-                    Export memory ↓
+                    Export ↓
                   </button>
                   <span className="lethe-id" style={{ color: "var(--text-dim)" }}>NEWEST FIRST</span>
                 </span>
@@ -455,6 +519,69 @@ export default function MemoryPage() {
                 style={{ background: "var(--accent-h)", color: "var(--bg-panel)" }}
               >
                 {forgetBusy ? "Forgetting…" : "Forget"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Import dialog — paste what another AI remembers about you ── */}
+      {importOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-6 lethe-overlay-in"
+          style={{ background: "rgba(10, 22, 40, 0.45)" }}
+          onClick={() => importState.phase !== "writing" && importState.phase !== "extracting" && setImportOpen(false)}
+        >
+          <div
+            data-testid="import-dialog"
+            className="w-full max-w-lg rounded border p-5"
+            style={{ borderColor: "var(--border)", background: "var(--bg-panel)" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-base font-semibold" style={{ fontFamily: "var(--font-display)" }}>
+              Import memory from another AI
+            </h3>
+            <p className="mt-2 text-xs leading-relaxed" style={{ color: "var(--text-dim)" }}>
+              Ask ChatGPT (or any assistant): <em>&ldquo;What do you remember about me?&rdquo;</em>{" "}
+              — then paste the answer here. Each durable fact becomes a Seal-encrypted memory on
+              Walrus, owned by you, tagged <code className="lethe-id">imported</code>.
+            </p>
+            <textarea
+              value={importText}
+              onChange={(e) => setImportText(e.target.value.slice(0, 8000))}
+              placeholder="Paste here — up to 8,000 characters…"
+              rows={8}
+              autoFocus
+              className="mt-3 w-full rounded border p-3 text-sm outline-none resize-y"
+              style={{ borderColor: "var(--border)", background: "var(--bg)", color: "var(--text)" }}
+            />
+            <div className="mt-1 flex items-center justify-between">
+              <span className="lethe-id" style={{ color: "var(--text-dim)" }}>{importText.length}/8000</span>
+              {importState.phase === "error" && (
+                <span className="text-xs" style={{ color: "#C0564A" }}>{importState.message}</span>
+              )}
+            </div>
+            <div className="mt-3 flex justify-end gap-2">
+              <button
+                onClick={() => setImportOpen(false)}
+                disabled={importState.phase === "extracting" || importState.phase === "writing"}
+                className="h-9 px-4 rounded text-sm border disabled:opacity-50"
+                style={{ borderColor: "var(--border)", color: "var(--text-dim)" }}
+              >
+                Cancel
+              </button>
+              <button
+                data-testid="import-run"
+                onClick={runImport}
+                disabled={!importText.trim() || importState.phase === "extracting" || importState.phase === "writing"}
+                className="h-9 px-4 rounded text-sm font-semibold disabled:opacity-50"
+                style={{ background: "var(--text)", color: "var(--bg)" }}
+              >
+                {importState.phase === "extracting"
+                  ? "Reading…"
+                  : importState.phase === "writing"
+                    ? `Encrypting ${importState.done}/${importState.total}…`
+                    : "Import"}
               </button>
             </div>
           </div>

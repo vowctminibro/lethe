@@ -47,6 +47,17 @@ export default function DocsSecurity() {
 cd contracts/memory_specs && sui-prover   # 19/19`}</code>
       </pre>
 
+      <h2>Policy privacy vs cryptographic privacy</h2>
+      <p>
+        Most private AI services offer policy privacy: a commitment, written in a privacy
+        policy, that the operator will not read your data — while the infrastructure still could.
+        Lethe is built for cryptographic privacy: memories are encrypted before they leave your
+        browser, the decryption keys sit with a decentralized key-server committee, and the
+        release policy is enforced by on-chain code whose deny-side is machine-proven (19/19,
+        I5 deny-universality). The difference is verifiable: one model asks for trust, the other
+        removes the need for it. Venice promises not to look. Lethe can&rsquo;t look.
+      </p>
+
       <h2>Revoke = the key servers stop approving</h2>
       <p>
         Revocation is not a soft delete. The policy reads the live{" "}
