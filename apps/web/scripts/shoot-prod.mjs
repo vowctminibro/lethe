@@ -26,10 +26,13 @@ for (const vp of [
   page.on("pageerror", (e) => errors.push(`pageerror: ${e.message}`));
 
   await page.goto(`${BASE}/`, { waitUntil: "networkidle" });
+  // Block 6 verse hero: h1 = "Named after the river of forgetting. Built so
+  // nothing is."; the "Memory you own" tagline lives in body copy + <title>.
   const h1 = await page.locator("h1").first().textContent();
-  console.log(`[${vp.tag}] h1: ${h1?.trim()}`);
-  if (!h1?.includes("Memory you own")) {
-    console.error(`[${vp.tag}] FAIL: hero headline missing`);
+  const body = await page.locator("body").textContent();
+  console.log(`[${vp.tag}] h1: ${h1?.trim().slice(0, 60)}`);
+  if (!h1?.includes("river") || !body?.includes("Memory you own")) {
+    console.error(`[${vp.tag}] FAIL: hero verse or tagline missing`);
     failed = true;
   }
   await page.screenshot({ path: path.join(OUT, `landing-${vp.tag}.png`), fullPage: true });

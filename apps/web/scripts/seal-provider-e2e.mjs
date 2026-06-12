@@ -17,7 +17,7 @@ process.env.NEXT_PUBLIC_WALRUS_AGGREGATOR_URL ??= "https://aggregator.walrus-tes
 
 const { SealProvider } = await import("../src/lib/memory/seal-provider.ts");
 
-const BASE = "http://localhost:3010";
+const BASE = process.env.E2E_BASE || "http://localhost:3010";
 const msEnv = readFileSync(new URL("../../memory-service/.env", import.meta.url), "utf8");
 const SK = msEnv.match(/^DEPLOYER_PRIVATE_KEY=(.+)$/m)?.[1]?.trim();
 const kp = Ed25519Keypair.fromSecretKey(SK);

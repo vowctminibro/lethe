@@ -1039,3 +1039,43 @@ failing; the page decrypts those with the owner's cached session and merges
 same plumbing as the proven signTransaction path; the one un-automatable
 browser OAuth pass stays on the known-seam list (Vow's hero pass covers it).
 `tsc` clean · `pnpm build` GREEN.
+
+## 2026-06-12 — BLOCK 8, Phase 5 (prover + honest copy + Seal in prod)
+
+Prover: **19/19** (was 16/16) — new `memory_policy_specs::seal_approve_spec`
+proves I5 deny-universality: seal_approve ABORTS for every sender that is
+neither owner nor currently authorized, for ALL identities (with I3 this is
+revoke = key servers stop approving, by proof). The approve direction is not
+expressible externally (`object::id().to_bytes()` is uninterpreted in the
+prover model — two attempts documented) and stays covered by the 6 unit tests.
+Spec gotcha logged: spec params MUST reuse the target's parameter names or the
+prover binds fresh symbols.
+
+Copy now TRUE and shipped: README (browser-side Seal encrypt, e2e claim,
+19/19, roadmap → selective sharing + shared-registry policy), /memory line,
+landing pillar 02. Manual fallback retained + disclosed.
+
+Prod flip: NEXT_PUBLIC_MEMORY_PROVIDER=seal + v3 package id upserted to
+production/preview/development. Deploy lethe-qytlqf2xs… → lethe-gold.vercel.app.
+
+External verify (public URL): 4 routes 200 · Seal key-server config + v3 id
+confirmed inside shipped JS chunks · **Seal-mode write+recall run AGAINST PROD**
+(seal-provider-e2e with E2E_BASE=https://lethe-gold.vercel.app): blob stored
+via prod /api/memory/store, gasless add_entry 83x7NaJ5b1FDgEpQr3Ba2qyEMYAm7sbD2TVAQfkTGAet,
+recall decrypted new + 7 legacy entries · Playwright unauthed desktop+mobile:
+0 console errors, sign-in visible (shoot-prod hero assertion updated for the
+Block 6 verse). Full suite re-run on v3 beforehand: gasless · hero+session-B ·
+forget · pulse · seal-policy · seal-provider · seal-ux — ALL GREEN.
+
+=== LETHE BLOCK 8 REPORT ===
+Phase 1 verdict: SEAL-GO — testnet round-trip ~25 min in. Key server config: verified decentralized testnet server 0xb012378c9f3799fb5b1a7083da74a4069e3c3f1c93de0b27212a5799ce1e1e98, aggregator https://seal-aggregator-testnet.mystenlabs.com, weight 1, threshold 1 (committee 3-of-5 internally), no API key. Spike: 330B ciphertext, decrypt==original, stranger → NoAccessError. Gotcha: SealClient caches derived keys — negative tests need a fresh client.
+@mysten/sui compat: was 2.17.0 ≥ 2.16.2 required — OK, no bump. @mysten/seal@1.1.3 installed; SuiJsonRpcClient exposes .core → SealCompatible.
+Policy + republish: memory::memory_policy (seal_approve: vault-id prefix + owner||authorized, canonical whitelist pattern) · UPGRADE to v3 0x0c79fd944a51153e4d668a4f53a280fe5d0ab6d4db0a572a2f85c11ac5fc2f6c (UpgradeCap held; original id 0x9dcc482c…1331 unchanged, vaults untouched) · Move tests 16/16 (6 new policy tests) · empirical Seal-upgrade semantics: encrypt/Session = ORIGINAL id (SDK hard-requires v1), PTB targets LATEST; key server normalizes. B17: key-server dry-run rejects owned-object inputs for non-owner senders → owner-session decryption everywhere, Pulse keeps server-enforced grants.
+SealProvider: ROUND-TRIPS on testnet AND against prod. extends ManualProvider (grant/revoke/forget untouched); client-side encrypt → /api/memory/store passthrough (server never sees plaintext/keys) → gasless add_entry; recall = aggregator fetch (browser-direct) + batched fetchKeys + decrypt; legacy AES blobs auto-detected → server fallback (old vaults readable).
+UX signing: 0 signatures for writes (gasless untouched, sponsor≠signer verified), EXACTLY 1 per session for reads — measured: remember + 3 recalls (2 parallel) = 1 personal-message signature (sessionStorage TTL 30min + in-memory fallback + in-flight dedupe; first run caught storage-blocked re-signing, fixed). Quiet "unlocking your memories…" rail state; sign-out clears the session key. zkLogin signs silently via Enoki (same plumbing as proven signTransaction).
+Prover: 19/19 (new I5 deny-universality on seal_approve; approve direction covered by unit tests — to_bytes uninterpreted in model).
+Deploy: lethe-qytlqf2xs-vowctminibro-7069s-projects.vercel.app → lethe-gold.vercel.app · prod provider=seal CONFIRMED (key-server config + v3 id in shipped chunks; Seal write+recall executed against the public URL) · / /chat /memory /pulse 200 · Playwright unauthed 0 console errors.
+Copy updated: YES, now true — README "End-to-end encrypted with Seal threshold encryption: even Lethe's servers can't read your memories; decryption requires on-chain policy approval", /memory line, landing pillar; old server-holds-key caveat removed; one-line ManualProvider-fallback note kept; framing everywhere "Lethe USES Seal" (Mysten infra).
+Blockers: B17 (design note, handled — owned vault ⇒ owner-session decrypt; shared-registry policy on roadmap for true third-party app sessions). None blocking. NOTE for Vow: a concurrent root-cleanup lane (PR #1) raced Phase 3 mid-block — recovered, everything merged; PROGRESS/BLOCKERS now live at docs/.
+Recommended next: (1) Vow re-runs the ONE human browser pass on prod in Seal mode (sign-in → chat → watch "unlocking your memories…" → /memory → grant/revoke → /pulse) — the OAuth seam is still the only thing agents can't click. (2) Soft-launch copy/demo can now lead with provable e2e encryption + 19/19. (3) Post-launch: shared-registry policy (kills B17), Seal-gated selective sharing, MemWal ≥0.0.4 adapter.
+=== END REPORT ===
