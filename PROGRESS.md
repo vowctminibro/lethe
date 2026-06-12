@@ -964,3 +964,27 @@ testnet, ~25 min into the 3-hr box.
   keys after a successful decrypt — negative tests (and any per-user
   isolation reasoning) need a fresh client; cache is per-client-instance.
 GATE PASSED.
+
+## 2026-06-12 — BLOCK 8, Phase 2 (memory_policy + republish v3)
+
+`memory::memory_policy` shipped — `entry fun seal_approve(id, &Memory, ctx)`:
+identity must be `[vault object id][nonce]` (prefix check, canonical Seal
+whitelist pattern) AND sender == owner OR on the vault's live `authorized`
+vector — the SAME grant state the app already uses, so revoke bites at the
+key servers. Move tests 16/16 (6 new: owner allowed, granted-until-revoked,
+stranger denied, wrong-vault prefix denied even for owner, entry happy path,
+entry abort).
+
+**Republish: UPGRADE to v3** `0x0c79fd944a51153e4d668a4f53a280fe5d0ab6d4db0a572a2f85c11ac5fc2f6c`
+(UpgradeCap 0x29e201bc…c0dc, digest 7otJ5mhpbWZRcpjptSeZkAEBY4F9iCNsmZQEcCL5Ymg5).
+Original/defining id unchanged 0x9dcc482c…1331 — existing vaults untouched.
+
+**Seal × upgrade semantics settled empirically** (seal-policy-e2e.mjs, real
+vault 0x4737…7655): encrypt + SessionKey MUST use the ORIGINAL package id
+(SDK hard-rejects non-v1 packages); the seal_approve PTB targets the LATEST
+id; key server normalizes to the first version for the namespace. Owner
+round-trip PASS · stranger denied PASS · revoked denied PASS · granted-app
+session DENIED at dry-run input resolution → B17 design note (owned vault ⇒
+owner-session decryption everywhere; Pulse keeps server-enforced grants).
+GATE PASSED (tests, package live, e2e proof). Ids propagated next phase
+alongside SealProvider env.

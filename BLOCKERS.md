@@ -231,3 +231,26 @@ After B6 is resolved (Enoki keys in hand), wire:
 </EnokiProvider>
 ```
 Then add `import './providers'` to layout.tsx before {children}.
+
+## B17 — Seal: address-owned vault blocks third-party (app) decryption sessions
+Status: DESIGN NOTE (not blocking — owner path is the product's hero path)
+Logged: 2026-06-12 (Block 8, Phase 2)
+
+Seal key servers evaluate `seal_approve` via `dry_run_transaction_block` with
+sender = the SessionKey address. Empirically (seal-policy-e2e.mjs): a PTB that
+takes our address-OWNED `Memory` object as input is rejected with
+`InvalidParameterError` for ANY sender that does not own the object — even an
+app address with an ACTIVE on-chain grant. Dry-run input resolution enforces
+owned-object ownership before our policy logic ever runs.
+
+Consequence: in Seal mode, only the VAULT OWNER's session key can fetch
+decryption keys. The `memory_policy::seal_approve` owner||authorized check
+stays as defense-in-depth (and is what the prover verifies), but a
+granted app cannot run its own decrypt session against an owned vault.
+
+Decided handling (Block 8): decryption happens in the OWNER's browser session
+on every surface — /chat, /memory, AND /pulse (the portability demo is the
+same signed-in user; Pulse's server-enforced 403-on-revoke via the on-chain
+authorized list is unchanged). True app-side third-party decrypt would need
+the grant state mirrored in a SHARED object (registry) — a contract redesign
+deferred post-launch; noted for the Seal roadmap conversation.
