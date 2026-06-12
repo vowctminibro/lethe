@@ -1096,3 +1096,14 @@ Tagline candidates (Vow picks; current "Memory you own." unchanged): 1) "Memory 
 Blockers: none new. B17 unchanged (SDK copy states it plainly). Note: GROQ_API_KEY still empty (selector auto-grows when filled); global GEMINI_API_KEY in ~/.zshrc shadows the empty .env.local in LOCAL dev only — harmless but worth deleting to avoid confusion.
 Recommended next: video/deck days — (1) demo script now has 3 extra beats: model switch mid-chat, Export memory, /docs/security 19/19; (2) Vow human pass over the new surfaces (selector, export download, /docs on mobile); (3) fill GROQ key for a 3-model selector on camera; (4) consider /pricing anchor in nav → already #pricing.
 === END REPORT ===
+
+## 2026-06-13 — BLOCK 9 ADDENDUM (strategy session lockdown) + FEATURE FREEZE
+
+=== BLOCK 9 ADDENDUM REPORT ===
+P5 amend: /docs/security gained "Policy privacy vs cryptographic privacy" — factual contrast (policy = commitment the operator won't read; Lethe = browser-side Seal + decentralized key committee + machine-proven deny-side 19/19 I5), closing line "Venice promises not to look. Lethe can't look." — verified rendering on prod.
+P7 amend: Pricing section gained the "Proof of demand" block — WAL/SUI unit-economics line verbatim + revenue waterfall as COMMITTED POLICY (costs → WAL storage & renewals for all users → monthly WAL buy-and-burn via public burn address, on-chain verifiable). Mechanism only — zero price claims/projections. Live on prod.
+P10 Import memory: SHIPPED paste-first — /memory "Import ↑" (ledger header) + empty-state CTA → modal ("Ask ChatGPT: what do you remember about me? Paste the answer here.", 8k char cap, live counter) → /api/memory/import-extract (LLM splits the dump into ≤20 standalone facts; nothing stored server-side; salvage parser added after a transient MiniMax strict-JSON failure surfaced in the first gate run) → sequential remember() loop kind="imported" with "Encrypting n/m…" progress — Seal-encrypted, on Walrus, same verify links as every entry. File upload (conversations.json) NOT shipped — paste-only per the brittleness clause; noted for roadmap.
+GATE: import-e2e — 5-fact ChatGPT-style paste → 9 standalone facts → 9 on-chain imported entries → recall returns them (dog-fact check) → export JSON carries "kind":"imported" ×9. PASSED.
+Deploy: tsc + build green · ed85d55 → vercel --prod → all routes 200; security paragraph, proof-of-demand block, and import dialog all confirmed in served prod HTML/JS.
+FEATURE FREEZE in effect — anything further goes to docs/ROADMAP notes.
+=== END ADDENDUM REPORT ===
