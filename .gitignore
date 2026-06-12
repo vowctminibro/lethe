@@ -13,6 +13,7 @@ apps/web/out/
 
 # Sui Move build artifacts
 contracts/build/
+contracts/*/build/
 contracts/lethe/build/
 
 # Node build output
