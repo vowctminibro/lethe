@@ -1122,3 +1122,14 @@ P8 evidence: tsc clean · build green · deploy c5f830a → lethe-gold.vercel.ap
 Blockers: none new.
 Recommended next: this was the freeze-state polish — video/deck can shoot the landing as-is; only remaining lever is filling GROQ_API_KEY so the default model reads "Groq" on camera.
 === END REPORT ===
+
+## 2026-06-13 — BLOCK 11: GROWTH MAP
+
+=== LETHE BLOCK 11 REPORT ===
+Section: SHIPPED — "Three rings around one vault" replaces the flat timeline in the SAME #roadmap slot (anchor verified resolving), same .lethe-section scale, eyebrow "HOW THIS GROWS" + Fraunces display heading per the Block 10 pattern. Old "Roadmap" heading retired.
+Layout: desktop = concentric-rings SVG left (solid Coral core dot + "ONE VAULT" mono label, three hairline Mist rings dashed for the future phases, opacity stepping outward) / four phase blocks right with hairline rules (mono phase tag — Coral on CORE — → Fraunces claim → dim unlocks line → mono milestone sub-line). Mobile 390px: rings degrade to a 96px motif above the stacked full-width phase rows. Closer "Each phase is a bigger ring around the same vault you already own today." centered Fraunces italic below the map. Flat, hairline, token-only — no gradients/shadows/icons.
+Copy: all founder copy VERBATIM (CORE/PHASE 1 WEDGE/PHASE 2 NETWORK/PHASE 3 OPEN DOOR, claims, Unlocks → lines, closer); all four pre-existing milestone sentences kept verbatim as sub-lines (the "Memory editing; MemWal adapter…" line as the small footnote under Phase 3). No metrics, no user-count claims, no invented copy.
+Gates: tsc clean · build green · fixed one self-inflicted console error pre-deploy (svg height="auto" → removed; re-shot 0 errors) · 390px: 0 horizontal overflow, rings motif + stacked rows verified · deploy 4d3cbcc → lethe-gold.vercel.app · routes 200 · EVERY frozen string AND all four milestone sentences AND all new growth-map strings grep=1 on served prod HTML · Venice line still 1 on /docs/security · after-captures design/screens/prod/landing-{desktop,mobile}.png (+ block11/ working set).
+Blockers: none.
+Recommended next: freeze holds — video/deck days. The growth map gives the deck its "how this gets big" slide for free (crop design/screens/prod/landing-desktop.png).
+=== END REPORT ===
