@@ -1,12 +1,15 @@
 /**
  * LLM factory — provider chain with per-request failover.
  *
- * Order: MiniMax (paid, primary) → NVIDIA NIM → Groq → Gemini. `complete()` and
- * `streamComplete()` try each configured provider in turn; a timeout, 5xx, 429,
- * or any other setup error falls through to the next provider and is logged
- * with `[llm]` so failovers are visible in server logs. If NO provider is
- * configured it throws a readable message telling the cloner exactly which key
- * to set — never a silent or cryptic failure.
+ * Chat order: Groq → Gemini → NVIDIA NIM. All three are free-tier; MiniMax
+ * (paid) is deliberately EXCLUDED from the chat chain so it can never answer a
+ * chat message and burn the paid plan. It is opted into ONLY by server-side
+ * import-extract (CompleteOptions.includeMinimax) as a last-resort backstop.
+ * `complete()` and `streamComplete()` try each configured provider in turn; a
+ * timeout, 5xx, 429, or any other setup error falls through to the next
+ * provider and is logged with `[llm]` so failovers are visible in server logs.
+ * If NO provider is configured it throws a readable message telling the cloner
+ * exactly which key to set — never a silent or cryptic failure.
  *
  * Per-attempt timeout (default 30s, override LLM_TIMEOUT_MS) covers the whole
  * completion for complete() and the setup-to-first-byte window for streams —
@@ -24,16 +27,20 @@ import { NvidiaNimProvider } from "./nvidia";
 
 export type { ChatMessage, CompleteOptions, LLMProvider } from "./types";
 
-/** Provider chain, highest-priority first. Paid primary, then free fallbacks. */
-function providers(): LLMProvider[] {
-  return [new MiniMaxProvider(), new NvidiaNimProvider(), new GroqProvider(), new GeminiProvider()];
+/**
+ * The DEFAULT chat chain, highest-priority first — all free-tier. MiniMax is
+ * NOT here: it must never answer chat. `includeMinimax` appends it last, for
+ * server-side import-extract only.
+ */
+function providers(includeMinimax = false): LLMProvider[] {
+  const chat: LLMProvider[] = [new GroqProvider(), new GeminiProvider(), new NvidiaNimProvider()];
+  return includeMinimax ? [...chat, new MiniMaxProvider()] : chat;
 }
 
 const SETUP_HINT =
-  "No LLM provider configured. Set a key in apps/web/.env.local — " +
-  "MINIMAX_API_KEY (primary), or a FREE fallback: NVIDIA_NIM_API_KEY " +
-  "(build.nvidia.com), GROQ_API_KEY (console.groq.com), or GEMINI_API_KEY " +
-  "(aistudio.google.com). See .env.example.";
+  "No LLM provider configured. Set a FREE key in apps/web/.env.local — " +
+  "GROQ_API_KEY (console.groq.com), GEMINI_API_KEY (aistudio.google.com), or " +
+  "NVIDIA_NIM_API_KEY (build.nvidia.com). See .env.example.";
 
 const DEFAULT_TIMEOUT_MS = 30_000;
 
@@ -43,8 +50,8 @@ function attemptTimeoutMs(): number {
 }
 
 /** The configured providers, in priority order. Empty if the cloner set no key. */
-export function configuredProviders(): LLMProvider[] {
-  return providers().filter((p) => p.isConfigured());
+export function configuredProviders(includeMinimax = false): LLMProvider[] {
+  return providers(includeMinimax).filter((p) => p.isConfigured());
 }
 
 export interface AvailableModel {
@@ -94,8 +101,8 @@ export function availableModels(): AvailableModel[] {
  * The chain with the user's preferred provider moved to the front. Unknown or
  * unconfigured keys leave the default order — selection can never brick chat.
  */
-function chainPreferring(prefer?: string): LLMProvider[] {
-  const chain = configuredProviders();
+function chainPreferring(prefer?: string, includeMinimax = false): LLMProvider[] {
+  const chain = configuredProviders(includeMinimax);
   if (!prefer) return chain;
   const i = chain.findIndex((p) => p.id.split("/")[0] === prefer);
   if (i <= 0) return chain;
@@ -133,7 +140,7 @@ function describe(e: unknown): string {
 /** Result of a completion: the text plus which model actually produced it. */
 export interface CompletionResult {
   text: string;
-  /** e.g. "minimax/MiniMax-Text-01" — reported so the UI can show it. */
+  /** e.g. "groq/llama-3.3-70b-versatile" — reported so the UI can show it. */
   provider: string;
 }
 
@@ -146,7 +153,7 @@ export async function complete(
   messages: ChatMessage[],
   opts?: CompleteOptions,
 ): Promise<CompletionResult> {
-  const chain = chainPreferring(opts?.prefer);
+  const chain = chainPreferring(opts?.prefer, opts?.includeMinimax);
   if (chain.length === 0) throw new Error(SETUP_HINT);
 
   let lastErr: unknown;
@@ -179,7 +186,7 @@ export async function streamComplete(
   messages: ChatMessage[],
   opts?: CompleteOptions,
 ): Promise<StreamResult> {
-  const chain = chainPreferring(opts?.prefer);
+  const chain = chainPreferring(opts?.prefer, opts?.includeMinimax);
   if (chain.length === 0) throw new Error(SETUP_HINT);
 
   let lastErr: unknown;

@@ -3,8 +3,10 @@
  *
  * Mirrors the MemoryProvider/Encryptor seams: one small interface, multiple
  * implementations chosen by env, never importing a paid/secret key into a client
- * component. The factory in ./index.ts chains providers (MiniMax → NIM → Groq →
- * Gemini) so the repo stays clone-and-run: a judge sets ONE key and chat works.
+ * component. The factory in ./index.ts chains the free chat providers
+ * (Groq → Gemini → NVIDIA NIM) so the repo stays clone-and-run: a judge sets ONE
+ * key and chat works. MiniMax (paid) is excluded from chat and opted into only
+ * for server-side import-extract.
  *
  * All implementations read keys from process.env only — nothing is hardcoded.
  */
@@ -24,11 +26,17 @@ export interface CompleteOptions {
   /** Ask the provider for a strict JSON object back (best-effort across providers). */
   json?: boolean;
   /**
-   * Provider key the user picked (e.g. "minimax", "nvidia-nim") — moved to
+   * Provider key the user picked (e.g. "groq", "nvidia-nim") — moved to
    * the FRONT of the chain, everything else stays as fallback. Unknown or
    * unconfigured keys are ignored, so a stale selection never bricks chat.
    */
   prefer?: string;
+  /**
+   * Append MiniMax (paid) as a last-resort backstop. Server-side
+   * import-extract ONLY — chat never sets this, so MiniMax can never answer a
+   * chat message.
+   */
+  includeMinimax?: boolean;
   signal?: AbortSignal;
 }
 

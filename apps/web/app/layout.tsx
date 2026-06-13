@@ -60,6 +60,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`${fraunces.variable} ${instrument.variable} ${plexMono.variable}`}
     >
       <body className="min-h-screen antialiased bg-[var(--bg)] text-[var(--text)]">
+        {/* Block 13: arm the scroll-reveal hidden state pre-paint, ONLY when JS
+            is on and motion is allowed — so no-JS / reduced-motion render the
+            content visible with no flash and no layout shift. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('reveal-ready')}catch(e){}",
+          }}
+        />
         <Providers>{children}</Providers>
       </body>
     </html>

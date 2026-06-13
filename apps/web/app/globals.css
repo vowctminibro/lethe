@@ -246,9 +246,10 @@ html, body {
 }
 .lethe-docs p,
 .lethe-docs li {
-  font-size: 0.925rem;
+  font-size: 1rem;        /* Block 13: ≥15px reading body (was 0.925rem ≈ 14.3px) */
   line-height: 1.65;
   color: var(--text);
+  max-width: 70ch;        /* comfortable measure */
 }
 .lethe-docs p { margin-bottom: 0.75rem; }
 .lethe-docs ul, .lethe-docs ol { margin: 0.5rem 0 1rem 1.25rem; }
@@ -319,4 +320,31 @@ html, body {
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
   padding: 3rem 1.5rem;
+}
+
+/* ── Block 13: readable body scale ──────────────────────────────────────── */
+/* The landing's reading voice — body face (Instrument Sans), >=15px, line-height
+   ~1.6, measure capped near 70ch. The type scale is, top to bottom:
+     .lethe-display / .lethe-section-head  — Fraunces (headings)
+     .lethe-body                            — sentences a visitor reads (>=15px)
+     .lethe-id / .lethe-eyebrow             — mono uppercase MICRO-LABELS only.
+   Mono is never used for a sentence. */
+.lethe-body {
+  font-family: var(--font-sans);
+  font-size: 1rem;        /* 15.5px at the 15.5px root */
+  line-height: 1.6;
+}
+.lethe-measure { max-width: 70ch; }
+
+/* ── Block 13: ONE motion layer — scroll reveal (fade + 12px rise, once) ──── */
+/* The hidden state applies ONLY when JS confirmed motion is allowed
+   (html.reveal-ready, set pre-paint in layout). No-JS or prefers-reduced-motion
+   → content is fully visible, no transform, no layout shift (opacity/transform
+   never reflow, so reserved space is unchanged → no CLS). */
+.lethe-rise { transition: opacity 0.45s ease-out, transform 0.45s ease-out; }
+html.reveal-ready .lethe-rise { opacity: 0; transform: translateY(12px); }
+html.reveal-ready .lethe-rise.is-in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  html.reveal-ready .lethe-rise { opacity: 1; transform: none; }
+  .lethe-rise { transition: none; }
 }

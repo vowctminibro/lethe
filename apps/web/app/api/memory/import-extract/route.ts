@@ -44,7 +44,9 @@ export async function POST(req: NextRequest) {
         { role: "system", content: SYSTEM },
         { role: "user", content: `Pasted memory dump:\n${input}` },
       ],
-      { json: true, temperature: 0.2, maxTokens: 1200 },
+      // import-extract is the ONE place MiniMax stays available — appended as a
+      // last-resort backstop for strict-JSON extraction. Chat never sets this.
+      { json: true, temperature: 0.2, maxTokens: 1200, includeMinimax: true },
     );
 
     let facts: { text: string }[] = [];

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Logo } from "@/src/components/Logo";
 import { HeroCTA } from "@/src/components/HeroCTA";
+import { RevealOnScroll } from "@/src/components/RevealOnScroll";
 
 /**
  * Landing — "Letterpress on water".
@@ -219,7 +220,12 @@ function ProductFrames() {
       <h2 className="lethe-section-head">The loop, in three frames</h2>
       <div className="mt-10 grid grid-cols-1 lg:grid-cols-3 gap-8">
         {FRAMES.map((f, i) => (
-          <figure key={f.src} className={i === 1 ? "lg:mt-10" : undefined}>
+          <figure
+            key={f.src}
+            className={`lethe-rise${i === 1 ? " lg:mt-10" : ""}`}
+            data-reveal
+            data-reveal-delay={i * 90}
+          >
             <div
               className="rounded border overflow-hidden"
               style={{ borderColor: "var(--border)", boxShadow: "var(--shadow-ambient)" }}
@@ -227,7 +233,7 @@ function ProductFrames() {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={f.src} alt={f.alt} className="w-full h-auto block" loading="lazy" />
             </div>
-            <figcaption className="lethe-id mt-3 leading-relaxed" style={{ color: "var(--text-dim)" }}>
+            <figcaption className="mt-3 lethe-body" style={{ color: "var(--text-dim)" }}>
               {f.caption}
             </figcaption>
           </figure>
@@ -240,6 +246,7 @@ function ProductFrames() {
 export default function Home() {
   return (
     <main className="min-h-screen flex flex-col" style={{ background: "var(--bg)", color: "var(--text)" }}>
+      <RevealOnScroll />
       {/* ── Nav ── */}
       <nav className="max-w-6xl mx-auto w-full px-6 py-6 flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -258,7 +265,7 @@ export default function Home() {
       {/* ── Hero — asymmetric: verse left, constellation right ── */}
       <section className="lethe-water flex-1 w-full overflow-hidden">
         <div className="max-w-6xl mx-auto w-full px-6 pt-14 pb-20 grid grid-cols-1 lg:grid-cols-[7fr_5fr] gap-12 items-center relative">
-          <div className="relative">
+          <div className="relative lethe-rise" data-reveal>
             <h1 className="lethe-display" style={{ color: "var(--text)" }}>
               Named after the river
               <br />
@@ -293,11 +300,17 @@ export default function Home() {
             { n: "01", k: "Remembers", v: "Tell Lethe your crypto style. It remembers across sessions, not just this chat." },
             { n: "02", k: "You own it", v: "Every memory is Seal-encrypted end-to-end on Walrus — even Lethe’s servers can’t read it. Decryption needs on-chain approval you control." },
             { n: "03", k: "Portable", v: "Your memory is not trapped in one app. Open another Lethe agent and it already knows you." },
-          ].map((c) => (
-            <div key={c.k} className="px-0 sm:px-8 py-6 sm:py-2 first:pl-0 last:pr-0" style={{ borderColor: "var(--border)" }}>
+          ].map((c, i) => (
+            <div
+              key={c.k}
+              className="px-0 sm:px-8 py-6 sm:py-2 first:pl-0 last:pr-0 lethe-rise"
+              style={{ borderColor: "var(--border)" }}
+              data-reveal
+              data-reveal-delay={i * 80}
+            >
               <div className="lethe-id" style={{ color: "var(--text-dim)" }}>{c.n}</div>
               <div className="mt-2 text-lg" style={{ fontFamily: "var(--font-display)", fontWeight: 500 }}>{c.k}</div>
-              <p className="mt-2 text-sm leading-relaxed" style={{ color: "var(--text-dim)" }}>{c.v}</p>
+              <p className="mt-2 lethe-body" style={{ color: "var(--text-dim)" }}>{c.v}</p>
             </div>
           ))}
         </div>
@@ -308,7 +321,7 @@ export default function Home() {
       {/* ── Why Walrus needs Lethe — asymmetric editorial (NOT the grid) ── */}
       <div className="lethe-divider" aria-hidden="true" />
       <section id="why-walrus" className="max-w-6xl mx-auto w-full px-6 lethe-section">
-        <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-10 md:gap-16">
+        <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-10 md:gap-16 lethe-rise" data-reveal>
           <div>
             <div className="lethe-eyebrow">The thesis</div>
             <h2 className="lethe-section-head">Why Walrus needs Lethe</h2>
@@ -330,11 +343,11 @@ export default function Home() {
             ].map((c, i) => (
               <div key={c.k} className="py-6" style={{ borderTop: i > 0 ? "1px solid var(--border)" : "none" }}>
                 <div className="text-lg" style={{ fontFamily: "var(--font-display)", fontWeight: 600 }}>{c.k}</div>
-                <p className="mt-1.5 text-sm leading-relaxed max-w-xl" style={{ color: "var(--text-dim)" }}>{c.v}</p>
+                <p className="mt-1.5 lethe-body lethe-measure" style={{ color: "var(--text-dim)" }}>{c.v}</p>
               </div>
             ))}
             <p
-              className="py-6 text-sm leading-relaxed max-w-xl"
+              className="py-6 lethe-body lethe-measure"
               style={{ borderTop: "1px solid var(--border)", color: "var(--text-dim)" }}
             >
               And because every memory is a Sui object, Lethe is a primitive other apps — and
@@ -343,7 +356,7 @@ export default function Home() {
             </p>
           </div>
         </div>
-        <blockquote className="lethe-pullquote mt-14 max-w-4xl mx-auto" style={{ color: "var(--text)" }}>
+        <blockquote className="lethe-pullquote mt-14 max-w-4xl mx-auto lethe-rise" data-reveal style={{ color: "var(--text)" }}>
           &ldquo;Remove Walrus and Lethe breaks. Ship Lethe and Walrus gets what it&rsquo;s
           missing: users who come back.&rdquo;
         </blockquote>
@@ -392,21 +405,23 @@ export default function Home() {
               v: "“Continue with Lethe” — warm-start your users with memory they already own.",
               live: false,
             },
-          ].map((t) => (
+          ].map((t, i) => (
             <div
               key={t.k}
-              className="rounded border p-6"
+              className="rounded border p-6 lethe-rise"
               style={{
                 borderColor: "var(--border)",
                 background: "var(--bg)",
                 borderTopColor: t.live ? "var(--accent-h)" : "var(--border)",
                 borderTopWidth: t.live ? 2 : 1,
               }}
+              data-reveal
+              data-reveal-delay={i * 70}
             >
               <div className="text-2xl" style={{ fontFamily: "var(--font-display)", fontWeight: 500 }}>{t.k}</div>
               <div className="lethe-id uppercase mt-1.5" style={{ color: "var(--accent-h)" }}>{t.tag}</div>
-              {t.price && <div className="mt-2 text-sm" style={{ color: "var(--text)" }}>{t.price}</div>}
-              <p className="mt-3 text-sm leading-relaxed" style={{ color: "var(--text-dim)" }}>{t.v}</p>
+              {t.price && <div className="mt-2 lethe-body" style={{ color: "var(--text)" }}>{t.price}</div>}
+              <p className="mt-3 lethe-body" style={{ color: "var(--text-dim)" }}>{t.v}</p>
             </div>
           ))}
         </div>
@@ -420,7 +435,7 @@ export default function Home() {
 
       {/* ── Proof of Demand — the page’s single DARK inverted panel ── */}
       <section className="max-w-6xl mx-auto w-full px-6 lethe-section" style={{ paddingTop: 0 }}>
-        <div className="rounded px-8 py-12 md:px-14 md:py-14" style={{ background: "var(--text)", color: "var(--bg)" }}>
+        <div className="rounded px-8 py-12 md:px-14 md:py-14 lethe-rise" data-reveal style={{ background: "var(--text)", color: "var(--bg)" }}>
           <div className="lethe-eyebrow">Proof of demand</div>
           <p className="mt-4 text-base md:text-lg leading-relaxed max-w-3xl" style={{ color: "var(--bg)" }}>
             Lethe&rsquo;s unit economics are denominated in WAL and SUI by design: every user
@@ -435,7 +450,7 @@ export default function Home() {
             ].map((step, i) => (
               <div key={step} className="flex flex-col md:flex-row md:items-center gap-3 md:flex-1">
                 <div
-                  className="rounded border px-4 py-3 text-sm leading-snug w-full"
+                  className="rounded border px-4 py-3 lethe-body w-full"
                   style={{ borderColor: "rgba(239,245,244,0.25)", color: "var(--bg)" }}
                 >
                   {step}
@@ -448,7 +463,7 @@ export default function Home() {
               </div>
             ))}
           </div>
-          <p className="mt-8 text-sm leading-relaxed max-w-3xl" style={{ color: "rgba(239,245,244,0.7)" }}>
+          <p className="mt-8 lethe-body lethe-measure" style={{ color: "rgba(239,245,244,0.7)" }}>
             Committed policy, executing from first revenue: revenue covers costs → funds WAL
             storage and renewals for all users → the remainder goes to a monthly WAL
             buy-and-burn via a public burn address — published, on-chain, verifiable by anyone.
@@ -460,7 +475,7 @@ export default function Home() {
       <section id="roadmap" className="max-w-6xl mx-auto w-full px-6 lethe-section" style={{ paddingTop: 0 }}>
         <div className="lethe-eyebrow">How this grows</div>
         <h2 className="lethe-section-head">Three rings around one vault</h2>
-        <p className="mt-3 text-sm" style={{ color: "var(--text-dim)" }}>
+        <p className="mt-3 lethe-body lethe-measure" style={{ color: "var(--text-dim)" }}>
           Most roadmaps ask you to believe. This one is mostly receipts — verify any line.
         </p>
 
@@ -475,33 +490,39 @@ export default function Home() {
 
           <div>
             {GROWTH.map((g, i) => (
-              <div key={g.tag} className="py-6" style={{ borderTop: i > 0 ? "1px solid var(--border)" : "none" }}>
+              <div
+                key={g.tag}
+                className="py-6 lethe-rise"
+                style={{ borderTop: i > 0 ? "1px solid var(--border)" : "none" }}
+                data-reveal
+                data-reveal-delay={i * 80}
+              >
                 <div className="lethe-id uppercase" style={{ color: g.now ? "var(--accent-h)" : "var(--text-dim)" }}>
                   {g.tag}
                 </div>
                 <div className="mt-3 grid grid-cols-1 sm:grid-cols-[130px_1fr] gap-x-4 gap-y-2.5">
-                  <span className="lethe-id uppercase pt-0.5" style={{ color: "var(--accent-h)" }}>Live today</span>
-                  <p className="text-sm leading-relaxed" style={{ color: "var(--text)" }}>{g.live}</p>
+                  <span className="lethe-id uppercase pt-1" style={{ color: "var(--accent-h)" }}>Live today</span>
+                  <p className="lethe-body" style={{ color: "var(--text)" }}>{g.live}</p>
                   {g.unlock && (
                     <>
-                      <span className="lethe-id uppercase pt-0.5" style={{ color: "#5A8A9E" }}>One unlock away</span>
-                      <p className="text-sm leading-relaxed" style={{ color: "var(--text)" }}>{g.unlock}</p>
+                      <span className="lethe-id uppercase pt-1" style={{ color: "#5A8A9E" }}>One unlock away</span>
+                      <p className="lethe-body" style={{ color: "var(--text)" }}>{g.unlock}</p>
                     </>
                   )}
-                  <span className="lethe-id uppercase pt-0.5" style={{ color: "#5A8A9E" }}>Revenue</span>
-                  <p className="text-sm leading-relaxed" style={{ color: "var(--text)" }}>{g.revenue}</p>
+                  <span className="lethe-id uppercase pt-1" style={{ color: "#5A8A9E" }}>Revenue</span>
+                  <p className="lethe-body" style={{ color: "var(--text)" }}>{g.revenue}</p>
                 </div>
                 {g.closing && (
-                  <p className="mt-2.5 text-sm italic" style={{ color: "var(--text-dim)" }}>{g.closing}</p>
+                  <p className="mt-2.5 lethe-body italic" style={{ color: "var(--text-dim)" }}>{g.closing}</p>
                 )}
                 {g.sub && (
-                  <p className="lethe-id mt-3 leading-relaxed" style={{ color: "var(--text-dim)" }}>{g.sub}</p>
+                  <p className="mt-3 lethe-body lethe-measure" style={{ color: "var(--text-dim)" }}>{g.sub}</p>
                 )}
                 {g.horizon && (
-                  <p className="lethe-id mt-3 leading-relaxed" style={{ color: "#5A8A9E" }}>{g.horizon}</p>
+                  <p className="mt-3 lethe-body lethe-measure" style={{ color: "#5A8A9E" }}>{g.horizon}</p>
                 )}
                 {g.footnote && (
-                  <p className="lethe-id mt-3 leading-relaxed" style={{ color: "var(--text-dim)", opacity: 0.8 }}>{g.footnote}</p>
+                  <p className="mt-3 lethe-body lethe-measure" style={{ color: "var(--text-dim)", opacity: 0.8 }}>{g.footnote}</p>
                 )}
               </div>
             ))}
