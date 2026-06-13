@@ -74,6 +74,7 @@ interface GrowthPhase {
   revenue: React.ReactNode;
   closing?: string;
   sub: string;
+  stable?: string;
   horizon?: string;
   footnote?: string;
   now: boolean;
@@ -125,6 +126,7 @@ const GROWTH: GrowthPhase[] = [
       </>
     ),
     sub: "Mainnet. Seal-gated selective sharing — share one memory, not the vault.",
+    stable: "Pay for Pro in stablecoins — USDC, no card.",
     now: false,
   },
   {
@@ -194,50 +196,106 @@ function GrowthRings({ size = 380 }: { size?: number }) {
 
 
 // The loop, in three frames — real product captures (DEMO_MOCK populated
-// states, representative data only). The landing finally shows the product.
-const FRAMES: { src: string; alt: string; caption: string }[] = [
+// states, representative data only). Stacked large + vertical so the UI text
+// inside is legible, with hairline annotation callouts on the key moment.
+type Callout = { label: string; x: number; y: number; dir: "l" | "r" };
+const FRAMES: { src: string; alt: string; caption: string; callouts: Callout[] }[] = [
   {
     src: "/screens/frame-chat.webp",
     alt: "Lethe chat with the memory rail",
     caption: "/chat — a fact settles into the rail, Seal-encrypted, with live Walrus and Suiscan links.",
+    callouts: [
+      { label: "the fact settles here", x: 75, y: 19, dir: "l" },
+      { label: "model — switch mid-chat", x: 72, y: 6, dir: "l" },
+    ],
   },
   {
     src: "/screens/frame-memory.webp",
     alt: "The /memory ownership surface",
     caption: "/memory — the ownership surface: verify on-chain, import, export, grant, revoke.",
+    callouts: [
+      { label: "import / export", x: 63, y: 86, dir: "l" },
+      { label: "verify on Suiscan ↗", x: 49, y: 94, dir: "r" },
+    ],
   },
   {
     src: "/screens/frame-pulse.webp",
     alt: "Pulse reading the same memory",
     caption: "/pulse — a second app that already knows you. Revoke and it forgets — live.",
+    callouts: [
+      { label: "a second app, your grant", x: 50, y: 30, dir: "r" },
+      { label: "revoke → it forgets", x: 50, y: 91, dir: "r" },
+    ],
   },
 ];
+
+/** One annotation: anchor dot at (x,y) over the frame, short leader line, mono
+ *  Coral tag. Desktop only — on mobile the labels drop to a list under the frame. */
+function FrameCallout({ label, x, y, dir }: Callout) {
+  const toLeft = dir === "l";
+  const dot = <span style={{ width: 7, height: 7, borderRadius: 9999, background: "var(--accent-h)", flexShrink: 0 }} />;
+  const line = <span style={{ width: 26, height: 1, background: "var(--accent-h)", flexShrink: 0 }} />;
+  const tag = (
+    <span
+      className="lethe-id uppercase whitespace-nowrap rounded px-2 py-1"
+      style={{ color: "var(--accent-h)", background: "var(--bg)", border: "1px solid var(--border)", boxShadow: "var(--shadow-ambient)" }}
+    >
+      {label}
+    </span>
+  );
+  return (
+    <div
+      className="absolute z-10 hidden md:flex items-center gap-1.5 pointer-events-none"
+      style={{ left: `${x}%`, top: `${y}%`, transform: `translate(${toLeft ? "-100%" : "0"}, -50%)` }}
+    >
+      {toLeft ? (<>{tag}{line}{dot}</>) : (<>{dot}{line}{tag}</>)}
+    </div>
+  );
+}
 
 function ProductFrames() {
   return (
     <section className="max-w-6xl mx-auto w-full px-6 lethe-section" style={{ paddingTop: 0 }}>
       <div className="lethe-eyebrow">The loop</div>
       <h2 className="lethe-section-head">The loop, in three frames</h2>
-      <div className="mt-10 grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {FRAMES.map((f, i) => (
-          <figure
-            key={f.src}
-            className={`lethe-rise${i === 1 ? " lg:mt-10" : ""}`}
-            data-reveal
-            data-reveal-delay={i * 90}
-          >
-            <div
-              className="rounded border overflow-hidden"
-              style={{ borderColor: "var(--border)", boxShadow: "var(--shadow-ambient)" }}
+      <div className="mt-12 space-y-16 lg:space-y-24">
+        {FRAMES.map((f, i) => {
+          const frameRight = i % 2 === 1;
+          return (
+            <figure
+              key={f.src}
+              className="lethe-rise grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 items-center"
+              data-reveal
+              data-reveal-delay={i * 90}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={f.src} alt={f.alt} className="w-full h-auto block" loading="lazy" />
-            </div>
-            <figcaption className="mt-3 lethe-body" style={{ color: "var(--text-dim)" }}>
-              {f.caption}
-            </figcaption>
-          </figure>
-        ))}
+              <div className={`relative lg:col-span-8 ${frameRight ? "lg:order-2" : ""}`}>
+                <div
+                  className="rounded border overflow-hidden"
+                  style={{ borderColor: "var(--border)", boxShadow: "var(--shadow-ambient)" }}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={f.src} alt={f.alt} className="w-full h-auto block" loading="lazy" />
+                </div>
+                {f.callouts.map((c) => (
+                  <FrameCallout key={c.label} {...c} />
+                ))}
+              </div>
+              <div className={`lg:col-span-4 ${frameRight ? "lg:order-1" : ""}`}>
+                <figcaption className="lethe-body lethe-measure" style={{ color: "var(--text)" }}>
+                  {f.caption}
+                </figcaption>
+                {/* mobile fallback: callouts as labels under the frame */}
+                <ul className="md:hidden mt-3 space-y-1">
+                  {f.callouts.map((c) => (
+                    <li key={c.label} className="lethe-id uppercase" style={{ color: "var(--accent-h)" }}>
+                      → {c.label}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </figure>
+          );
+        })}
       </div>
     </section>
   );
@@ -333,6 +391,7 @@ const COMPARE: { cols: string[]; rows: { axis: string; cells: string[] }[] } = {
     { axis: "Privacy", cells: ["Policy", "Policy", "Cryptographic (Seal, proven)"] },
     { axis: "Portable across apps", cells: ["No", "SDK (vendor cloud)", "Yes — grant/revoke on-chain"] },
     { axis: "Leave with your data", cells: ["Limited", "Export", "Export, one click"] },
+    { axis: "Model lock-in", cells: ["Tied to the platform", "Vendor cloud", "Switch models, memory follows"] },
   ],
 };
 
@@ -541,6 +600,7 @@ export default function Home() {
               tag: "live today",
               price: null as string | null,
               v: "Full memory features forever — derive, grant, revoke, forget, export. Free models with daily limits.",
+              credit: null as string | null,
               live: true,
               glyph: PRICING_GLYPHS.spark,
               cta: { label: "Start free", href: "/chat", disabled: false },
@@ -550,6 +610,7 @@ export default function Home() {
               tag: "coming",
               price: null as string | null,
               v: "Bring your own model keys; your memory plane stays exactly the same.",
+              credit: null as string | null,
               live: false,
               glyph: PRICING_GLYPHS.key,
               cta: { label: "Coming soon", href: "", disabled: true },
@@ -559,6 +620,7 @@ export default function Home() {
               tag: "planned",
               price: "~$5–8/mo",
               v: "Premium models and higher limits. The memory itself is never behind the paywall.",
+              credit: "Credits are simple: 1 credit = 1¢.",
               live: false,
               glyph: PRICING_GLYPHS.ring,
               cta: { label: "Coming soon", href: "", disabled: true },
@@ -568,6 +630,7 @@ export default function Home() {
               tag: "pilot pricing",
               price: null as string | null,
               v: "“Continue with Lethe” — warm-start your users with memory they already own.",
+              credit: null as string | null,
               live: false,
               glyph: PRICING_GLYPHS.bracket,
               cta: { label: "Read the docs", href: "/docs/sdk", disabled: false },
@@ -595,6 +658,9 @@ export default function Home() {
                 </div>
               )}
               <div className="lethe-id uppercase mt-1.5" style={{ color: "var(--accent-h)" }}>{t.tag}</div>
+              {t.credit && (
+                <p className="mt-2 lethe-body" style={{ color: "var(--text-dim)" }}>{t.credit}</p>
+              )}
               <p className="mt-3 lethe-body flex-1" style={{ color: "var(--text-dim)" }}>{t.v}</p>
               {t.cta.disabled ? (
                 <span
@@ -715,6 +781,9 @@ export default function Home() {
                 )}
                 {g.sub && (
                   <p className="mt-3 lethe-body lethe-measure" style={{ color: "var(--text-dim)" }}>{g.sub}</p>
+                )}
+                {g.stable && (
+                  <p className="mt-3 lethe-body lethe-measure" style={{ color: "#5A8A9E" }}>{g.stable}</p>
                 )}
                 {g.horizon && (
                   <p className="mt-3 lethe-body lethe-measure" style={{ color: "#5A8A9E" }}>{g.horizon}</p>
