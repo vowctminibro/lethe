@@ -32,14 +32,18 @@ const DESCRIPTION =
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://lethe-gold.vercel.app"),
-  title: TITLE,
+  // Template lets client pages set a short name → "Lethe — Docs", etc.
+  title: { default: TITLE, template: "Lethe — %s" },
   description: DESCRIPTION,
-  // Favicon + apple-icon are auto-served from app/icon.svg and app/apple-icon.svg.
+  // Favicon set is auto-served from app/icon.svg (SVG), app/favicon.ico (16/32/48),
+  // and app/apple-icon.png (180) — all generated from the brand monogram.
   openGraph: {
     title: TITLE,
     description: DESCRIPTION,
     type: "website",
-    images: ["/og.png"],
+    url: "https://lethe-gold.vercel.app",
+    siteName: "Lethe",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "Lethe — Memory you own" }],
   },
   twitter: {
     card: "summary_large_image",

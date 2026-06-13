@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { Logo } from "@/src/components/Logo";
 
 export const metadata: Metadata = {
-  title: "Lethe — docs",
+  title: "Docs",
   description: "What Lethe is, how the memory vault works, the SDK, and the security model.",
 };
 

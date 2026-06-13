@@ -243,6 +243,164 @@ function ProductFrames() {
   );
 }
 
+/**
+ * Pricing tier glyphs — hairline, brand-stroke, monogram-style (NOT third-party
+ * logos, not clip-art): a spark (Free), a key (BYOK), a ring echoing the growth
+ * map (Pro), code brackets (SDK). Color is inherited from the card (Coral on the
+ * live tier, Mist otherwise).
+ */
+const PRICING_GLYPHS = {
+  spark: (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.25} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 3 C12.5 8.5 15.5 11.5 21 12 C15.5 12.5 12.5 15.5 12 21 C11.5 15.5 8.5 12.5 3 12 C8.5 11.5 11.5 8.5 12 3 Z" />
+    </svg>
+  ),
+  key: (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.25} strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="8" cy="8" r="4.5" />
+      <path d="M11 11 L20 20" />
+      <path d="M17 17 L19.5 14.5" />
+    </svg>
+  ),
+  ring: (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.25} strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="8.5" />
+      <circle cx="12" cy="12" r="2.5" />
+    </svg>
+  ),
+  bracket: (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.25} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M9 6 L4 12 L9 18" />
+      <path d="M15 6 L20 12 L15 18" />
+    </svg>
+  ),
+};
+
+/**
+ * "Built on" — the load-bearing Mysten stack Lethe genuinely uses (honest: no
+ * payment/partner logos it doesn't). Sui + Walrus carry their official marks
+ * (grayscale so four brand colors don't fight the Fog palette); Seal + Enoki
+ * have no standalone SVG mark, so they're set as in-brand wordmarks. Each links
+ * to the artifact it represents.
+ */
+const BUILT_ON: { name: string; mark: string | null; href: string }[] = [
+  { name: "Sui", mark: "/partners/sui-droplet.svg", href: "https://suiscan.xyz/testnet/object/0x0c79fd944a51153e4d668a4f53a280fe5d0ab6d4db0a572a2f85c11ac5fc2f6c" },
+  { name: "Walrus", mark: "/partners/walrus-monogram.svg", href: "https://aggregator.walrus-testnet.walrus.space/v1/blobs/GbB45iJxmH5F8Si_78GG_macC6WeLS64jXjx7x852Eg" },
+  { name: "Seal", mark: null, href: "/docs/security" },
+  { name: "Enoki", mark: null, href: "/docs/concepts" },
+];
+
+function BuiltOnStrip() {
+  return (
+    <section className="max-w-4xl mx-auto w-full px-6 pt-10 pb-2 lethe-rise" data-reveal>
+      <div className="lethe-eyebrow text-center">Built on</div>
+      <div className="mt-4 flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
+        {BUILT_ON.flatMap((it, i) => {
+          const inner = (
+            <>
+              {it.mark && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={it.mark} alt="" aria-hidden="true" className="h-4 w-auto" style={{ filter: "grayscale(1)", opacity: 0.8 }} />
+              )}
+              <span className="lethe-id uppercase" style={{ color: "var(--text)" }}>{it.name}</span>
+            </>
+          );
+          const cls = "inline-flex items-center gap-2 transition hover:opacity-70";
+          const link = it.href.startsWith("http") ? (
+            <a key={it.name} href={it.href} target="_blank" rel="noreferrer" className={cls}>{inner}</a>
+          ) : (
+            <Link key={it.name} href={it.href} className={cls}>{inner}</Link>
+          );
+          const sep = (
+            <span key={`sep-${i}`} aria-hidden="true" className="hidden sm:block h-3.5 w-px" style={{ background: "var(--border)" }} />
+          );
+          return i === 0 ? [link] : [sep, link];
+        })}
+      </div>
+    </section>
+  );
+}
+
+/**
+ * "How Lethe is different" — a compact, factual comparison. Only defensible,
+ * non-disparaging cells (per the honesty rule). Coral accent marks the Lethe
+ * column; the table scrolls inside its own box on mobile (never the page).
+ */
+const COMPARE: { cols: string[]; rows: { axis: string; cells: string[] }[] } = {
+  cols: ["ChatGPT memory", "Mem0", "Lethe"],
+  rows: [
+    { axis: "Who owns the memory", cells: ["The app", "The app", "You — an on-chain object"] },
+    { axis: "Privacy", cells: ["Policy", "Policy", "Cryptographic (Seal, proven)"] },
+    { axis: "Portable across apps", cells: ["No", "SDK (vendor cloud)", "Yes — grant/revoke on-chain"] },
+    { axis: "Leave with your data", cells: ["Limited", "Export", "Export, one click"] },
+  ],
+};
+
+function ComparisonTable() {
+  const CORAL_BG = "rgba(232, 184, 148, 0.08)";
+  return (
+    <section className="max-w-5xl mx-auto w-full px-6 lethe-section" style={{ paddingTop: 0 }}>
+      <div className="lethe-eyebrow">How this compares</div>
+      <h2 className="lethe-section-head">How Lethe is different</h2>
+      <div className="mt-8 overflow-x-auto lethe-rise" data-reveal>
+        <table className="w-full border-collapse" style={{ minWidth: 600 }}>
+          <thead>
+            <tr>
+              <th className="text-left align-bottom p-4" />
+              {COMPARE.cols.map((c) => {
+                const isLethe = c === "Lethe";
+                return (
+                  <th
+                    key={c}
+                    className="lethe-id uppercase text-left align-bottom p-4"
+                    style={{
+                      color: isLethe ? "var(--accent-h)" : "var(--text-dim)",
+                      background: isLethe ? CORAL_BG : "transparent",
+                      borderTop: isLethe ? "2px solid var(--accent-h)" : "none",
+                      borderBottom: "1px solid var(--border)",
+                    }}
+                  >
+                    {c}
+                  </th>
+                );
+              })}
+            </tr>
+          </thead>
+          <tbody>
+            {COMPARE.rows.map((r) => (
+              <tr key={r.axis}>
+                <th
+                  scope="row"
+                  className="text-left p-4 lethe-body"
+                  style={{ fontWeight: 600, color: "var(--text)", borderBottom: "1px solid var(--border)" }}
+                >
+                  {r.axis}
+                </th>
+                {r.cells.map((cell, ci) => {
+                  const isLethe = ci === r.cells.length - 1;
+                  return (
+                    <td
+                      key={ci}
+                      className="p-4 lethe-body align-top"
+                      style={{
+                        color: isLethe ? "var(--text)" : "var(--text-dim)",
+                        background: isLethe ? CORAL_BG : "transparent",
+                        borderBottom: "1px solid var(--border)",
+                      }}
+                    >
+                      {cell}
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
+
 export default function Home() {
   return (
     <main className="min-h-screen flex flex-col" style={{ background: "var(--bg)", color: "var(--text)" }}>
@@ -290,6 +448,9 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ── Built on — the real Mysten stack, just below the hero ── */}
+      <BuiltOnStrip />
+
       {/* ── Section divider — water line-work ── */}
       <div className="lethe-divider" aria-hidden="true" />
 
@@ -319,8 +480,7 @@ export default function Home() {
       <ProductFrames />
 
       {/* ── Why Walrus needs Lethe — asymmetric editorial (NOT the grid) ── */}
-      <div className="lethe-divider" aria-hidden="true" />
-      <section id="why-walrus" className="max-w-6xl mx-auto w-full px-6 lethe-section">
+      <section id="why-walrus" className="max-w-6xl mx-auto w-full px-6 lethe-section" style={{ paddingTop: 0 }}>
         <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-10 md:gap-16 lethe-rise" data-reveal>
           <div>
             <div className="lethe-eyebrow">The thesis</div>
@@ -363,8 +523,7 @@ export default function Home() {
       </section>
 
       {/* ── Pricing — four true cards, principles as typographic moments ── */}
-      <div className="lethe-divider" aria-hidden="true" />
-      <section id="pricing" className="max-w-6xl mx-auto w-full px-6 lethe-section">
+      <section id="pricing" className="max-w-6xl mx-auto w-full px-6 lethe-section" style={{ paddingTop: 0 }}>
         <div className="text-center">
           <div className="lethe-eyebrow">Pricing</div>
           <h2 className="lethe-section-head">Pricing</h2>
@@ -375,7 +534,7 @@ export default function Home() {
         >
           &ldquo;Your memory is free forever. We charge for the intelligence on top.&rdquo;
         </p>
-        <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 items-stretch">
           {[
             {
               k: "Free",
@@ -383,6 +542,8 @@ export default function Home() {
               price: null as string | null,
               v: "Full memory features forever — derive, grant, revoke, forget, export. Free models with daily limits.",
               live: true,
+              glyph: PRICING_GLYPHS.spark,
+              cta: { label: "Start free", href: "/chat", disabled: false },
             },
             {
               k: "BYOK",
@@ -390,6 +551,8 @@ export default function Home() {
               price: null as string | null,
               v: "Bring your own model keys; your memory plane stays exactly the same.",
               live: false,
+              glyph: PRICING_GLYPHS.key,
+              cta: { label: "Coming soon", href: "", disabled: true },
             },
             {
               k: "Pro",
@@ -397,6 +560,8 @@ export default function Home() {
               price: "~$5–8/mo",
               v: "Premium models and higher limits. The memory itself is never behind the paywall.",
               live: false,
+              glyph: PRICING_GLYPHS.ring,
+              cta: { label: "Coming soon", href: "", disabled: true },
             },
             {
               k: "SDK for apps",
@@ -404,11 +569,13 @@ export default function Home() {
               price: null as string | null,
               v: "“Continue with Lethe” — warm-start your users with memory they already own.",
               live: false,
+              glyph: PRICING_GLYPHS.bracket,
+              cta: { label: "Read the docs", href: "/docs/sdk", disabled: false },
             },
           ].map((t, i) => (
             <div
               key={t.k}
-              className="rounded border p-6 lethe-rise"
+              className="rounded border p-6 lethe-rise flex flex-col h-full"
               style={{
                 borderColor: "var(--border)",
                 background: "var(--bg)",
@@ -418,10 +585,38 @@ export default function Home() {
               data-reveal
               data-reveal-delay={i * 70}
             >
-              <div className="text-2xl" style={{ fontFamily: "var(--font-display)", fontWeight: 500 }}>{t.k}</div>
+              <div style={{ color: t.live ? "var(--accent-h)" : "var(--text-dim)" }} aria-hidden="true">
+                {t.glyph}
+              </div>
+              <div className="mt-3 text-2xl" style={{ fontFamily: "var(--font-display)", fontWeight: 500 }}>{t.k}</div>
+              {t.price && (
+                <div className="mt-1.5 text-lg" style={{ fontFamily: "var(--font-display)", fontWeight: 500, color: "var(--text)" }}>
+                  {t.price}
+                </div>
+              )}
               <div className="lethe-id uppercase mt-1.5" style={{ color: "var(--accent-h)" }}>{t.tag}</div>
-              {t.price && <div className="mt-2 lethe-body" style={{ color: "var(--text)" }}>{t.price}</div>}
-              <p className="mt-3 lethe-body" style={{ color: "var(--text-dim)" }}>{t.v}</p>
+              <p className="mt-3 lethe-body flex-1" style={{ color: "var(--text-dim)" }}>{t.v}</p>
+              {t.cta.disabled ? (
+                <span
+                  className="mt-6 w-full inline-flex items-center justify-center rounded border px-4 py-2.5 lethe-id uppercase cursor-not-allowed select-none"
+                  style={{ borderColor: "var(--border)", color: "var(--text-dim)", opacity: 0.55 }}
+                  aria-disabled="true"
+                >
+                  {t.cta.label}
+                </span>
+              ) : (
+                <Link
+                  href={t.cta.href}
+                  className="mt-6 w-full inline-flex items-center justify-center rounded border px-4 py-2.5 lethe-id uppercase transition hover:opacity-80"
+                  style={
+                    t.live
+                      ? { borderColor: "var(--accent-h)", background: "var(--accent-h)", color: "var(--bg)" }
+                      : { borderColor: "var(--border)", color: "var(--text)" }
+                  }
+                >
+                  {t.cta.label}
+                </Link>
+              )}
             </div>
           ))}
         </div>
@@ -432,6 +627,9 @@ export default function Home() {
           &ldquo;We lock you in with value, not custody — export and leave any day.&rdquo;
         </p>
       </section>
+
+      {/* ── How Lethe is different — factual comparison ── */}
+      <ComparisonTable />
 
       {/* ── Proof of Demand — the page’s single DARK inverted panel ── */}
       <section className="max-w-6xl mx-auto w-full px-6 lethe-section" style={{ paddingTop: 0 }}>
@@ -542,14 +740,7 @@ export default function Home() {
       <footer className="w-full" style={{ borderTop: "1px solid var(--border)" }}>
         <div className="max-w-2xl mx-auto px-6 py-12 text-center flex flex-col items-center gap-4">
           <div className="lethe-id" style={{ color: "var(--text-dim)" }}>· COLOPHON ·</div>
-          {/* Official marks from sui.io/media-kit + walrus.xyz media kit — do not recolor or restyle */}
-          <div className="flex items-center justify-center gap-3 text-sm" style={{ color: "var(--text)" }}>
-            <img src="/partners/sui-droplet.svg" alt="Sui" className="h-4 w-auto" />
-            <span>Built on Sui</span>
-            <span aria-hidden="true" style={{ color: "var(--text-dim)" }}>·</span>
-            <img src="/partners/walrus-monogram.svg" alt="Walrus" className="h-3.5 w-auto" />
-            <span>Stored on Walrus</span>
-          </div>
+          {/* Stack marks live in the "Built on" strip below the hero — not duplicated here. */}
           <p className="text-xs leading-relaxed max-w-md" style={{ color: "var(--text-dim)" }}>
             Encrypted per-user · grant-controlled on-chain. Set in Fraunces &amp; Instrument Sans;
             every on-chain id in IBM Plex Mono.
