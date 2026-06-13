@@ -37,6 +37,12 @@ export default function DocsConcepts() {
         <code>revoke</code>) are owner-only — machine-checked, not just tested (see Security).
         All writes are gasless through Enoki sponsorship.
       </p>
+      <p>
+        Because the vault is a Sui object and not a row in a database, its authorization state
+        lives on-chain — which means other Move contracts can be written to compose against it,
+        not just off-chain apps. Today Lethe ships the off-chain read path (the SDK); on-chain
+        composition is a roadmap direction unique to the object model.
+      </p>
 
       <h2>Grant / revoke</h2>
       <p>

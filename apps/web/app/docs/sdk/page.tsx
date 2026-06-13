@@ -3,6 +3,12 @@ export default function DocsSdk() {
     <>
       <h1>SDK — &ldquo;Continue with Lethe&rdquo;</h1>
       <p>
+        Lethe is a primitive, not a destination. The same vault one person owns is a read surface
+        any Sui app can build on — memory becomes shared infrastructure the user controls, not a
+        moat each app rebuilds from zero. One app is one demand source; a primitive is a demand
+        category.
+      </p>
+      <p>
         Apps integrate Lethe to warm-start their users with memory the user already owns: your
         new trading app doesn&rsquo;t start from zero — it asks for a grant and already knows the
         user is a no-leverage momentum trader. <code>@lethe/sdk</code> wraps the same paths the

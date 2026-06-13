@@ -73,6 +73,7 @@ interface GrowthPhase {
   revenue: React.ReactNode;
   closing?: string;
   sub: string;
+  horizon?: string;
   footnote?: string;
   now: boolean;
 }
@@ -145,6 +146,8 @@ const GROWTH: GrowthPhase[] = [
       </>
     ),
     sub: "Shared-registry policy: third-party apps run their own decrypt sessions.",
+    horizon:
+      "On the horizon: memory other Sui contracts can read — a lending market that honors your no-leverage history, on-chain. Impossible without the object model.",
     now: false,
   },
   {
@@ -330,6 +333,14 @@ export default function Home() {
                 <p className="mt-1.5 text-sm leading-relaxed max-w-xl" style={{ color: "var(--text-dim)" }}>{c.v}</p>
               </div>
             ))}
+            <p
+              className="py-6 text-sm leading-relaxed max-w-xl"
+              style={{ borderTop: "1px solid var(--border)", color: "var(--text-dim)" }}
+            >
+              And because every memory is a Sui object, Lethe is a primitive other apps — and
+              other contracts — build on. Demand compounds across the ecosystem, not inside one
+              app.
+            </p>
           </div>
         </div>
         <blockquote className="lethe-pullquote mt-14 max-w-4xl mx-auto" style={{ color: "var(--text)" }}>
@@ -485,6 +496,9 @@ export default function Home() {
                 )}
                 {g.sub && (
                   <p className="lethe-id mt-3 leading-relaxed" style={{ color: "var(--text-dim)" }}>{g.sub}</p>
+                )}
+                {g.horizon && (
+                  <p className="lethe-id mt-3 leading-relaxed" style={{ color: "#5A8A9E" }}>{g.horizon}</p>
                 )}
                 {g.footnote && (
                   <p className="lethe-id mt-3 leading-relaxed" style={{ color: "var(--text-dim)", opacity: 0.8 }}>{g.footnote}</p>
