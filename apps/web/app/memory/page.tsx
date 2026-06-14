@@ -16,6 +16,8 @@ import { useSuiClient } from "@mysten/dapp-kit";
 import { Logo } from "@/src/components/Logo";
 import { SignIn } from "@/src/components/SiteHeader";
 import { useMemory, getOwnedMemory, type OwnedMemory, type RecallHit } from "@/src/lib/memory";
+import { exportMemoryFile } from "@/src/lib/memory/export-file";
+import { ImportMemoryDialog } from "@/src/components/ImportMemoryDialog";
 import { DEMO_MOCK, getMockOwnedMemory, useLetheAccount } from "@/src/lib/demo/mock";
 import { PULSE_APP_ADDRESS } from "@/src/lib/pulse";
 
@@ -38,10 +40,6 @@ export default function MemoryPage() {
   const [forgetTarget, setForgetTarget] = useState<RecallHit | null>(null);
   const [forgetBusy, setForgetBusy] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
-  const [importText, setImportText] = useState("");
-  const [importState, setImportState] = useState<
-    { phase: "idle" } | { phase: "extracting" } | { phase: "writing"; done: number; total: number } | { phase: "error"; message: string }
-  >({ phase: "idle" });
   const [leaving, setLeaving] = useState<string | null>(null);
   const [toast, setToast] = useState<{ text: string; href?: string } | null>(null);
 
@@ -94,79 +92,25 @@ export default function MemoryPage() {
     }
   }
 
-  // Import = arrival: paste what another AI remembers about you, split it
-  // into durable facts (LLM extraction, nothing stored server-side), then run
-  // each through the NORMAL remember() loop — Seal-encrypted on Walrus,
-  // referenced on the vault, kind="imported".
-  async function runImport() {
-    const text = importText.trim();
-    if (!memory || !text || importState.phase === "extracting" || importState.phase === "writing") return;
-    setImportState({ phase: "extracting" });
-    try {
-      const res = await fetch("/api/memory/import-extract", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text }),
-      });
-      if (!res.ok) {
-        const err = (await res.json().catch(() => ({}))) as { error?: string };
-        throw new Error(err?.error ?? "extraction failed");
-      }
-      const { facts } = (await res.json()) as { facts: { text: string }[] };
-      if (facts.length === 0) {
-        setImportState({ phase: "error", message: "No durable facts found in that paste — try the full answer from your other AI." });
-        return;
-      }
-      setImportState({ phase: "writing", done: 0, total: facts.length });
-      let done = 0;
-      for (const f of facts) {
-        // Sequential on purpose: each write is a gasless tx on the same vault.
-        await memory.remember({ text: f.text, kind: "imported" });
-        done++;
-        setImportState({ phase: "writing", done, total: facts.length });
-      }
-      setImportOpen(false);
-      setImportText("");
-      setImportState({ phase: "idle" });
-      setToast({ text: `Imported ${done} ${done === 1 ? "memory" : "memories"} — encrypted and yours now.` });
-      setTimeout(() => setToast(null), 6000);
-      setNonce((n) => n + 1); // reload ledger from chain
-    } catch (e) {
-      setImportState({ phase: "error", message: e instanceof Error ? e.message : "import failed" });
-    }
+  // Import = arrival (paste → extract → remember). The flow now lives in the
+  // shared <ImportMemoryDialog>; on success we toast + reload the ledger.
+  function onImported(count: number) {
+    setToast({ text: `Imported ${count} ${count === 1 ? "memory" : "memories"} — encrypted and yours now.` });
+    setTimeout(() => setToast(null), 6000);
+    setNonce((n) => n + 1); // reload ledger from chain
   }
 
   // Export = exit: every entry, already decrypted CLIENT-SIDE by the owner's
-  // Seal session (the server can't read Seal blobs), downloaded as a file the
-  // user keeps. Ownership means you can leave with your data any day.
+  // Seal session, downloaded as a file the user keeps. Shared helper — same
+  // file shape it has always produced.
   function exportMemory() {
     if (!account || !chain || !hits || hits.length === 0) return;
-    const agg = process.env.NEXT_PUBLIC_WALRUS_AGGREGATOR_URL ?? "";
-    const payload = {
-      note: "Exported from Lethe — your memory, your file.",
-      exportedAt: new Date().toISOString(),
-      owner: account.address,
+    const { name, count } = exportMemoryFile({
+      address: account.address,
       vaultId: chain.objectId,
-      vaultUrl: `https://suiscan.xyz/testnet/object/${chain.objectId}`,
-      entries: hits.map((h) => ({
-        text: h.text,
-        kind: h.kind,
-        createdAtMs: h.createdAtMs,
-        blobId: h.blobId,
-        walrusUrl: `${agg}/v1/blobs/${encodeURIComponent(h.blobId)}`,
-        suiscanObjectUrl: `https://suiscan.xyz/testnet/object/${chain.objectId}`,
-      })),
-    };
-    const date = new Date().toISOString().slice(0, 10).replace(/-/g, "");
-    const name = `lethe-memory-${account.address.slice(2, 8)}-${date}.json`;
-    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = name;
-    a.click();
-    URL.revokeObjectURL(url);
-    setToast({ text: `Exported ${hits.length} ${hits.length === 1 ? "memory" : "memories"} → ${name}` });
+      entries: hits.map((h) => ({ text: h.text, kind: h.kind, createdAtMs: h.createdAtMs, blobId: h.blobId })),
+    });
+    setToast({ text: `Exported ${count} ${count === 1 ? "memory" : "memories"} → ${name}` });
     setTimeout(() => setToast(null), 6000);
   }
 
@@ -525,68 +469,8 @@ export default function MemoryPage() {
         </div>
       )}
 
-      {/* ── Import dialog — paste what another AI remembers about you ── */}
-      {importOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-6 lethe-overlay-in"
-          style={{ background: "rgba(10, 22, 40, 0.45)" }}
-          onClick={() => importState.phase !== "writing" && importState.phase !== "extracting" && setImportOpen(false)}
-        >
-          <div
-            data-testid="import-dialog"
-            className="w-full max-w-lg rounded border p-5"
-            style={{ borderColor: "var(--border)", background: "var(--bg-panel)" }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h3 className="text-base font-semibold" style={{ fontFamily: "var(--font-display)" }}>
-              Import memory from another AI
-            </h3>
-            <p className="mt-2 text-xs leading-relaxed" style={{ color: "var(--text-dim)" }}>
-              Ask ChatGPT (or any assistant): <em>&ldquo;What do you remember about me?&rdquo;</em>{" "}
-              — then paste the answer here. Each durable fact becomes a Seal-encrypted memory on
-              Walrus, owned by you, tagged <code className="lethe-id">imported</code>.
-            </p>
-            <textarea
-              value={importText}
-              onChange={(e) => setImportText(e.target.value.slice(0, 8000))}
-              placeholder="Paste here — up to 8,000 characters…"
-              rows={8}
-              autoFocus
-              className="mt-3 w-full rounded border p-3 text-sm outline-none resize-y"
-              style={{ borderColor: "var(--border)", background: "var(--bg)", color: "var(--text)" }}
-            />
-            <div className="mt-1 flex items-center justify-between">
-              <span className="lethe-id" style={{ color: "var(--text-dim)" }}>{importText.length}/8000</span>
-              {importState.phase === "error" && (
-                <span className="text-xs" style={{ color: "#C0564A" }}>{importState.message}</span>
-              )}
-            </div>
-            <div className="mt-3 flex justify-end gap-2">
-              <button
-                onClick={() => setImportOpen(false)}
-                disabled={importState.phase === "extracting" || importState.phase === "writing"}
-                className="h-9 px-4 rounded text-sm border disabled:opacity-50"
-                style={{ borderColor: "var(--border)", color: "var(--text-dim)" }}
-              >
-                Cancel
-              </button>
-              <button
-                data-testid="import-run"
-                onClick={runImport}
-                disabled={!importText.trim() || importState.phase === "extracting" || importState.phase === "writing"}
-                className="h-9 px-4 rounded text-sm font-semibold disabled:opacity-50"
-                style={{ background: "var(--text)", color: "var(--bg)" }}
-              >
-                {importState.phase === "extracting"
-                  ? "Reading…"
-                  : importState.phase === "writing"
-                    ? `Encrypting ${importState.done}/${importState.total}…`
-                    : "Import"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* ── Import dialog — shared component (same paste→extract→remember flow) ── */}
+      <ImportMemoryDialog open={importOpen} onClose={() => setImportOpen(false)} onImported={onImported} />
 
       {/* ── Toast ── */}
       {toast && (

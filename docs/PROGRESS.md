@@ -1273,3 +1273,27 @@ P5 RINGS COPY TRIM: NOT NEEDED. After the contrast fix (Ink primary sentences, -
 GATES: tsc clean · pnpm build GREEN · deploy lethe-5j64fxn5a… → lethe-gold.vercel.app · 8/8 routes 200. ALL Block 9–15 frozen strings grep=1 on served prod (Why Walrus / free forever / export and leave any day / users who come back / both principle italic lines / Venice "Lethe can't look." / four milestone sentences / verify any line / One unlock away [→ ONE UNLOCK AWAY via CSS] / demand category [=2 on /docs/sdk] / On the horizon… / Impossible without the object model / Credits are simple: 1 credit = 1¢. / Pay for Pro in stablecoins — USDC, no card.) PLUS new "More models as they ship". 390px + desktop: 0 horizontal overflow, 0 console errors, reveal 22/22, prefers-reduced-motion instant, #roadmap + #pricing resolve; Free→/chat + SDK→/docs/sdk live, Pro/Plus aria-disabled (not anchors). After-captures + crops: design/screens/prod/{landing,pricing,rings,why-walrus}-{desktop,mobile}.png.
 Blockers: none.
 === END REPORT ===
+
+## 2026-06-14 — BLOCK 17: surface import + export + model selector on /chat (discoverability)
+
+=== BLOCK 17 REPORT ===
+UX-surfacing only, PRODUCT behavior freeze intact: reused the EXISTING working features, no new logic/routes/endpoints. Goal — a first-time /chat user can now SEE they can switch models, import from another AI, and export.
+
+SHARED EXTRACTION (no fork, no behavior change): the import flow and the export download were inlined in /memory. Extracted both into shared modules so /chat reuses the identical logic:
+ • src/components/ImportMemoryDialog.tsx — the SAME paste→/api/memory/import-extract→remember({kind:"imported"}) modal, verbatim (same copy, same testids import-dialog/import-run, same phases Reading…/Encrypting n/m…). Props: open / onClose / onImported(count); owns its own paste state.
+ • src/lib/memory/export-file.ts — exportMemoryFile({address,vaultId,entries}) producing the byte-identical JSON file (same note, field order, walrusUrl, filename lethe-memory-<addr6>-<YYYYMMDD>.json).
+ /memory was refactored to use BOTH (removed its inlined runImport + modal JSX + importText/importState; exportMemory() now calls the helper). Verified /memory unchanged: Import ↑ / Export ↓ still render, modal still opens (testids intact).
+
+P1 MODEL SELECTOR made legible. Moved out of the cramped header into a new always-visible capability toolbar (hairline strip under the header). Same <select> + pickModel logic; restyled from 12px Mist invisible-sugar → mono "MODEL" label + text-sm Ink bordered control (h-8, hover:accent-strong) that reads tappable, + a muted helper caption verbatim: "Switch anytime — your memory works with every model." (caption hidden < md so mobile doesn't crowd).
+
+P2 IMPORT entry point on /chat. Added "Import from another AI ↑" in the toolbar (mono uppercase, --accent-strong dotted-underline, matching /memory's styling). Opens the SHARED ImportMemoryDialog (verified: same modal renders from /chat — heading, textarea, Import button). Signed-out: disabled (title "Sign in to import"), never errors. On success: reloads the rail + toast. Also wove a short mention into the canned opener ("Already have an AI that knows you? Import what it remembers from the bar above — and switch models anytime; your memory works with all of them.").
+
+P3 EXPORT on /chat. Added "Export ↓" beside Import, calling exportMemoryFile() with the chat rail's confirmed on-chain entries (text/kind/createdAtMs/blobId) + vaultId — same file /memory produces. Enabled only when account && there are confirmed entries (exportable = rail.filter status===confirmed && blobId); otherwise disabled ("Nothing to export yet"), never errors. Toast on success.
+
+P4 /memory controls kept as-is (Import ↑ / Export ↓ in the ledger header + empty-state import) — both routes work; /memory stays the full ownership surface.
+
+DESIGN: one cohesive toolbar cluster (model left, import/export right), mono micro-labels, hairline — quiet utility, not loud. Mobile 390: wraps to two tidy rows (MODEL+select, then Import/Export), caption hidden, 0 overflow.
+
+GATES: tsc clean · pnpm build GREEN · deploy lethe-pm9woh9n3… → lethe-gold.vercel.app · 8/8 routes 200. No landing regressions — ALL Block 9–16 frozen strings still grep=1 on served prod (Why Walrus / free forever / export and leave any day / users who come back / both principle italic lines / Venice "Lethe can't look." / four milestone sentences / verify any line / One unlock away / demand category [=2 on /docs/sdk] / On the horizon… / Impossible without the object model / Credits are simple: 1 credit = 1¢. / Pay for Pro in stablecoins — USDC, no card. / More models as they ship). New /chat controls verified on prod (JS-rendered): "Import from another AI ↑" + "Export ↓" present in SSR; model select (3 opts) + "MODEL" label + caption render after /api/chat/models resolves. PROD /chat 390 + desktop: 0 horizontal overflow, 0 console errors (the lone hydration warning seen locally is a DEMO_MOCK+dev artifact, absent in the real signed-out prod build). Model switch still routes (Block 13 x-provider behavior unchanged — logic untouched). After-captures: design/screens/prod/chat-{desktop,mobile}.png (signed-out, real prod) + chat-signedin-mock.png + chat-import-modal-mock.png (DEMO_MOCK, representative — signed-in/import-modal aren't reachable on prod without OAuth).
+Blockers: none.
+=== END REPORT ===

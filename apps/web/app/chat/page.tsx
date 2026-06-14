@@ -18,7 +18,9 @@ import { useSuiClient } from "@mysten/dapp-kit";
 import { Logo } from "@/src/components/Logo";
 import { SignIn } from "@/src/components/SiteHeader";
 import { MemoryRail, type RailEntry } from "@/src/components/MemoryRail";
+import { ImportMemoryDialog } from "@/src/components/ImportMemoryDialog";
 import { useMemory, getOwnedMemory, MEMORY_ALLOWLISTED } from "@/src/lib/memory";
+import { exportMemoryFile } from "@/src/lib/memory/export-file";
 import { DEMO_MOCK, getMockOwnedMemory, useLetheAccount } from "@/src/lib/demo/mock";
 
 type Msg = {
@@ -81,7 +83,7 @@ export default function ChatPage() {
   const [msgs, setMsgs] = useState<Msg[]>([
     {
       role: "lethe",
-      text: "Hey — I'm Lethe. Tell me about your crypto style (e.g. \"I'm a momentum trader and I hate leverage\") and I'll remember it on Walrus, owned by you. Or let me read your on-chain activity and learn from what you've actually done.",
+      text: "Hey — I'm Lethe. Tell me about your crypto style (e.g. \"I'm a momentum trader and I hate leverage\") and I'll remember it on Walrus, owned by you. Or let me read your on-chain activity and learn from what you've actually done. Already have an AI that knows you? Import what it remembers from the bar above — and switch models anytime; your memory works with all of them.",
     },
   ]);
   const endRef = useRef<HTMLDivElement>(null);
@@ -89,6 +91,9 @@ export default function ChatPage() {
   // which configured provider goes FIRST. Persisted across sessions.
   const [models, setModels] = useState<ModelOption[]>([]);
   const [model, setModel] = useState<string>("");
+  // Block 17: surface import + export on /chat (reuse the /memory flow + helper).
+  const [importOpen, setImportOpen] = useState(false);
+  const [toast, setToast] = useState<{ text: string } | null>(null);
   useEffect(() => {
     fetch("/api/chat/models")
       .then((r) => r.json())
@@ -479,6 +484,28 @@ export default function ChatPage() {
 
   const short = (a: string) => `${a.slice(0, 6)}…${a.slice(-4)}`;
 
+  // Confirmed on-chain entries are the exportable set (same data /memory exports).
+  const exportable = rail.filter((r) => r.status === "confirmed" && r.blobId);
+
+  // Export ↓ — reuse the shared client-side JSON download.
+  function doExport() {
+    if (!account || !vaultId || exportable.length === 0) return;
+    const { name, count } = exportMemoryFile({
+      address: account.address,
+      vaultId,
+      entries: exportable.map((r) => ({ text: r.summary, kind: r.kind, createdAtMs: r.createdAtMs, blobId: r.blobId! })),
+    });
+    setToast({ text: `Exported ${count} ${count === 1 ? "memory" : "memories"} → ${name}` });
+    setTimeout(() => setToast(null), 6000);
+  }
+
+  // Import ↑ success — same flow as /memory; reload the rail + confirm.
+  function onImported(count: number) {
+    setToast({ text: `Imported ${count} ${count === 1 ? "memory" : "memories"} — encrypted and yours now.` });
+    setTimeout(() => setToast(null), 6000);
+    void loadRail();
+  }
+
   return (
     <main className="h-screen flex flex-col" style={{ background: "var(--bg)", color: "var(--text)" }}>
       <header className="border-b shrink-0" style={{ borderColor: "var(--border)", background: "var(--bg-panel)" }}>
@@ -490,22 +517,6 @@ export default function ChatPage() {
             </Link>
           </div>
           <div className="flex items-center gap-3">
-            {models.length > 0 && (
-              <select
-                value={model}
-                onChange={(e) => pickModel(e.target.value)}
-                className="text-xs h-7 px-1.5 rounded border outline-none cursor-pointer max-w-[180px]"
-                style={{ background: "var(--bg)", borderColor: "var(--border)", color: "var(--text-dim)" }}
-                title="Pick the model that answers — your memory works with all of them"
-                aria-label="Model"
-              >
-                {models.map((m) => (
-                  <option key={m.key} value={m.key}>
-                    {m.label}
-                  </option>
-                ))}
-              </select>
-            )}
             {DEMO_MOCK && (
               <span className="hidden sm:inline-block text-[10px] px-2 py-0.5 rounded border uppercase tracking-wide" style={{ borderColor: "var(--accent-h)", color: "var(--accent-h)" }}>
                 demo mock
@@ -515,6 +526,58 @@ export default function ChatPage() {
           </div>
         </div>
       </header>
+
+      {/* ── Capability toolbar — model switch + import + export, made visible ── */}
+      <div className="border-b shrink-0" style={{ borderColor: "var(--border)", background: "var(--bg-panel)" }}>
+        <div className="max-w-6xl mx-auto w-full px-6 py-2.5 flex items-center justify-between gap-x-5 gap-y-2 flex-wrap">
+          <div className="flex items-center gap-2.5 flex-wrap">
+            {models.length > 0 && (
+              <>
+                <span className="lethe-id uppercase" style={{ color: "var(--text-dim)" }}>Model</span>
+                <select
+                  value={model}
+                  onChange={(e) => pickModel(e.target.value)}
+                  className="text-sm h-8 px-2.5 rounded-md border outline-none cursor-pointer max-w-[200px] hover:border-[var(--accent-strong)] transition"
+                  style={{ background: "var(--bg)", borderColor: "var(--border)", color: "var(--text)" }}
+                  title="Pick the model that answers — your memory works with all of them"
+                  aria-label="Model"
+                >
+                  {models.map((m) => (
+                    <option key={m.key} value={m.key}>
+                      {m.label}
+                    </option>
+                  ))}
+                </select>
+                <span className="hidden md:inline text-xs" style={{ color: "var(--text-muted)" }}>
+                  Switch anytime — your memory works with every model.
+                </span>
+              </>
+            )}
+          </div>
+          <div className="flex items-center gap-4 shrink-0">
+            <button
+              onClick={() => (account ? setImportOpen(true) : undefined)}
+              disabled={!account}
+              data-testid="chat-import"
+              className="lethe-id uppercase underline decoration-dotted underline-offset-2 hover:opacity-70 transition disabled:opacity-40 disabled:cursor-not-allowed disabled:no-underline"
+              style={{ color: "var(--accent-strong)" }}
+              title={account ? "Paste what another AI remembers about you — it becomes yours" : "Sign in to import"}
+            >
+              Import from another AI ↑
+            </button>
+            <button
+              onClick={doExport}
+              disabled={!account || exportable.length === 0}
+              data-testid="chat-export"
+              className="lethe-id uppercase underline decoration-dotted underline-offset-2 hover:opacity-70 transition disabled:opacity-40 disabled:cursor-not-allowed disabled:no-underline"
+              style={{ color: "var(--accent-strong)" }}
+              title={exportable.length > 0 ? "Decrypts in your browser and downloads a JSON file" : "Nothing to export yet"}
+            >
+              Export ↓
+            </button>
+          </div>
+        </div>
+      </div>
 
       {!MEMORY_ALLOWLISTED && account && !DEMO_MOCK && (
         <div className="max-w-6xl mx-auto w-full px-6 pt-3 shrink-0">
@@ -736,6 +799,16 @@ export default function ChatPage() {
           <MemoryRail entries={rail} vaultId={vaultId} loading={railLoading} />
         </div>
       </div>
+
+      {/* ── Import dialog — shared component (same flow as /memory) ── */}
+      <ImportMemoryDialog open={importOpen} onClose={() => setImportOpen(false)} onImported={onImported} />
+
+      {/* ── Toast — import/export confirmations ── */}
+      {toast && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 rounded border px-4 py-2.5 text-sm" style={{ borderColor: "var(--border)", background: "var(--bg-panel)", color: "var(--text)", boxShadow: "var(--shadow-ambient)" }}>
+          {toast.text}
+        </div>
+      )}
     </main>
   );
 }
