@@ -88,8 +88,7 @@ const GROWTH: GrowthPhase[] = [
     tag: "CORE — TODAY",
     live: (
       <>
-        The whole loop — Google sign-in, memory derived from your chain, your chats, your
-        ChatGPT past; Seal-encrypted, portable to Pulse, revocable by proof, exportable.{" "}
+        The whole loop, shipped — derive, encrypt, recall, revoke, export.{" "}
         <a href="/docs/security" className="underline decoration-dotted underline-offset-2 hover:opacity-70">
           Formally verified (19/19)
         </a>
@@ -108,19 +107,18 @@ const GROWTH: GrowthPhase[] = [
   },
   {
     tag: "PHASE 1 — THE WEDGE",
-    live: <>the product crypto-natives can already use, end to end, on testnet.</>,
+    live: <>The product crypto-natives can use end to end, on testnet today.</>,
     unlock: (
       <>
-        mainnet (Q3–Q4 2026) —{" "}
-        <a href="#pricing" className="underline decoration-dotted underline-offset-2 hover:opacity-70">Pro and BYOK</a>{" "}
-        switch on, and first revenue starts the Proof of Demand waterfall: WAL storage, renewals,
-        the monthly burn.
+        Mainnet (Q3–Q4 2026) —{" "}
+        <a href="#pricing" className="underline decoration-dotted underline-offset-2 hover:opacity-70">Pro</a>{" "}
+        switches on and starts the burn waterfall.
       </>
     ),
     revenue: (
       <>
         <a href="#pricing" className="underline decoration-dotted underline-offset-2 hover:opacity-70">
-          Pro ~$5–8/mo + BYOK
+          Pro — $9/mo
         </a>
         .
       </>
@@ -133,16 +131,11 @@ const GROWTH: GrowthPhase[] = [
     tag: "PHASE 2 — THE NETWORK",
     live: (
       <>
-        <a href="/docs/sdk" className="underline decoration-dotted underline-offset-2 hover:opacity-70">the SDK</a>{" "}
-        wraps the exact paths Pulse already runs in production — cross-app memory works now.
+        <a href="/docs/sdk" className="underline decoration-dotted underline-offset-2 hover:opacity-70">The SDK</a>{" "}
+        wraps the paths Pulse runs in production — cross-app memory works now.
       </>
     ),
-    unlock: (
-      <>
-        the shared-registry policy lets any app run its own decrypt sessions. “Continue with
-        Lethe” kills the cold start for every Sui app.
-      </>
-    ),
+    unlock: <>A shared-registry policy lets any Sui app run its own decrypt sessions.</>,
     revenue: (
       <>
         <a href="#pricing" className="underline decoration-dotted underline-offset-2 hover:opacity-70">SDK pilots</a>.
@@ -155,15 +148,8 @@ const GROWTH: GrowthPhase[] = [
   },
   {
     tag: "PHASE 3 — THE OPEN DOOR",
-    live: (
-      <>Google login (no wallet) and ChatGPT import — a normal person can walk in right now.</>
-    ),
-    unlock: (
-      <>
-        BYOK brings any frontier model; memory derived from usage, not just chains — the
-        first Walrus write path for everyone.
-      </>
-    ),
+    live: <>Google login and ChatGPT import — a normal person walks in today.</>,
+    unlock: <>BYOK brings any frontier model; memory from usage, not just chains.</>,
     revenue: (
       <>
         <a href="#pricing" className="underline decoration-dotted underline-offset-2 hover:opacity-70">
@@ -178,18 +164,62 @@ const GROWTH: GrowthPhase[] = [
   },
 ];
 
-/** Concentric rings — core solid Coral dot, hairline Mist rings (dashed = future). */
-function GrowthRings({ size = 380 }: { size?: number }) {
+/**
+ * The growth map AS the visual — four concentric bands carry the four phases:
+ * CORE (shipped, solid Coral) → WEDGE → NETWORK → OPEN DOOR (roadmap, hairline
+ * Mist, fainter outward). Each band is labeled on its top arc (Fog-masked so the
+ * ring reads behind it). Inner = shipped, outer = roadmap — structure is the
+ * information. Detailed phase text sits beside it as support.
+ */
+const RING_BANDS = [
+  { key: "CORE", r: 0.14, op: 1, core: true },
+  { key: "WEDGE", r: 0.26, op: 0.6, core: false },
+  { key: "NETWORK", r: 0.38, op: 0.42, core: false },
+  { key: "OPEN DOOR", r: 0.47, op: 0.28, core: false },
+];
+function GrowthRings({ size = 360, labeled = true }: { size?: number; labeled?: boolean }) {
   const c = size / 2;
   return (
     <svg viewBox={`0 0 ${size} ${size}`} width="100%" aria-hidden="true">
-      <circle cx={c} cy={c} r={size * 0.18} fill="none" stroke="#5A8A9E" strokeWidth="1" strokeDasharray="3 5" opacity="0.7" />
-      <circle cx={c} cy={c} r={size * 0.31} fill="none" stroke="#5A8A9E" strokeWidth="1" strokeDasharray="3 5" opacity="0.5" />
-      <circle cx={c} cy={c} r={size * 0.44} fill="none" stroke="#5A8A9E" strokeWidth="1" strokeDasharray="3 5" opacity="0.35" />
-      <circle cx={c} cy={c} r={7} fill="#E8B894" />
-      <text x={c} y={c + 26} textAnchor="middle" fontFamily="var(--font-plex-mono), monospace" fontSize="9" letterSpacing="0.12em" fill="#5A8A9E">
+      {RING_BANDS.map((b) => (
+        <circle
+          key={b.key}
+          cx={c}
+          cy={c}
+          r={size * b.r}
+          fill="none"
+          stroke={b.core ? "#E8B894" : "#5A8A9E"}
+          strokeWidth={b.core ? 1.5 : 1}
+          strokeDasharray={b.core ? undefined : "3 5"}
+          opacity={b.op}
+        />
+      ))}
+      <circle cx={c} cy={c} r={6} fill="#E8B894" />
+      <text x={c} y={c + 22} textAnchor="middle" fontFamily="var(--font-plex-mono), monospace" fontSize="8.5" letterSpacing="0.12em" fill="#5A8A9E">
         ONE VAULT
       </text>
+      {labeled &&
+        RING_BANDS.map((b) => {
+          const ly = c - size * b.r;
+          const w = b.key.length * 6.4 + 12;
+          return (
+            <g key={`lbl-${b.key}`}>
+              <rect x={c - w / 2} y={ly - 8} width={w} height={14} fill="#EFF5F4" />
+              <text
+                x={c}
+                y={ly + 2.5}
+                textAnchor="middle"
+                fontFamily="var(--font-plex-mono), monospace"
+                fontSize="9"
+                letterSpacing="0.1em"
+                fill={b.core ? "#C4946E" : "#5A8A9E"}
+                opacity={b.core ? 1 : Math.min(b.op + 0.35, 0.85)}
+              >
+                {b.key}
+              </text>
+            </g>
+          );
+        })}
     </svg>
   );
 }
@@ -332,6 +362,14 @@ const PRICING_GLYPHS = {
       <path d="M15 6 L20 12 L15 18" />
     </svg>
   ),
+  // ascending bars — "more quota" (Plus)
+  bars: (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.25} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M5 19 L5 14" />
+      <path d="M12 19 L12 9" />
+      <path d="M19 19 L19 5" />
+    </svg>
+  ),
 };
 
 /**
@@ -376,6 +414,120 @@ function BuiltOnStrip() {
         })}
       </div>
     </section>
+  );
+}
+
+/**
+ * Within-Lethe plan matrix (Venice "Compare Features" pattern). Truthful
+ * capabilities only — Free is live today; paid tiers are honestly "planned"
+ * (the cards' tags + Coming-soon CTAs carry that). Pro column gets the Coral
+ * accent. Scrolls in its own box on mobile, never the page.
+ */
+const PLAN_COLS = ["Free", "Pro", "Plus", "SDK"];
+const PLAN_PRO_IDX = 1;
+const PLAN_GROUPS: { group: string; rows: { label: string; cells: string[] }[] }[] = [
+  {
+    group: "Models",
+    rows: [
+      { label: "Free models · daily limits", cells: ["✓", "✓", "✓", "—"] },
+      { label: "Premium models", cells: ["—", "✓", "✓", "—"] },
+      { label: "Bring your own keys", cells: ["—", "✓", "✓", "—"] },
+      { label: "Switch model mid-chat", cells: ["✓", "✓", "✓", "—"] },
+    ],
+  },
+  {
+    group: "Memory",
+    rows: [
+      { label: "Derive · recall · export", cells: ["✓", "✓", "✓", "✓"] },
+      { label: "Grant / revoke on-chain", cells: ["✓", "✓", "✓", "✓"] },
+      { label: "Credits / month", cells: ["—", "900", "More", "Usage"] },
+      { label: "Early access", cells: ["—", "—", "✓", "—"] },
+    ],
+  },
+  {
+    group: "Privacy",
+    rows: [
+      { label: "Seal end-to-end encryption", cells: ["✓", "✓", "✓", "✓"] },
+      { label: "Formally verified (19/19)", cells: ["✓", "✓", "✓", "✓"] },
+    ],
+  },
+  {
+    group: "Portability",
+    rows: [
+      { label: "Portable across apps", cells: ["✓", "✓", "✓", "✓"] },
+      { label: "Continue with Lethe (SDK)", cells: ["—", "—", "—", "✓"] },
+    ],
+  },
+];
+
+function PlanCell({ v, isPro }: { v: string; isPro: boolean }) {
+  if (v === "✓") return <span style={{ color: isPro ? "var(--accent-h)" : "var(--text-dim)" }}>✓</span>;
+  if (v === "—") return <span style={{ color: "var(--text-dim)", opacity: 0.5 }}>—</span>;
+  return <span style={{ color: isPro ? "var(--text)" : "var(--text-dim)" }}>{v}</span>;
+}
+
+function PlanCompare() {
+  const CORAL_BG = "rgba(232, 184, 148, 0.08)";
+  return (
+    <div className="mt-14">
+      <div className="lethe-eyebrow text-center">Compare features</div>
+      <div className="mt-6 overflow-x-auto lethe-rise" data-reveal>
+        <table className="w-full border-collapse" style={{ minWidth: 640 }}>
+          <thead>
+            <tr>
+              <th className="text-left p-3" />
+              {PLAN_COLS.map((c, i) => {
+                const pro = i === PLAN_PRO_IDX;
+                return (
+                  <th
+                    key={c}
+                    className="lethe-id uppercase text-center p-3"
+                    style={{
+                      color: pro ? "var(--accent-h)" : "var(--text-dim)",
+                      background: pro ? CORAL_BG : "transparent",
+                      borderTop: pro ? "2px solid var(--accent-h)" : "none",
+                      borderBottom: "1px solid var(--border)",
+                    }}
+                  >
+                    {c}
+                  </th>
+                );
+              })}
+            </tr>
+          </thead>
+          <tbody>
+            {PLAN_GROUPS.flatMap((g) => [
+              <tr key={`g-${g.group}`}>
+                <td className="lethe-id uppercase pt-6 pb-2 px-3" style={{ color: "var(--accent-h)" }}>{g.group}</td>
+                {PLAN_COLS.map((c, i) => (
+                  <td key={`${g.group}-${c}`} style={{ background: i === PLAN_PRO_IDX ? CORAL_BG : "transparent" }} />
+                ))}
+              </tr>,
+              ...g.rows.map((r) => (
+                <tr key={r.label}>
+                  <th
+                    scope="row"
+                    className="text-left p-3 lethe-body"
+                    style={{ fontWeight: 500, color: "var(--text)", borderBottom: "1px solid var(--border)" }}
+                  >
+                    {r.label}
+                  </th>
+                  {r.cells.map((v, i) => (
+                    <td
+                      key={i}
+                      className="text-center p-3 lethe-body"
+                      style={{ background: i === PLAN_PRO_IDX ? CORAL_BG : "transparent", borderBottom: "1px solid var(--border)" }}
+                    >
+                      <PlanCell v={v} isPro={i === PLAN_PRO_IDX} />
+                    </td>
+                  ))}
+                </tr>
+              )),
+            ])}
+          </tbody>
+        </table>
+      </div>
+    </div>
   );
 }
 
@@ -460,6 +612,45 @@ function ComparisonTable() {
   );
 }
 
+/**
+ * Stat bar — a ROW of small honest proof points (NOT one giant number; the
+ * big-number-with-label is the template answer). Mono micro-labels, hairline
+ * strip, quiet. 19/19 links to the security page. No invented metrics.
+ */
+const STATS: { label: string; href: string | null }[] = [
+  { label: "19/19 formally verified", href: "/docs/security" },
+  { label: "Seal end-to-end encrypted", href: null },
+  { label: "4 Mysten primitives, load-bearing", href: null },
+  { label: "live on Sui testnet", href: null },
+];
+function StatBar() {
+  return (
+    <section className="max-w-6xl mx-auto w-full px-6 mt-6 lethe-rise" data-reveal>
+      <div
+        className="flex flex-wrap items-center justify-center gap-x-7 gap-y-2 py-4"
+        style={{ borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}
+      >
+        {STATS.flatMap((s, i) => {
+          const label = (
+            <span className="lethe-id uppercase" style={{ color: s.href ? "var(--accent-h)" : "var(--text-dim)" }}>
+              {s.label}
+            </span>
+          );
+          const node = s.href ? (
+            <Link key={s.label} href={s.href} className="transition hover:opacity-70">{label}</Link>
+          ) : (
+            <span key={s.label}>{label}</span>
+          );
+          const sep = (
+            <span key={`sep-${i}`} aria-hidden="true" className="hidden sm:block h-3 w-px" style={{ background: "var(--border)" }} />
+          );
+          return i === 0 ? [node] : [sep, node];
+        })}
+      </div>
+    </section>
+  );
+}
+
 export default function Home() {
   return (
     <main className="min-h-screen flex flex-col" style={{ background: "var(--bg)", color: "var(--text)" }}>
@@ -492,8 +683,8 @@ export default function Home() {
             </h1>
 
             <p className="mt-8 text-base max-w-md leading-relaxed" style={{ color: "var(--text-dim)" }}>
-              Lethe is user-owned memory for AI agents — stored on Walrus, anchored on Sui,
-              portable across every app. Sign in with Google — no wallet, no gas.
+              User-owned memory for AI agents — stored on Walrus, anchored on Sui, portable
+              across every app.
             </p>
 
             <div className="mt-9">
@@ -509,6 +700,9 @@ export default function Home() {
 
       {/* ── Built on — the real Mysten stack, just below the hero ── */}
       <BuiltOnStrip />
+
+      {/* ── Stat bar — a row of small honest proof points ── */}
+      <StatBar />
 
       {/* ── Section divider — water line-work ── */}
       <div className="lethe-divider" aria-hidden="true" />
@@ -549,15 +743,15 @@ export default function Home() {
             {[
               {
                 k: "Memories renew forever",
-                v: "Archives pay for storage once. Memories renew every epoch — recurring demand per user, not a one-time deal.",
+                v: "Archives pay once; memories renew every epoch — recurring demand per user.",
               },
               {
                 k: "Highest value per byte",
-                v: "A memory is a few hundred bytes that knows you. People pay for identity, not gigabytes.",
+                v: "A few hundred bytes that know you — people pay for identity, not gigabytes.",
               },
               {
                 k: "The Web2 door is built",
-                v: "Google login, no wallet, no gas — the only Walrus write path a normal person can walk through. Live today.",
+                v: "Google login, no wallet, no gas — the only Walrus write path a normal person can walk through.",
               },
             ].map((c, i) => (
               <div key={c.k} className="py-6" style={{ borderTop: i > 0 ? "1px solid var(--border)" : "none" }}>
@@ -598,39 +792,47 @@ export default function Home() {
             {
               k: "Free",
               tag: "live today",
-              price: null as string | null,
-              v: "Full memory features forever — derive, grant, revoke, forget, export. Free models with daily limits.",
+              price: "$0",
+              v: "Memory features, free models, daily limits.",
               credit: null as string | null,
+              byok: null as string | null,
+              recommended: false,
               live: true,
               glyph: PRICING_GLYPHS.spark,
               cta: { label: "Start free", href: "/chat", disabled: false },
             },
             {
-              k: "BYOK",
-              tag: "coming",
-              price: null as string | null,
-              v: "Bring your own model keys; your memory plane stays exactly the same.",
-              credit: null as string | null,
-              live: false,
-              glyph: PRICING_GLYPHS.key,
-              cta: { label: "Coming soon", href: "", disabled: true },
-            },
-            {
               k: "Pro",
               tag: "planned",
-              price: "~$5–8/mo",
-              v: "Premium models and higher limits. The memory itself is never behind the paywall.",
+              price: "$9/mo",
+              v: "Premium models, higher limits, 900 credits.",
               credit: "Credits are simple: 1 credit = 1¢.",
+              byok: "Bring your own model keys — your memory plane stays the same.",
+              recommended: true,
               live: false,
               glyph: PRICING_GLYPHS.ring,
               cta: { label: "Coming soon", href: "", disabled: true },
             },
             {
+              k: "Plus",
+              tag: "planned",
+              price: "$29/mo",
+              v: "Everything in Pro, more quota, early access.",
+              credit: null as string | null,
+              byok: null as string | null,
+              recommended: false,
+              live: false,
+              glyph: PRICING_GLYPHS.bars,
+              cta: { label: "Coming soon", href: "", disabled: true },
+            },
+            {
               k: "SDK for apps",
               tag: "pilot pricing",
-              price: null as string | null,
-              v: "“Continue with Lethe” — warm-start your users with memory they already own.",
+              price: "Usage-based",
+              v: "Continue with Lethe — warm-start your users with memory they already own.",
               credit: null as string | null,
+              byok: null as string | null,
+              recommended: false,
               live: false,
               glyph: PRICING_GLYPHS.bracket,
               cta: { label: "Read the docs", href: "/docs/sdk", disabled: false },
@@ -640,28 +842,34 @@ export default function Home() {
               key={t.k}
               className="rounded border p-6 lethe-rise flex flex-col h-full"
               style={{
-                borderColor: "var(--border)",
-                background: "var(--bg)",
-                borderTopColor: t.live ? "var(--accent-h)" : "var(--border)",
-                borderTopWidth: t.live ? 2 : 1,
+                borderColor: t.recommended ? "var(--accent-h)" : "var(--border)",
+                background: t.recommended ? "rgba(232, 184, 148, 0.06)" : "var(--bg)",
+                borderTopColor: t.live || t.recommended ? "var(--accent-h)" : "var(--border)",
+                borderTopWidth: t.live || t.recommended ? 2 : 1,
               }}
               data-reveal
               data-reveal-delay={i * 70}
             >
-              <div style={{ color: t.live ? "var(--accent-h)" : "var(--text-dim)" }} aria-hidden="true">
+              {/* quiet emphasis — a recommendation eyebrow, not a loud badge */}
+              <div className="lethe-id uppercase" style={{ color: "var(--accent-h)", minHeight: "1rem" }}>
+                {t.recommended ? "Recommended" : ""}
+              </div>
+              <div className="mt-2" style={{ color: t.live || t.recommended ? "var(--accent-h)" : "var(--text-dim)" }} aria-hidden="true">
                 {t.glyph}
               </div>
               <div className="mt-3 text-2xl" style={{ fontFamily: "var(--font-display)", fontWeight: 500 }}>{t.k}</div>
-              {t.price && (
-                <div className="mt-1.5 text-lg" style={{ fontFamily: "var(--font-display)", fontWeight: 500, color: "var(--text)" }}>
-                  {t.price}
-                </div>
-              )}
+              <div className="mt-1.5 text-lg" style={{ fontFamily: "var(--font-display)", fontWeight: 500, color: "var(--text)" }}>
+                {t.price}
+              </div>
               <div className="lethe-id uppercase mt-1.5" style={{ color: "var(--accent-h)" }}>{t.tag}</div>
               {t.credit && (
                 <p className="mt-2 lethe-body" style={{ color: "var(--text-dim)" }}>{t.credit}</p>
               )}
-              <p className="mt-3 lethe-body flex-1" style={{ color: "var(--text-dim)" }}>{t.v}</p>
+              <p className="mt-3 lethe-body" style={{ color: "var(--text-dim)" }}>{t.v}</p>
+              {t.byok && (
+                <p className="mt-2 text-[0.82rem] leading-relaxed" style={{ color: "var(--text-dim)", opacity: 0.85 }}>{t.byok}</p>
+              )}
+              <div className="flex-1" />
               {t.cta.disabled ? (
                 <span
                   className="mt-6 w-full inline-flex items-center justify-center rounded border px-4 py-2.5 lethe-id uppercase cursor-not-allowed select-none"
@@ -692,6 +900,9 @@ export default function Home() {
         >
           &ldquo;We lock you in with value, not custody — export and leave any day.&rdquo;
         </p>
+
+        {/* within-Lethe plan matrix */}
+        <PlanCompare />
       </section>
 
       {/* ── How Lethe is different — factual comparison ── */}
@@ -748,8 +959,8 @@ export default function Home() {
           <div className="hidden lg:block" aria-hidden="true">
             <GrowthRings />
           </div>
-          <div className="lg:hidden mx-auto w-24" aria-hidden="true">
-            <GrowthRings size={96} />
+          <div className="lg:hidden mx-auto w-44" aria-hidden="true">
+            <GrowthRings size={176} />
           </div>
 
           <div>
@@ -780,7 +991,7 @@ export default function Home() {
                   <p className="mt-2.5 lethe-body italic" style={{ color: "var(--text-dim)" }}>{g.closing}</p>
                 )}
                 {g.sub && (
-                  <p className="mt-3 lethe-body lethe-measure" style={{ color: "var(--text-dim)" }}>{g.sub}</p>
+                  <p className="mt-3 lethe-measure text-[0.82rem] leading-relaxed" style={{ color: "var(--text-dim)", opacity: 0.75 }}>{g.sub}</p>
                 )}
                 {g.stable && (
                   <p className="mt-3 lethe-body lethe-measure" style={{ color: "#5A8A9E" }}>{g.stable}</p>
@@ -789,7 +1000,7 @@ export default function Home() {
                   <p className="mt-3 lethe-body lethe-measure" style={{ color: "#5A8A9E" }}>{g.horizon}</p>
                 )}
                 {g.footnote && (
-                  <p className="mt-3 lethe-body lethe-measure" style={{ color: "var(--text-dim)", opacity: 0.8 }}>{g.footnote}</p>
+                  <p className="mt-3 lethe-measure text-[0.82rem] leading-relaxed" style={{ color: "var(--text-dim)", opacity: 0.7 }}>{g.footnote}</p>
                 )}
               </div>
             ))}
