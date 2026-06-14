@@ -34,10 +34,12 @@
   color-scheme: light;
   --bg:         #EFF5F4;  /* Fog = paper */
   --bg-panel:   #FFFFFF;
-  --text:       #1A3A4A;  /* Ink */
-  --text-dim:   #5A8A9E;  /* Mist */
-  --accent:     #E8B894;  /* Coral — RESERVED: memory events, proof links, remembrance */
-  --accent-h:   #C4946E;
+  --text:       #1A3A4A;  /* Ink — body/reading text (AA: 10.9:1 on Fog) */
+  --text-dim:   #5A8A9E;  /* Mist — micro-labels/chrome ONLY, never reading text */
+  --text-muted: #436470;  /* darkened Mist — secondary reading text (captions, milestone subs) */
+  --accent:     #E8B894;  /* soft Coral — large quiet fills (Pro tint, top-hairlines) */
+  --accent-h:   #C4946E;  /* muted Coral — tags, section eyebrows */
+  --accent-strong: #C85A2E;  /* deep Coral — CTAs, prices, Recommended, links, vault core */
   --border:     rgba(26, 58, 74, 0.12);  /* hairline */
   --shadow-ambient: 0 0 0 1px var(--border), 0 2px 12px rgba(26, 58, 74, 0.05);
 }
@@ -63,8 +65,10 @@ html, body {
   --bg-panel:   #12243A;
   --text:       #E8DFD0;
   --text-dim:   #6B9BD1;
+  --text-muted: #9BB6CE;
   --accent:     #D4A574;
   --accent-h:   #C4946E;
+  --accent-strong: #E0703A;
   --border:     rgba(232, 223, 208, 0.14);
   --shadow-ambient: 0 0 0 1px var(--border), 0 2px 12px rgba(0, 0, 0, 0.25);
 }
@@ -93,6 +97,7 @@ html, body {
 .lethe-id {
   font-family: var(--font-mono);
   font-size: 12.5px;
+  font-weight: 500;
   letter-spacing: 0.08em;
 }
 
@@ -297,6 +302,7 @@ html, body {
 .lethe-eyebrow {
   font-family: var(--font-plex-mono), monospace;
   font-size: 0.72rem;
+  font-weight: 500;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--accent-h);
@@ -332,9 +338,21 @@ html, body {
 .lethe-body {
   font-family: var(--font-sans);
   font-size: 1rem;        /* 15.5px at the 15.5px root */
+  font-weight: 450;       /* Block 16: raise the floor so body reads solid, not thin */
   line-height: 1.6;
+  color: var(--text);     /* Ink by default — Mist is never the reading color */
 }
 .lethe-measure { max-width: 70ch; }
+
+/* Inline proof/receipt links — deep coral, dotted underline (Block 16 accent). */
+.lethe-link {
+  color: var(--accent-strong);
+  text-decoration-line: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 2px;
+  transition: opacity 0.15s ease;
+}
+.lethe-link:hover { opacity: 0.7; }
 
 /* ── Block 13: ONE motion layer — scroll reveal (fade + 12px rise, once) ──── */
 /* The hidden state applies ONLY when JS confirmed motion is allowed

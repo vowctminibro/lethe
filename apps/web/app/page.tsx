@@ -89,7 +89,7 @@ const GROWTH: GrowthPhase[] = [
     live: (
       <>
         The whole loop, shipped — derive, encrypt, recall, revoke, export.{" "}
-        <a href="/docs/security" className="underline decoration-dotted underline-offset-2 hover:opacity-70">
+        <a href="/docs/security" className="lethe-link">
           Formally verified (19/19)
         </a>
         .
@@ -97,7 +97,7 @@ const GROWTH: GrowthPhase[] = [
     ),
     revenue: (
       <>
-        <a href="#pricing" className="underline decoration-dotted underline-offset-2 hover:opacity-70">Free</a>{" "}
+        <a href="#pricing" className="lethe-link">Free</a>{" "}
         — live today.
       </>
     ),
@@ -111,13 +111,13 @@ const GROWTH: GrowthPhase[] = [
     unlock: (
       <>
         Mainnet (Q3–Q4 2026) —{" "}
-        <a href="#pricing" className="underline decoration-dotted underline-offset-2 hover:opacity-70">Pro</a>{" "}
+        <a href="#pricing" className="lethe-link">Pro</a>{" "}
         switches on and starts the burn waterfall.
       </>
     ),
     revenue: (
       <>
-        <a href="#pricing" className="underline decoration-dotted underline-offset-2 hover:opacity-70">
+        <a href="#pricing" className="lethe-link">
           Pro — $9/mo
         </a>
         .
@@ -131,14 +131,14 @@ const GROWTH: GrowthPhase[] = [
     tag: "PHASE 2 — THE NETWORK",
     live: (
       <>
-        <a href="/docs/sdk" className="underline decoration-dotted underline-offset-2 hover:opacity-70">The SDK</a>{" "}
+        <a href="/docs/sdk" className="lethe-link">The SDK</a>{" "}
         wraps the paths Pulse runs in production — cross-app memory works now.
       </>
     ),
     unlock: <>A shared-registry policy lets any Sui app run its own decrypt sessions.</>,
     revenue: (
       <>
-        <a href="#pricing" className="underline decoration-dotted underline-offset-2 hover:opacity-70">SDK pilots</a>.
+        <a href="#pricing" className="lethe-link">SDK pilots</a>.
       </>
     ),
     sub: "Shared-registry policy: third-party apps run their own decrypt sessions.",
@@ -152,7 +152,7 @@ const GROWTH: GrowthPhase[] = [
     unlock: <>BYOK brings any frontier model; memory from usage, not just chains.</>,
     revenue: (
       <>
-        <a href="#pricing" className="underline decoration-dotted underline-offset-2 hover:opacity-70">
+        <a href="#pricing" className="lethe-link">
           category-scale subscriptions
         </a>
         .
@@ -171,12 +171,16 @@ const GROWTH: GrowthPhase[] = [
  * ring reads behind it). Inner = shipped, outer = roadmap — structure is the
  * information. Detailed phase text sits beside it as support.
  */
+// Block 16: stronger band contrast (was too faint), CORE in deep coral
+// (--accent-strong) so "shipped = solid coral" is unmistakable, Ink labels.
 const RING_BANDS = [
   { key: "CORE", r: 0.14, op: 1, core: true },
-  { key: "WEDGE", r: 0.26, op: 0.6, core: false },
-  { key: "NETWORK", r: 0.38, op: 0.42, core: false },
-  { key: "OPEN DOOR", r: 0.47, op: 0.28, core: false },
+  { key: "WEDGE", r: 0.27, op: 0.85, core: false },
+  { key: "NETWORK", r: 0.39, op: 0.62, core: false },
+  { key: "OPEN DOOR", r: 0.48, op: 0.42, core: false },
 ];
+const INK = "#1A3A4A";
+const ACCENT_STRONG = "#C85A2E";
 function GrowthRings({ size = 360, labeled = true }: { size?: number; labeled?: boolean }) {
   const c = size / 2;
   return (
@@ -188,32 +192,32 @@ function GrowthRings({ size = 360, labeled = true }: { size?: number; labeled?: 
           cy={c}
           r={size * b.r}
           fill="none"
-          stroke={b.core ? "#E8B894" : "#5A8A9E"}
-          strokeWidth={b.core ? 1.5 : 1}
+          stroke={b.core ? ACCENT_STRONG : "#5A8A9E"}
+          strokeWidth={b.core ? 2.25 : 1.25}
           strokeDasharray={b.core ? undefined : "3 5"}
           opacity={b.op}
         />
       ))}
-      <circle cx={c} cy={c} r={6} fill="#E8B894" />
-      <text x={c} y={c + 22} textAnchor="middle" fontFamily="var(--font-plex-mono), monospace" fontSize="8.5" letterSpacing="0.12em" fill="#5A8A9E">
+      <circle cx={c} cy={c} r={7} fill={ACCENT_STRONG} />
+      <text x={c} y={c + 24} textAnchor="middle" fontFamily="var(--font-plex-mono), monospace" fontSize="10" fontWeight="500" letterSpacing="0.12em" fill={INK}>
         ONE VAULT
       </text>
       {labeled &&
         RING_BANDS.map((b) => {
           const ly = c - size * b.r;
-          const w = b.key.length * 6.4 + 12;
+          const w = b.key.length * 7.6 + 14;
           return (
             <g key={`lbl-${b.key}`}>
-              <rect x={c - w / 2} y={ly - 8} width={w} height={14} fill="#EFF5F4" />
+              <rect x={c - w / 2} y={ly - 9} width={w} height={17} fill="#EFF5F4" />
               <text
                 x={c}
-                y={ly + 2.5}
+                y={ly + 3}
                 textAnchor="middle"
                 fontFamily="var(--font-plex-mono), monospace"
-                fontSize="9"
+                fontSize="11"
+                fontWeight="500"
                 letterSpacing="0.1em"
-                fill={b.core ? "#C4946E" : "#5A8A9E"}
-                opacity={b.core ? 1 : Math.min(b.op + 0.35, 0.85)}
+                fill={b.core ? ACCENT_STRONG : INK}
               >
                 {b.key}
               </text>
@@ -461,9 +465,9 @@ const PLAN_GROUPS: { group: string; rows: { label: string; cells: string[] }[] }
 ];
 
 function PlanCell({ v, isPro }: { v: string; isPro: boolean }) {
-  if (v === "✓") return <span style={{ color: isPro ? "var(--accent-h)" : "var(--text-dim)" }}>✓</span>;
-  if (v === "—") return <span style={{ color: "var(--text-dim)", opacity: 0.5 }}>—</span>;
-  return <span style={{ color: isPro ? "var(--text)" : "var(--text-dim)" }}>{v}</span>;
+  if (v === "✓") return <span style={{ color: isPro ? "var(--accent-strong)" : "var(--text)" }}>✓</span>;
+  if (v === "—") return <span style={{ color: "var(--text-dim)", opacity: 0.6 }}>—</span>;
+  return <span style={{ color: "var(--text)" }}>{v}</span>;
 }
 
 function PlanCompare() {
@@ -483,9 +487,9 @@ function PlanCompare() {
                     key={c}
                     className="lethe-id uppercase text-center p-3"
                     style={{
-                      color: pro ? "var(--accent-h)" : "var(--text-dim)",
+                      color: pro ? "var(--accent-strong)" : "var(--text)",
                       background: pro ? CORAL_BG : "transparent",
-                      borderTop: pro ? "2px solid var(--accent-h)" : "none",
+                      borderTop: pro ? "2px solid var(--accent-strong)" : "none",
                       borderBottom: "1px solid var(--border)",
                     }}
                   >
@@ -565,9 +569,9 @@ function ComparisonTable() {
                     key={c}
                     className="lethe-id uppercase text-left align-bottom p-4"
                     style={{
-                      color: isLethe ? "var(--accent-h)" : "var(--text-dim)",
+                      color: isLethe ? "var(--accent-strong)" : "var(--text)",
                       background: isLethe ? CORAL_BG : "transparent",
-                      borderTop: isLethe ? "2px solid var(--accent-h)" : "none",
+                      borderTop: isLethe ? "2px solid var(--accent-strong)" : "none",
                       borderBottom: "1px solid var(--border)",
                     }}
                   >
@@ -594,7 +598,7 @@ function ComparisonTable() {
                       key={ci}
                       className="p-4 lethe-body align-top"
                       style={{
-                        color: isLethe ? "var(--text)" : "var(--text-dim)",
+                        color: "var(--text)",
                         background: isLethe ? CORAL_BG : "transparent",
                         borderBottom: "1px solid var(--border)",
                       }}
@@ -632,7 +636,7 @@ function StatBar() {
       >
         {STATS.flatMap((s, i) => {
           const label = (
-            <span className="lethe-id uppercase" style={{ color: s.href ? "var(--accent-h)" : "var(--text-dim)" }}>
+            <span className="lethe-id uppercase" style={{ color: s.href ? "var(--accent-strong)" : "var(--text)" }}>
               {s.label}
             </span>
           );
@@ -682,7 +686,7 @@ export default function Home() {
               <span style={{ fontStyle: "normal", fontWeight: 500 }}>Built so nothing is.</span>
             </h1>
 
-            <p className="mt-8 text-base max-w-md leading-relaxed" style={{ color: "var(--text-dim)" }}>
+            <p className="mt-8 text-base max-w-md leading-relaxed" style={{ color: "var(--text)", fontWeight: 450 }}>
               User-owned memory for AI agents — stored on Walrus, anchored on Sui, portable
               across every app.
             </p>
@@ -724,7 +728,7 @@ export default function Home() {
             >
               <div className="lethe-id" style={{ color: "var(--text-dim)" }}>{c.n}</div>
               <div className="mt-2 text-lg" style={{ fontFamily: "var(--font-display)", fontWeight: 500 }}>{c.k}</div>
-              <p className="mt-2 lethe-body" style={{ color: "var(--text-dim)" }}>{c.v}</p>
+              <p className="mt-2 lethe-body" style={{ color: "var(--text)" }}>{c.v}</p>
             </div>
           ))}
         </div>
@@ -756,12 +760,12 @@ export default function Home() {
             ].map((c, i) => (
               <div key={c.k} className="py-6" style={{ borderTop: i > 0 ? "1px solid var(--border)" : "none" }}>
                 <div className="text-lg" style={{ fontFamily: "var(--font-display)", fontWeight: 600 }}>{c.k}</div>
-                <p className="mt-1.5 lethe-body lethe-measure" style={{ color: "var(--text-dim)" }}>{c.v}</p>
+                <p className="mt-1.5 lethe-body lethe-measure" style={{ color: "var(--text)" }}>{c.v}</p>
               </div>
             ))}
             <p
               className="py-6 lethe-body lethe-measure"
-              style={{ borderTop: "1px solid var(--border)", color: "var(--text-dim)" }}
+              style={{ borderTop: "1px solid var(--border)", color: "var(--text)" }}
             >
               And because every memory is a Sui object, Lethe is a primitive other apps — and
               other contracts — build on. Demand compounds across the ecosystem, not inside one
@@ -851,23 +855,23 @@ export default function Home() {
               data-reveal-delay={i * 70}
             >
               {/* quiet emphasis — a recommendation eyebrow, not a loud badge */}
-              <div className="lethe-id uppercase" style={{ color: "var(--accent-h)", minHeight: "1rem" }}>
+              <div className="lethe-id uppercase" style={{ color: "var(--accent-strong)", minHeight: "1rem" }}>
                 {t.recommended ? "Recommended" : ""}
               </div>
-              <div className="mt-2" style={{ color: t.live || t.recommended ? "var(--accent-h)" : "var(--text-dim)" }} aria-hidden="true">
+              <div className="mt-2" style={{ color: t.live || t.recommended ? "var(--accent-strong)" : "var(--text-dim)" }} aria-hidden="true">
                 {t.glyph}
               </div>
               <div className="mt-3 text-2xl" style={{ fontFamily: "var(--font-display)", fontWeight: 500 }}>{t.k}</div>
-              <div className="mt-1.5 text-lg" style={{ fontFamily: "var(--font-display)", fontWeight: 500, color: "var(--text)" }}>
+              <div className="mt-1.5 text-lg" style={{ fontFamily: "var(--font-display)", fontWeight: 600, color: "var(--accent-strong)" }}>
                 {t.price}
               </div>
               <div className="lethe-id uppercase mt-1.5" style={{ color: "var(--accent-h)" }}>{t.tag}</div>
               {t.credit && (
-                <p className="mt-2 lethe-body" style={{ color: "var(--text-dim)" }}>{t.credit}</p>
+                <p className="mt-2 lethe-body" style={{ color: "var(--text)" }}>{t.credit}</p>
               )}
-              <p className="mt-3 lethe-body" style={{ color: "var(--text-dim)" }}>{t.v}</p>
+              <p className="mt-3 lethe-body" style={{ color: "var(--text)" }}>{t.v}</p>
               {t.byok && (
-                <p className="mt-2 text-[0.82rem] leading-relaxed" style={{ color: "var(--text-dim)", opacity: 0.85 }}>{t.byok}</p>
+                <p className="mt-2 text-[0.82rem] leading-relaxed" style={{ color: "var(--text-muted)" }}>{t.byok}</p>
               )}
               <div className="flex-1" />
               {t.cta.disabled ? (
@@ -882,11 +886,7 @@ export default function Home() {
                 <Link
                   href={t.cta.href}
                   className="mt-6 w-full inline-flex items-center justify-center rounded border px-4 py-2.5 lethe-id uppercase transition hover:opacity-80"
-                  style={
-                    t.live
-                      ? { borderColor: "var(--accent-h)", background: "var(--accent-h)", color: "var(--bg)" }
-                      : { borderColor: "var(--border)", color: "var(--text)" }
-                  }
+                  style={{ borderColor: "var(--accent-strong)", background: "var(--accent-strong)", color: "var(--bg)" }}
                 >
                   {t.cta.label}
                 </Link>
@@ -903,6 +903,11 @@ export default function Home() {
 
         {/* within-Lethe plan matrix */}
         <PlanCompare />
+
+        {/* model-future line — models come and go; the memory is permanent */}
+        <p className="mt-8 text-center lethe-body mx-auto max-w-2xl" style={{ color: "var(--text-muted)" }}>
+          More models as they ship — your memory works with all of them.
+        </p>
       </section>
 
       {/* ── How Lethe is different — factual comparison ── */}
@@ -950,17 +955,17 @@ export default function Home() {
       <section id="roadmap" className="max-w-6xl mx-auto w-full px-6 lethe-section" style={{ paddingTop: 0 }}>
         <div className="lethe-eyebrow">How this grows</div>
         <h2 className="lethe-section-head">Three rings around one vault</h2>
-        <p className="mt-3 lethe-body lethe-measure" style={{ color: "var(--text-dim)" }}>
+        <p className="mt-3 lethe-body lethe-measure" style={{ color: "var(--text)" }}>
           Most roadmaps ask you to believe. This one is mostly receipts — verify any line.
         </p>
 
-        <div className="mt-10 grid grid-cols-1 lg:grid-cols-[2fr_3fr] gap-10 lg:gap-16 items-center">
-          {/* rings — desktop only; mobile gets the small motif below */}
+        <div className="mt-10 grid grid-cols-1 lg:grid-cols-[5fr_6fr] gap-10 lg:gap-16 items-center">
+          {/* rings — desktop bigger so band labels read; mobile gets a near-full-width motif */}
           <div className="hidden lg:block" aria-hidden="true">
             <GrowthRings />
           </div>
-          <div className="lg:hidden mx-auto w-44" aria-hidden="true">
-            <GrowthRings size={176} />
+          <div className="lg:hidden mx-auto w-full max-w-xs" aria-hidden="true">
+            <GrowthRings />
           </div>
 
           <div>
@@ -988,10 +993,10 @@ export default function Home() {
                   <p className="lethe-body" style={{ color: "var(--text)" }}>{g.revenue}</p>
                 </div>
                 {g.closing && (
-                  <p className="mt-2.5 lethe-body italic" style={{ color: "var(--text-dim)" }}>{g.closing}</p>
+                  <p className="mt-2.5 lethe-body italic" style={{ color: "var(--text-muted)" }}>{g.closing}</p>
                 )}
                 {g.sub && (
-                  <p className="mt-3 lethe-measure text-[0.82rem] leading-relaxed" style={{ color: "var(--text-dim)", opacity: 0.75 }}>{g.sub}</p>
+                  <p className="mt-3 lethe-measure text-[0.82rem] leading-relaxed" style={{ color: "var(--text-muted)" }}>{g.sub}</p>
                 )}
                 {g.stable && (
                   <p className="mt-3 lethe-body lethe-measure" style={{ color: "#5A8A9E" }}>{g.stable}</p>
@@ -1000,7 +1005,7 @@ export default function Home() {
                   <p className="mt-3 lethe-body lethe-measure" style={{ color: "#5A8A9E" }}>{g.horizon}</p>
                 )}
                 {g.footnote && (
-                  <p className="mt-3 lethe-measure text-[0.82rem] leading-relaxed" style={{ color: "var(--text-dim)", opacity: 0.7 }}>{g.footnote}</p>
+                  <p className="mt-3 lethe-measure text-[0.82rem] leading-relaxed" style={{ color: "var(--text-muted)" }}>{g.footnote}</p>
                 )}
               </div>
             ))}

@@ -15,10 +15,11 @@ const fraunces = Fraunces({
   style: ["normal", "italic"],
   axes: ["opsz"],
 });
+// Variable axis (not fixed instances) so body can sit at a true 450 — the
+// Block 16 "raise the floor" weight that fixes thin/sleepy reading text.
 const instrument = Instrument_Sans({
   subsets: ["latin"],
   variable: "--font-instrument",
-  weight: ["400", "500", "600"],
 });
 const plexMono = IBM_Plex_Mono({
   subsets: ["latin"],
