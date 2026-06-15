@@ -28,8 +28,6 @@ type Msg = {
   text: string;
   /** which model produced this reply, e.g. "minimax/MiniMax-Text-01" */
   provider?: string;
-  /** quiet failover note, e.g. "MiniMax unavailable — answered with Llama" */
-  note?: string;
   /** true while tokens are still arriving */
   streaming?: boolean;
 };
@@ -118,10 +116,6 @@ export default function ChatPage() {
       window.localStorage.setItem(MODEL_LS_KEY, key);
     } catch {/* private mode */}
   };
-  const labelOf = useCallback(
-    (key: string) => models.find((m) => m.key === key)?.label.split(" · ")[0] ?? key,
-    [models],
-  );
   // Compact digest of every owned memory, kept in context for the whole chat.
   const digestRef = useRef<string[]>([]);
   // One personalized greeting per page load, and only before the user types.
@@ -284,14 +278,11 @@ export default function ChatPage() {
         throw new Error((err as { error?: string })?.error ?? "chat failed");
       }
       const provider = res.headers.get("x-provider") ?? undefined;
-      // Preferred model didn't answer → say so quietly, never fail the chat.
-      const answeredBy = provider?.split("/")[0];
-      const note =
-        model && answeredBy && answeredBy !== model
-          ? `${labelOf(model)} unavailable right now — answered with ${labelOf(answeredBy)}`
-          : undefined;
-
-      setMsgs((m) => [...m, { role: "lethe", text: "", provider, note, streaming: true }]);
+      // Failover is SILENT in the UI: if the preferred model was busy the chain
+      // already answered with the next one server-side (logged + in x-provider).
+      // The user just sees a normal reply + the tasteful `via <model>` line —
+      // no "unavailable" apology that reads like a malfunction in a demo.
+      setMsgs((m) => [...m, { role: "lethe", text: "", provider, streaming: true }]);
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       let reply = "";
@@ -631,11 +622,6 @@ export default function ChatPage() {
                     {m.provider && !m.streaming && (
                       <div className="lethe-id mt-1.5" style={{ color: "var(--text-dim)" }} title="The model that actually produced this reply">
                         via {m.provider}
-                      </div>
-                    )}
-                    {m.note && !m.streaming && (
-                      <div className="text-[11px] mt-1 italic" style={{ color: "var(--accent-h)" }}>
-                        {m.note}
                       </div>
                     )}
                   </div>
