@@ -419,6 +419,21 @@ function BuiltOnStrip() {
           return i === 0 ? [link] : [sep, link];
         })}
       </div>
+
+      {/* Credibility line — every claim links to its own proof. */}
+      <div className="mt-4 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 lethe-id uppercase" style={{ color: "var(--text-dim)" }}>
+        <a href="https://github.com/vowctminibro/lethe" target="_blank" rel="noopener noreferrer" className="hover:opacity-70 transition" style={{ color: "var(--accent-strong)" }}>
+          Open source
+        </a>
+        <span aria-hidden="true">·</span>
+        <a href="https://suiscan.xyz/testnet/object/0x0c79fd944a51153e4d668a4f53a280fe5d0ab6d4db0a572a2f85c11ac5fc2f6c" target="_blank" rel="noopener noreferrer" className="hover:opacity-70 transition" style={{ color: "var(--accent-strong)" }}>
+          Verifiable on-chain
+        </a>
+        <span aria-hidden="true">·</span>
+        <Link href="/docs/security" className="hover:opacity-70 transition" style={{ color: "var(--accent-strong)" }}>
+          Formally verified · Sui Prover 19/19
+        </Link>
+      </div>
     </section>
   );
 }
