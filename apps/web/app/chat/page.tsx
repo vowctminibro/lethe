@@ -100,8 +100,15 @@ export default function ChatPage() {
       .then(({ models: m }: { models: ModelOption[] }) => {
         setModels(m);
         const saved = window.localStorage.getItem(MODEL_LS_KEY);
-        if (saved && m.some((x) => x.key === saved)) setModel(saved);
-        else setModel(m.find((x) => x.isDefault)?.key ?? m[0]?.key ?? "");
+        // Only honor a saved choice if that provider is configured on THIS
+        // environment — never preselect a model the chain can't answer as.
+        const firstConfigured = m.find((x) => x.isDefault && x.configured)?.key
+          ?? m.find((x) => x.configured)?.key
+          ?? m.find((x) => x.isDefault)?.key
+          ?? m[0]?.key
+          ?? "";
+        if (saved && m.some((x) => x.key === saved && x.configured)) setModel(saved);
+        else setModel(firstConfigured);
       })
       .catch(() => {/* selector is sugar — chat works on the default chain */});
   }, []);
@@ -543,8 +550,9 @@ export default function ChatPage() {
                   aria-label="Model"
                 >
                   {models.map((m) => (
-                    <option key={m.key} value={m.key}>
+                    <option key={m.key} value={m.key} disabled={!m.configured}>
                       {m.label}
+                      {m.configured ? "" : " — not configured"}
                     </option>
                   ))}
                 </select>
