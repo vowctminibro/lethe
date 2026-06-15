@@ -1399,3 +1399,7 @@ STEP 2 — implemented (verified only):
 STEP 3 — MVR (read-only, NOT implemented): registering creates a separate SuiNS-namespaced name→package metadata record; does NOT modify/republish the deployed package → safe on that constraint. BUT needs a SuiNS name + mvr CLI/SDK + several txs + source-verify flow, for modest judge visibility. Verdict: DEFER to roadmap.
 RECHECK: tsc clean · build green · landing 0 overflow + 0 console errors at 1280 & 390 · 3 trust links resolve · main untouched (work on feat/credibility). Files: apps/web/app/page.tsx, README.md, SECURITY.md, docs/PROGRESS.md, design/screens/prod/credibility-line.png.
 === END NOTE ===
+
+=== BLOCK 20 — MERGE + DEPLOY (2026-06-15) ===
+feat/credibility merged into main (--no-ff, commit 52c1de0) — CLEAN, no conflicts (5 files, +90/-3). feat/connect-agent-ux deliberately NOT merged (awaiting on-chain verify via Hermes). Pushed 09f2a21..52c1de0 → origin/main. Deploy --prod → lethe-gold.vercel.app (dpl ...42js366of, READY). PROD VERIFY: 8/8 routes 200; trust line live ("Open source / Verifiable on-chain / Formally verified · Sui Prover 19/19") with all 3 links resolving 200 (GitHub repo / Suiscan v3 package 0x0c79… / /docs/security); 0 console errors + 0 overflow at 1280 & 390; money-shot path unchanged (/api/pulse/recall + /api/grant/recall still 403, broker untouched). README badge swap (CI→formally-verified) + SECURITY.md now on main.
+=== END ===
