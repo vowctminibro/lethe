@@ -10,6 +10,10 @@ const nextConfig: NextConfig = {
   // routing layer makes them unreachable.
   async redirects() {
     return [
+      // /pricing has no page of its own — pricing lives in the #pricing
+      // section on the landing page. Send any direct/external /pricing hit
+      // there so the link is never dead.
+      { source: "/pricing", destination: "/#pricing", permanent: false },
       { source: "/create", destination: "/chat", permanent: false },
       { source: "/me", destination: "/memory", permanent: false },
       { source: "/battle", destination: "/chat", permanent: false },
