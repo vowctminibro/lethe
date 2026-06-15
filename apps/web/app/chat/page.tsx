@@ -765,13 +765,33 @@ export default function ChatPage() {
                 </div>
 
                 <div className="flex gap-2">
+                  {/* Compact model picker right by the box (ChatGPT/Venice habit).
+                      Same `model` state as the top capability-bar selector, so
+                      changing either updates both — single source of truth. */}
+                  {models.length > 0 && (
+                    <select
+                      value={model}
+                      onChange={(e) => pickModel(e.target.value)}
+                      className="shrink-0 h-11 px-2 rounded-xl text-xs outline-none cursor-pointer max-w-[116px] hover:border-[var(--accent-strong)] transition"
+                      style={{ background: "var(--bg)", border: "1px solid var(--border)", color: "var(--text-dim)" }}
+                      title="Model that answers — your memory works with all of them"
+                      aria-label="Model"
+                    >
+                      {models.map((m) => (
+                        <option key={m.key} value={m.key} disabled={!m.configured} style={{ color: "var(--text)" }}>
+                          {m.label.split(" · ")[0]}
+                          {m.configured ? "" : " — n/a"}
+                        </option>
+                      ))}
+                    </select>
+                  )}
                   <input
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && send()}
                     placeholder="Tell Lethe about your crypto style…"
                     disabled={busy}
-                    className="flex-1 h-11 px-4 rounded-xl text-sm outline-none"
+                    className="flex-1 min-w-0 h-11 px-4 rounded-xl text-sm outline-none"
                     style={{ background: "var(--bg)", border: "1px solid var(--border)", color: "var(--text)" }}
                   />
                   <button
