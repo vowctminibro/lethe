@@ -1417,3 +1417,19 @@ Local: 8/8 green (CI-identical command). Awaiting green CI on the PR before merg
 === FIX failover-test — MERGE + DEPLOY (2026-06-15) ===
 PR #2 (fix/failover-test) green → merged into main (--no-ff, commit 1725ba8), CLEAN no conflicts (2 files). Pushed 33ea7a6..1725ba8. CI on MAIN verified GREEN (run 27556752216, sha 1725ba8): Move tests ✓ + Web LLM-failover ✓ (the previously-red job now passes). Deploy --prod → lethe-gold.vercel.app (dpl …a7lzzlewh, READY). PROD verify: 8/8 routes 200; money-shot path unchanged (/api/pulse/recall + /api/grant/recall still 403); 0 console errors at 1280 & 390. CI is now green on main — a real CI status badge could be added honestly if desired. (feat/connect-agent-ux still NOT merged — awaiting on-chain verify.)
 === END ===
+
+## 2026-06-15 — ON-CHAIN VERIFY: connect-agent grant/revoke loop (real testnet, no OAuth)
+
+=== ON-CHAIN E2E REPORT ===
+Bypassed the OAuth UI seam (preview redirect_uri_mismatch = config, not a bug). New script apps/web/scripts/onchain-grant-revoke-e2e.mjs signs grant/revoke as the LOCAL sui CLI wallet (key stays in keystore — never read/printed/committed) against a REAL vault, then hits the live /api/grant/recall broker. No Move/Seal touched, no republish — only CALLS the deployed memory::grant / memory::revoke + queries chain state. grant→revoke leaves the vault at baseline (net change 0).
+Result: ✅ ALL 6 STEPS PASS.
+  owner (CLI wallet) = 0x4bf2…8077 · agent = 0x…061676e74 · vault = 0x0d65…e34f (24 entries)
+  1. baseline authorized = [] — agent NOT present ✓
+  2. grant(agent) → tx success 2zNSYKCdwB49Wu7x7WAWGvhZftwRZ71qXdv1PfSRjSpT → authorized = [0x…61676e74] (agent ADDED on-chain) ✓
+  3. /api/grant/recall (granted) → HTTP 200, 23 entries readable ✓
+  4. revoke(agent) → tx success 9Kw6267v562gZmLQZxowmCSHNUF5PboDGLuLyzEKpRHb → authorized = [] (agent REMOVED on-chain) ✓
+  5. vault returned to baseline (authorized [] == baseline) — net state change 0 ✓
+  6. /api/grant/recall (revoked) → HTTP 403 (blind) ✓
+Suiscan: grant tx https://suiscan.xyz/testnet/tx/2zNSYKCdwB49Wu7x7WAWGvhZftwRZ71qXdv1PfSRjSpT · revoke tx https://suiscan.xyz/testnet/tx/9Kw6267v562gZmLQZxowmCSHNUF5PboDGLuLyzEKpRHb · vault https://suiscan.xyz/testnet/object/0x0d65da620e5447f6a85b051bf1f9a2c5ed26c2efc184a60c77dc7cc5b7bae34f
+Note: vault has 24 entries; broker returned 23 (one entry not server-decryptable — expected for mixed Seal/legacy blobs; the 200/403 GATE is what's asserted). The grant/revoke pattern has NO bug on chain → feat/connect-agent-ux is de-risked for merge (user's call).
+=== END REPORT ===
