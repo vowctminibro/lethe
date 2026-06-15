@@ -1362,6 +1362,17 @@ Recheck (local): tsc clean · web build green (/api/grant/recall registered) · 
 Blockers: none.
 === END REPORT ===
 
+## 2026-06-15 — BLOCK 18b: BUILT ON logo links → official sites
+
+=== BLOCK 18b NOTE ===
+Landing "BUILT ON" strip (apps/web/app/page.tsx, const BUILT_ON) — repointed the 4 logo links to the official sites + open in a new tab. Only the 4 hrefs + the strip anchor's rel touched; marks/names/layout/other logos and the colophon links untouched.
+  SUI:    https://suiscan.xyz/testnet/object/0x0c79…2f6c        → https://sui.io
+  WALRUS: https://aggregator.walrus-testnet.walrus.space/v1/blobs/GbB4…2Eg → https://www.walrus.xyz
+  SEAL:   /docs/security                                        → https://seal.mystenlabs.com
+  ENOKI:  /docs/concepts                                        → https://docs.enoki.mystenlabs.com
+All 4 now render `<a target="_blank" rel="noopener noreferrer">` (verified in served HTML). tsc clean · build green.
+=== END NOTE ===
+
 ## 2026-06-15 — LANDING POLISH: Seal + Enoki marks on "Built on"
 
 Seal/Enoki were bare wordmarks beside Sui's droplet + Walrus's W (unbalanced trust strip). Added two subtle in-brand geometric marks — padlock (Seal = encryption) and key (Enoki = zkLogin identity) — grayscaled to the Fog palette at the same h-4 weight/spacing, so all four read as one set. New assets public/partners/{seal-lock,enoki-key}.svg; BUILT_ON marks wired. No staking/burn/counter (out of scope). Build green; commit b568dcf pushed; deploy --prod → lethe-gold.vercel.app (dpl ...2pym4ahvk). Verified on prod: 4 SVG assets 200, 4 marks render (Sui/Walrus/Seal/Enoki), 0 page overflow at desktop(1280) + 390px, 0 console errors (Playwright). Blockers: none.

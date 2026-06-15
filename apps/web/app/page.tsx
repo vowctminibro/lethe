@@ -386,10 +386,10 @@ const PRICING_GLYPHS = {
  * represents.
  */
 const BUILT_ON: { name: string; mark: string | null; href: string }[] = [
-  { name: "Sui", mark: "/partners/sui-droplet.svg", href: "https://suiscan.xyz/testnet/object/0x0c79fd944a51153e4d668a4f53a280fe5d0ab6d4db0a572a2f85c11ac5fc2f6c" },
-  { name: "Walrus", mark: "/partners/walrus-monogram.svg", href: "https://aggregator.walrus-testnet.walrus.space/v1/blobs/GbB45iJxmH5F8Si_78GG_macC6WeLS64jXjx7x852Eg" },
-  { name: "Seal", mark: "/partners/seal.png", href: "/docs/security" },
-  { name: "Enoki", mark: "/partners/enoki.png", href: "/docs/concepts" },
+  { name: "Sui", mark: "/partners/sui-droplet.svg", href: "https://sui.io" },
+  { name: "Walrus", mark: "/partners/walrus-monogram.svg", href: "https://www.walrus.xyz" },
+  { name: "Seal", mark: "/partners/seal.png", href: "https://seal.mystenlabs.com" },
+  { name: "Enoki", mark: "/partners/enoki.png", href: "https://docs.enoki.mystenlabs.com" },
 ];
 
 function BuiltOnStrip() {
@@ -409,7 +409,7 @@ function BuiltOnStrip() {
           );
           const cls = "inline-flex items-center gap-2 transition hover:opacity-70";
           const link = it.href.startsWith("http") ? (
-            <a key={it.name} href={it.href} target="_blank" rel="noreferrer" className={cls}>{inner}</a>
+            <a key={it.name} href={it.href} target="_blank" rel="noopener noreferrer" className={cls}>{inner}</a>
           ) : (
             <Link key={it.name} href={it.href} className={cls}>{inner}</Link>
           );
