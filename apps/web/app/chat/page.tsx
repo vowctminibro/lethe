@@ -81,7 +81,7 @@ export default function ChatPage() {
   const [msgs, setMsgs] = useState<Msg[]>([
     {
       role: "lethe",
-      text: "Hey — I'm Lethe. Tell me about your crypto style (e.g. \"I'm a momentum trader and I hate leverage\") and I'll remember it on Walrus, owned by you. Or let me read your on-chain activity and learn from what you've actually done. Already have an AI that knows you? Import what it remembers from the bar above — and switch models anytime; your memory works with all of them.",
+      text: "I'm Lethe. The memory I keep of you is yours — encrypted on Walrus, controlled by you on-chain, and portable across any model. Tell me your style, or tap “Analyze my on-chain activity” and I'll learn from what you've actually done.",
     },
   ]);
   const endRef = useRef<HTMLDivElement>(null);
