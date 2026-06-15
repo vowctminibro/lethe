@@ -1348,3 +1348,7 @@ EXTRA (f48d601, dev-only): stamped the five DEMO_MOCK seeds with their real 245 
 DEPLOY + VERIFY. Build green before each of 4 commits; all pushed to origin/main (361e8ea→f48d601). One deploy --prod → lethe-gold.vercel.app (dpl ...i89cckfnj, READY; built from 175e336 = all user-facing steps; the later dev-only mock commit doesn't affect prod). External verify: 8/8 routes 200 (/, /chat, /memory, /pulse, /docs{,/concepts,/sdk,/security}); 0 console errors across / /chat /memory /pulse (Playwright); per-memory line + footprint + economics render + link resolves (DEMO_MOCK). Signed-in chips on prod need OAuth (the one un-automatable seam) — covered via DEMO_MOCK, same as Block 11.
 Blockers: none.
 === END REPORT ===
+
+## 2026-06-15 — LANDING POLISH: Seal + Enoki marks on "Built on"
+
+Seal/Enoki were bare wordmarks beside Sui's droplet + Walrus's W (unbalanced trust strip). Added two subtle in-brand geometric marks — padlock (Seal = encryption) and key (Enoki = zkLogin identity) — grayscaled to the Fog palette at the same h-4 weight/spacing, so all four read as one set. New assets public/partners/{seal-lock,enoki-key}.svg; BUILT_ON marks wired. No staking/burn/counter (out of scope). Build green; commit b568dcf pushed; deploy --prod → lethe-gold.vercel.app (dpl ...2pym4ahvk). Verified on prod: 4 SVG assets 200, 4 marks render (Sui/Walrus/Seal/Enoki), 0 page overflow at desktop(1280) + 390px, 0 console errors (Playwright). Blockers: none.
