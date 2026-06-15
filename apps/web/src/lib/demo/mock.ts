@@ -39,6 +39,9 @@ const seed = (text: string, kind: string, blobId: string, ageMin: number): Recal
   namespace: "lethe",
   createdAtMs: now - ageMin * 60_000,
   score: 0.6,
+  // Real on-Walrus size of these seed blobs (each 245 B, fetched from the
+  // testnet aggregator) — so the footprint reads truthfully in DEMO_MOCK.
+  size: 245,
 });
 
 // Real (encrypted) blobs stored on Walrus testnet in earlier verified sessions.
