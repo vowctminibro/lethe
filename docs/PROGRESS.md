@@ -1403,3 +1403,13 @@ RECHECK: tsc clean · build green · landing 0 overflow + 0 console errors at 12
 === BLOCK 20 — MERGE + DEPLOY (2026-06-15) ===
 feat/credibility merged into main (--no-ff, commit 52c1de0) — CLEAN, no conflicts (5 files, +90/-3). feat/connect-agent-ux deliberately NOT merged (awaiting on-chain verify via Hermes). Pushed 09f2a21..52c1de0 → origin/main. Deploy --prod → lethe-gold.vercel.app (dpl ...42js366of, READY). PROD VERIFY: 8/8 routes 200; trust line live ("Open source / Verifiable on-chain / Formally verified · Sui Prover 19/19") with all 3 links resolving 200 (GitHub repo / Suiscan v3 package 0x0c79… / /docs/security); 0 console errors + 0 overflow at 1280 & 390; money-shot path unchanged (/api/pulse/recall + /api/grant/recall still 403, broker untouched). README badge swap (CI→formally-verified) + SECURITY.md now on main.
 === END ===
+
+## 2026-06-15 — FIX: failover test refreshed to the Block-13 chain (branch fix/failover-test)
+
+=== NOTE ===
+CI's "web LLM-failover" job was RED — a STALE TEST, not a bug. It asserted the pre-Block-13 chain (MiniMax primary); Block 13 deliberately removed MiniMax from the chat chain (paid-plan-leak fix, verified on prod). NO logic/core touched — rewrote apps/web/scripts/test-llm-failover.mjs only:
+- asserts chat chain == ['groq','gemini','nvidia-nim'] AND MiniMax NOT in it (regression guard for the leak fix);
+- asserts configuredProviders(true) appends 'minimax' (import-extract backstop);
+- failover cases re-pointed to the real hosts (api.groq.com / generativelanguage.googleapis.com / integrate.api.nvidia.com / api.minimax.io): groq 5xx/429/timeout → gemini → nim for complete() + streamComplete(), healthy-groq primary, all-down → readable error, includeMinimax backstop.
+Local: 8/8 green (CI-identical command). Awaiting green CI on the PR before merge.
+=== END ===
