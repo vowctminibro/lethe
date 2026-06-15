@@ -19,6 +19,7 @@ import { Logo } from "@/src/components/Logo";
 import { SignIn } from "@/src/components/SiteHeader";
 import { MemoryRail, type RailEntry } from "@/src/components/MemoryRail";
 import { ImportMemoryDialog } from "@/src/components/ImportMemoryDialog";
+import { OnboardingOverlay } from "@/src/components/OnboardingOverlay";
 import { useMemory, getOwnedMemory, MEMORY_ALLOWLISTED } from "@/src/lib/memory";
 import { exportMemoryFile } from "@/src/lib/memory/export-file";
 import { DEMO_MOCK, getMockOwnedMemory, useLetheAccount } from "@/src/lib/demo/mock";
@@ -120,6 +121,31 @@ export default function ChatPage() {
   const digestRef = useRef<string[]>([]);
   // One personalized greeting per page load, and only before the user types.
   const greetedRef = useRef(false);
+
+  // ── first-run onboarding gate (NOT localStorage) ─────────────────────────
+  // Per-user signal = VAULT STATE: a user who already owns memories is
+  // returning and never sees it. Suppression within a visit = SESSION STATE
+  // (sessionStorage), so a reload doesn't re-pop it. No user data is shown.
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const onboardDecidedRef = useRef(false);
+  useEffect(() => {
+    if (onboardDecidedRef.current) return;
+    // For a signed-in user, wait until we know their vault state.
+    if (account && railLoading) return;
+    let seen = false;
+    try {
+      seen = window.sessionStorage.getItem("lethe-onboarding-seen") === "1";
+    } catch {/* private mode — fall through, show once */}
+    const hasMemories = rail.some((r) => r.status === "confirmed");
+    if (!seen && !hasMemories) setShowOnboarding(true);
+    onboardDecidedRef.current = true;
+  }, [account, railLoading, rail]);
+  const dismissOnboarding = useCallback(() => {
+    setShowOnboarding(false);
+    try {
+      window.sessionStorage.setItem("lethe-onboarding-seen", "1");
+    } catch {/* private mode — it simply may show again next visit */}
+  }, []);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -813,6 +839,9 @@ export default function ChatPage() {
           <MemoryRail entries={rail} vaultId={vaultId} loading={railLoading} />
         </div>
       </div>
+
+      {/* ── First-run onboarding — fresh visitor, no memories yet; skippable ── */}
+      {showOnboarding && <OnboardingOverlay onClose={dismissOnboarding} />}
 
       {/* ── Import dialog — shared component (same flow as /memory) ── */}
       <ImportMemoryDialog open={importOpen} onClose={() => setImportOpen(false)} onImported={onImported} />

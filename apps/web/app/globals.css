@@ -194,6 +194,10 @@ html, body {
 }
 .lethe-card-in { animation: lethe-card-in 0.4s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
 
+/* Onboarding step cross-fade — cheap opacity only, never delays first use. */
+@keyframes lethe-onboard-fade { from { opacity: 0; } to { opacity: 1; } }
+.lethe-onboard-fade { animation: lethe-onboard-fade 0.22s ease-out both; }
+
 /* ── Memory chip lifecycle — extract → lift → glide → anchor ───────── */
 
 /* A fact lifting out of the conversation with a soft coral glow. */
@@ -229,7 +233,7 @@ html, body {
 
 @media (prefers-reduced-motion: reduce) {
   .lethe-shimmer, .lethe-fade-in, .lethe-reveal, .lethe-overlay-in, .lethe-card-in,
-  .lethe-chip-lift, .lethe-stamp, .lethe-inkwash, .lethe-draw { animation: none; }
+  .lethe-chip-lift, .lethe-stamp, .lethe-inkwash, .lethe-draw, .lethe-onboard-fade { animation: none; }
   .lethe-water::before, .lethe-divider::before { animation: none; }
   .lethe-draw { stroke-dashoffset: 0; }
 }
