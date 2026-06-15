@@ -69,7 +69,9 @@ export class SealProvider extends ManualProvider {
       this.#sealDeps,
       buildAddEntryTx({ memoryId: vaultId, ref }),
     );
-    return { ...ref, memoryId: vaultId, digest, gasOwner };
+    // The ciphertext we just stored IS the Walrus blob — its byte length is the
+    // real footprint, known here with no extra fetch.
+    return { ...ref, memoryId: vaultId, digest, gasOwner, size: ciphertext.byteLength };
   }
 
   override async recall(query: string, opts?: { limit?: number }): Promise<RecallHit[]> {
@@ -113,7 +115,7 @@ export class SealProvider extends ManualProvider {
       );
       texts.forEach((plaintext, i) => {
         if (plaintext === null) return;
-        const { ref } = sealBlobs[i];
+        const { ref, bytes } = sealBlobs[i];
         let text = plaintext;
         try {
           const parsed = JSON.parse(plaintext);
@@ -128,6 +130,8 @@ export class SealProvider extends ManualProvider {
           kind: ref.kind,
           createdAtMs: ref.createdAtMs,
           score: scoreEntry(query, `${text} ${ref.kind.replace(/-/g, " ")}`),
+          // Real Walrus blob size — we already fetched these bytes to decrypt.
+          size: bytes.byteLength,
         });
       });
     }

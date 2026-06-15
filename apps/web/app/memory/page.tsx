@@ -17,6 +17,7 @@ import { Logo } from "@/src/components/Logo";
 import { SignIn } from "@/src/components/SiteHeader";
 import { useMemory, getOwnedMemory, type OwnedMemory, type RecallHit } from "@/src/lib/memory";
 import { exportMemoryFile } from "@/src/lib/memory/export-file";
+import { formatBytes } from "@/src/lib/format";
 import { ImportMemoryDialog } from "@/src/components/ImportMemoryDialog";
 import { DEMO_MOCK, getMockOwnedMemory, useLetheAccount } from "@/src/lib/demo/mock";
 import { PULSE_APP_ADDRESS } from "@/src/lib/pulse";
@@ -422,6 +423,10 @@ export default function MemoryPage() {
                           </span>
                         )}
                       </div>
+                      <p className="mt-1.5 text-[11px]" style={{ color: "var(--text-dim)" }} title="This memory is real WAL-backed Walrus storage">
+                        stored on Walrus
+                        {formatBytes(h.size) && <> · <span className="lethe-id">{formatBytes(h.size)}</span></>}
+                      </p>
                     </div>
                   </li>
                 ))}

@@ -212,6 +212,7 @@ export default function ChatPage() {
             status: "confirmed" as const,
             createdAtMs: h.createdAtMs,
             blobId: h.blobId,
+            size: h.size,
           })),
         );
         // Returning user: greet personally instead of the canned opener.
@@ -245,7 +246,7 @@ export default function ChatPage() {
       setRail((r) =>
         r.map((e) =>
           e.id === id
-            ? { ...e, status: "confirmed" as const, blobId: res.blobId, digest: res.digest, createdAtMs: res.createdAtMs }
+            ? { ...e, status: "confirmed" as const, blobId: res.blobId, digest: res.digest, createdAtMs: res.createdAtMs, size: res.size }
             : e,
         ),
       );

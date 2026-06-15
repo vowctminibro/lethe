@@ -34,6 +34,8 @@ export interface RememberResult extends BlobRef {
   digest: string;
   /** Gas sponsor address (proves gasless), if resolvable. */
   gasOwner: string | null;
+  /** Stored (encrypted) blob size in bytes — the real Walrus footprint. */
+  size?: number;
 }
 
 /** A recalled entry, with its decrypted text and a relevance score. */
@@ -42,4 +44,6 @@ export interface RecallHit extends BlobRef {
   text: string;
   /** Relevance score for the query in [0,1]; higher is better. */
   score: number;
+  /** Stored (encrypted) blob size in bytes, when read client-side. */
+  size?: number;
 }

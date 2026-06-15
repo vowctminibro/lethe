@@ -12,6 +12,7 @@
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useSealUnlocking } from "@/src/lib/memory/use-seal-unlock";
+import { formatBytes } from "@/src/lib/format";
 
 export interface RailEntry {
   id: string;
@@ -22,6 +23,8 @@ export interface RailEntry {
   blobId?: string;
   /** add_entry tx digest (fresh writes only — historical entries link the vault). */
   digest?: string;
+  /** Real stored blob size in bytes, when known (fresh write / recall). */
+  size?: number;
   error?: string;
 }
 
@@ -239,6 +242,13 @@ export function MemoryRail({
                     </PoolLink>
                   ) : null}
                 </div>
+              )}
+
+              {e.status === "confirmed" && (
+                <p className="mt-1.5 text-[10px]" style={{ color: POOL.dim }} title="This memory is real WAL-backed Walrus storage">
+                  stored on Walrus
+                  {formatBytes(e.size) && <> · <span className="lethe-id">{formatBytes(e.size)}</span></>}
+                </p>
               )}
             </div>
           ))}
