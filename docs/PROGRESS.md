@@ -1352,3 +1352,7 @@ Blockers: none.
 ## 2026-06-15 — LANDING POLISH: Seal + Enoki marks on "Built on"
 
 Seal/Enoki were bare wordmarks beside Sui's droplet + Walrus's W (unbalanced trust strip). Added two subtle in-brand geometric marks — padlock (Seal = encryption) and key (Enoki = zkLogin identity) — grayscaled to the Fog palette at the same h-4 weight/spacing, so all four read as one set. New assets public/partners/{seal-lock,enoki-key}.svg; BUILT_ON marks wired. No staking/burn/counter (out of scope). Build green; commit b568dcf pushed; deploy --prod → lethe-gold.vercel.app (dpl ...2pym4ahvk). Verified on prod: 4 SVG assets 200, 4 marks render (Sui/Walrus/Seal/Enoki), 0 page overflow at desktop(1280) + 390px, 0 console errors (Playwright). Blockers: none.
+
+## 2026-06-15 — LANDING: balance Seal mark weight in "Built on"
+
+The extracted Seal mascot was a cream/off-white body, so under the row's grayscale(1)+opacity it washed out near-white while Walrus's solid-black W and Enoki's filled monogram stayed dark — Seal read faint/thin, the optical outlier. Recolored the asset only (apps/web/public/partners/seal.png): cream body → wordmark navy #1A3A4A, outline/eyes/nose → near-black #0A0C10, alpha untouched (smooth edges + transparent bg kept). Now a solid dark mark balanced with the other three; face still reads. No code change, no other logo touched. Verified via row screenshot (desktop). Committed + pushed; deploy --prod. Blockers: none.
