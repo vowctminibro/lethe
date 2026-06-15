@@ -1331,3 +1331,20 @@ FIX 4 — FIRST-RUN ONBOARDING (00e65bc + race fix 861f6e6). New OnboardingOverl
 DEPLOY + VERIFY. tsc/build green before each commit; all 6 commits pushed to origin/main (496b070→861f6e6, origin in sync). One final deploy --prod → lethe-gold.vercel.app (dpl ...n12twxil3, READY). External verify: 8/8 routes 200 · /pricing 307→/#pricing · both selectors present + synced + next-call-uses-it (mock) · bare "hi" → "hello" · 0 failover banners · onboarding shows once on fresh incognito + skippable + no re-show on reload · top selector 3 configured options · 0 console errors across / /chat /memory /pulse (the DEMO_MOCK hydration warning is a dev-only artifact, absent in prod). NOTE: the input-bar selector + live sync render only when signed in; runtime sync proven via DEMO_MOCK (OAuth remains the one un-automatable seam, same as prior blocks).
 Blockers: none.
 === END REPORT ===
+
+## 2026-06-15 — BLOCK 12: WALRUS DEMAND, MADE VISIBLE
+
+=== LETHE BLOCK 12 REPORT ===
+Make it tangible in-product that every memory = real WAL-backed Walrus storage. No new systems, no token, no realtime price API. Sizes come from bytes ALREADY in hand — zero added per-chip network calls.
+
+STEP 1 — PER-MEMORY "stored on Walrus · <size>" (ea874c8). Added optional `size` (bytes) to RememberResult + RecallHit, populated for free: remember() returns the just-uploaded Seal ciphertext.byteLength; recall() returns the aggregator bytes.byteLength it already fetched to decrypt. Threaded → RailEntry → the /chat rail chip AND the /memory ledger rows render a quiet Mist line "stored on Walrus" with the mono size when known. Unknown size (legacy AES via server path, or a not-yet-confirmed chip) → just "stored on Walrus", never a fake number. Shared formatBytes() helper (B/KB/MB). VERIFIED (DEMO_MOCK, Playwright): 5/5 rail chips show "stored on Walrus · 245 B"; 5/5 /memory rows show the line. 390px /memory: 0 horizontal overflow (rail is desktop-only). Real-size path confirmed by construction — the five seed blobs fetched from the live aggregator are 245 B each, exactly what seal-provider reports from bytes-in-hand.
+
+STEP 2 — VAULT FOOTPRINT (1fd887e). One line near the vault header on /memory: "Your footprint: N memories · <total> on Walrus." Total sums real per-blob sizes and shows ONLY when allSized (every entry has a known size); otherwise count alone — never a wrong total. VERIFIED: footprint reads "Your footprint: 5 memories · 1.2 KB on Walrus." (5×245 B = 1225 B → 1.2 KB). A size-less mock write correctly degrades it to count-only.
+
+STEP 3 — ECONOMICS COPY (175e336). One muted sentence under the footprint: "Your memory is real Walrus storage — priced at $0.023/GB-month, paid in WAL." linking the verified Walrus storage-costs doc (docs.wal.app/docs/system-overview/storage-costs, HTTP 200; the same $0.023/GB/month figure cited in README L49). Used "/GB-month" (not the brief's bare "/GB") to match the verified per-GB-per-month model exactly — flagged for honesty. No predictions, no token claims.
+
+EXTRA (f48d601, dev-only): stamped the five DEMO_MOCK seeds with their real 245 B aggregator size so local demo/verification reads truthfully; fresh mock writes stay size-less (honest degradation). DEMO_MOCK is NODE_ENV=development-gated → does NOT touch prod.
+
+DEPLOY + VERIFY. Build green before each of 4 commits; all pushed to origin/main (361e8ea→f48d601). One deploy --prod → lethe-gold.vercel.app (dpl ...i89cckfnj, READY; built from 175e336 = all user-facing steps; the later dev-only mock commit doesn't affect prod). External verify: 8/8 routes 200 (/, /chat, /memory, /pulse, /docs{,/concepts,/sdk,/security}); 0 console errors across / /chat /memory /pulse (Playwright); per-memory line + footprint + economics render + link resolves (DEMO_MOCK). Signed-in chips on prod need OAuth (the one un-automatable seam) — covered via DEMO_MOCK, same as Block 11.
+Blockers: none.
+=== END REPORT ===
