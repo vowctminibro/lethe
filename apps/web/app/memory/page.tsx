@@ -209,6 +209,22 @@ export default function MemoryPage() {
           </p>
         )}
 
+        {account && memCount > 0 && (
+          <p className="mt-1 text-xs leading-relaxed" style={{ color: "var(--text-muted)" }}>
+            Your memory is real Walrus storage —{" "}
+            <a
+              className="underline decoration-dotted underline-offset-2 hover:opacity-70"
+              href="https://docs.wal.app/docs/system-overview/storage-costs"
+              target="_blank"
+              rel="noreferrer"
+              title="Walrus storage-cost model"
+            >
+              priced at $0.023/GB-month
+            </a>
+            , paid in WAL.
+          </p>
+        )}
+
         {/* ── MEMORY HUB — the vault and its readers, as a living map ── */}
         {account && chain && (
           <section className="mt-6 lethe-hairline rounded overflow-hidden lethe-water" style={{ background: "var(--bg-panel)" }}>
