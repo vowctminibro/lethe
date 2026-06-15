@@ -1380,3 +1380,15 @@ Seal/Enoki were bare wordmarks beside Sui's droplet + Walrus's W (unbalanced tru
 ## 2026-06-15 — LANDING: balance Seal mark weight in "Built on"
 
 The extracted Seal mascot was a cream/off-white body, so under the row's grayscale(1)+opacity it washed out near-white while Walrus's solid-black W and Enoki's filled monogram stayed dark — Seal read faint/thin, the optical outlier. Recolored the asset only (apps/web/public/partners/seal.png): cream body → wordmark navy #1A3A4A, outline/eyes/nose → near-black #0A0C10, alpha untouched (smooth edges + transparent bg kept). Now a solid dark mark balanced with the other three; face still reads. No code change, no other logo touched. Verified via row screenshot (desktop). Committed + pushed; deploy --prod. Blockers: none.
+
+
+## 2026-06-15 — BLOCK 19: "connect an agent" UX on /memory (branch feat/connect-agent-ux)
+
+=== BLOCK 19 NOTE ===
+TIER A only — additive UI on /memory, reuses existing grant()/revoke() + the shipped agent-broker; VERIFIED CORE UNTOUCHED (no Move/Seal/proofs). Makes the grant → agent-reads → revoke loop visible + judge-verifiable on the page.
+File touched: apps/web/app/memory/page.tsx ONLY (+ this note + 3 flow screenshots).
+- "Connect an agent" card (already had grant input + per-agent revoke): added (1) toast with a live Suiscan **tx** link on every grant AND revoke (captures the returned digest), (2) a "verify authorized vector ↗" link → the vault **object** on Suiscan (judge clicks to see the on-chain authorized[] live), (3) per-agent address link fixed to Suiscan **/account/** (was /object/), (4) an **empty state** ("No agents connected yet — paste an address above and Grant…"), (5) "Connected agents · N" header.
+- State: after grant/revoke we setNonce → reload getOwnedMemory from chain (on-chain refresh, not optimistic-only). Pulse stays controlled on the map node (excluded from this list to avoid double-control); noted in the empty state.
+Recheck: tsc clean · build green · full loop driven via DEMO_MOCK — empty → grant → agent appears (account link) + verify-vector link (→vault object) + toast tx link → revoke → back to empty. All 3 Suiscan link kinds resolve (/tx/<digest>, /account/<addr>, /object/<vaultId>). Pulse + money-shot untouched (no Pulse files changed). Screenshots: design/screens/prod/connect-agent-{empty,granted,revoked}.png.
+On the branch as a fallback-safe addition; verified core remains submittable on main at all times. Real on-chain grant/revoke needs the OAuth sign-in seam (same as every block) — DEMO_MOCK covers the loop + link wiring.
+=== END NOTE ===
