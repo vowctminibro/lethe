@@ -170,6 +170,12 @@ export default function MemoryPage() {
   const pulseGranted = chain?.authorized.includes(PULSE_APP_ADDRESS) ?? false;
   const pulseBusy = accessBusy === PULSE_APP_ADDRESS || accessBusy === "grant-pulse";
 
+  // Owned Walrus footprint — only sum when EVERY entry's real size is known,
+  // otherwise show the count alone (never a wrong total).
+  const memCount = hits?.length ?? 0;
+  const allSized = !!hits && hits.length > 0 && hits.every((h) => typeof h.size === "number" && h.size > 0);
+  const totalBytes = allSized ? hits!.reduce((sum, h) => sum + (h.size ?? 0), 0) : null;
+
   return (
     <main className="min-h-screen" style={{ background: "var(--bg)", color: "var(--text)" }}>
       <header className="border-b" style={{ borderColor: "var(--border)" }}>
@@ -189,6 +195,19 @@ export default function MemoryPage() {
         <p className="mt-2 text-sm" style={{ color: "var(--text-dim)" }}>
           Every entry is encrypted on Walrus and referenced on a Sui object you own. Tap any link to verify on-chain.
         </p>
+
+        {account && memCount > 0 && (
+          <p className="mt-3 text-sm" style={{ color: "var(--text)" }} data-testid="vault-footprint">
+            Your footprint:{" "}
+            <span className="lethe-id">{memCount}</span> {memCount === 1 ? "memory" : "memories"}
+            {totalBytes !== null && (
+              <>
+                {" "}· <span className="lethe-id">{formatBytes(totalBytes)}</span>
+              </>
+            )}{" "}
+            on Walrus.
+          </p>
+        )}
 
         {/* ── MEMORY HUB — the vault and its readers, as a living map ── */}
         {account && chain && (
