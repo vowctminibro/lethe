@@ -57,6 +57,13 @@ export interface LetheClientOptions {
   appBaseUrl?: string;
   /** Walrus aggregator for blob links. Default: public testnet aggregator. */
   aggregatorUrl?: string;
+  /**
+   * THIS app/agent's on-chain address — the one the user grants on their vault.
+   * When set, `requestReadAsGrantee` uses the generic broker endpoint
+   * (/api/grant/recall) gated on this address. When omitted, it falls back to
+   * the Pulse reference endpoint (back-compat).
+   */
+  appAddress?: string;
 }
 
 interface MoveVaultFields {
@@ -69,6 +76,7 @@ export class LetheClient {
   readonly sui: SuiJsonRpcClient;
   readonly appBaseUrl: string;
   readonly aggregatorUrl: string;
+  readonly appAddress?: string;
 
   constructor(opts: LetheClientOptions = {}) {
     this.sui = new SuiJsonRpcClient({
@@ -79,6 +87,7 @@ export class LetheClient {
     this.aggregatorUrl = (
       opts.aggregatorUrl ?? "https://aggregator.walrus-testnet.walrus.space"
     ).replace(/\/$/, "");
+    this.appAddress = opts.appAddress;
   }
 
   #toVault(objectId: string, fields: MoveVaultFields): Vault {
@@ -129,10 +138,15 @@ export class LetheClient {
     entries: GrantedEntry[];
     vaultId: string;
   }> {
-    const res = await fetch(`${this.appBaseUrl}/api/pulse/recall`, {
+    // With an appAddress configured → generic broker endpoint gated on it.
+    // Without → the Pulse reference endpoint (back-compat).
+    const { url, body } = this.appAddress
+      ? { url: `${this.appBaseUrl}/api/grant/recall`, body: { ownerAddress: args.ownerAddress, appAddress: this.appAddress } }
+      : { url: `${this.appBaseUrl}/api/pulse/recall`, body: { ownerAddress: args.ownerAddress } };
+    const res = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ownerAddress: args.ownerAddress }),
+      body: JSON.stringify(body),
     });
     const body = (await res.json().catch(() => ({}))) as {
       entries?: GrantedEntry[];

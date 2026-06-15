@@ -1349,6 +1349,19 @@ DEPLOY + VERIFY. Build green before each of 4 commits; all pushed to origin/main
 Blockers: none.
 === END REPORT ===
 
+## 2026-06-15 — BLOCK 18: generic agent-broker (Continue with Lethe for agents) + MCP
+
+=== BLOCK 18 REPORT ===
+Additive only — VERIFIED CORE UNTOUCHED (no Move, no Seal policy, no proofs changed). Generalized the Pulse-only grant-gated read into a broker any agent can use, + a dependency-free MCP server.
+- Shared helper `apps/web/src/lib/memory/grant-read.ts` — extracted Pulse's read logic verbatim (`grantGatedRead({ownerAddress, appAddress, appLabel?})`): reads the vault, returns decrypted entries ONLY if appAddress ∈ on-chain `authorized`; else 403; Seal blobs → `sealed:true` (owner-only). Same trust model as Pulse (server-mediated; caller-identity proof = shared-registry roadmap).
+- `apps/web/app/api/pulse/recall/route.ts` — refactored to call the helper (appLabel "Pulse"). Response shape IDENTICAL → Pulse page + SDK unaffected (verified: still 403 "Pulse is not authorized", same body).
+- NEW `apps/web/app/api/grant/recall/route.ts` — POST {ownerAddress, appAddress} → generic broker. 400 on bad input, 403 not-authorized, 200 with entries when granted.
+- SDK `packages/sdk/src/index.ts` — added `appAddress?` option; `requestReadAsGrantee` hits `/api/grant/recall` when appAddress is set, else `/api/pulse/recall` (back-compat). No breaking change.
+- NEW `packages/mcp/` — dependency-free MCP stdio server (`lethe-mcp.mjs`) so any MCP agent reads a user's granted memory: tools `lethe_get_vault` (public on-chain metadata via fullnode) + `lethe_recall_granted` (grant-gated via /api/grant/recall using LETHE_APP_ADDRESS). + package.json + README.
+Recheck (local): tsc clean · web build green (/api/grant/recall registered) · generic endpoint 403/400 correct · Pulse parity confirmed · MCP smoke test passed (initialize/tools/list/tools/call → get_vault returns live vault, recall_granted returns grant-denied, stdout clean / logs on stderr). Honesty: decrypt stays server-mediated/owner-session today; independent agent decrypt = shared-registry policy (roadmap). No frozen strings touched.
+Blockers: none.
+=== END REPORT ===
+
 ## 2026-06-15 — LANDING POLISH: Seal + Enoki marks on "Built on"
 
 Seal/Enoki were bare wordmarks beside Sui's droplet + Walrus's W (unbalanced trust strip). Added two subtle in-brand geometric marks — padlock (Seal = encryption) and key (Enoki = zkLogin identity) — grayscaled to the Fog palette at the same h-4 weight/spacing, so all four read as one set. New assets public/partners/{seal-lock,enoki-key}.svg; BUILT_ON marks wired. No staking/burn/counter (out of scope). Build green; commit b568dcf pushed; deploy --prod → lethe-gold.vercel.app (dpl ...2pym4ahvk). Verified on prod: 4 SVG assets 200, 4 marks render (Sui/Walrus/Seal/Enoki), 0 page overflow at desktop(1280) + 390px, 0 console errors (Playwright). Blockers: none.

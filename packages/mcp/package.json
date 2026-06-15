@@ -1,0 +1,12 @@
+{
+  "name": "@lethe/mcp",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "MCP stdio server — lets any agent read a user's Lethe memory through the on-chain grant. Dependency-free.",
+  "bin": { "lethe-mcp": "./lethe-mcp.mjs" },
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "start": "node ./lethe-mcp.mjs"
+  }
+}
