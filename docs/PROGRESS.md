@@ -1380,3 +1380,22 @@ Seal/Enoki were bare wordmarks beside Sui's droplet + Walrus's W (unbalanced tru
 ## 2026-06-15 — LANDING: balance Seal mark weight in "Built on"
 
 The extracted Seal mascot was a cream/off-white body, so under the row's grayscale(1)+opacity it washed out near-white while Walrus's solid-black W and Enoki's filled monogram stayed dark — Seal read faint/thin, the optical outlier. Recolored the asset only (apps/web/public/partners/seal.png): cream body → wordmark navy #1A3A4A, outline/eyes/nose → near-black #0A0C10, alpha untouched (smooth edges + transparent bg kept). Now a solid dark mark balanced with the other three; face still reads. No code change, no other logo touched. Verified via row screenshot (desktop). Committed + pushed; deploy --prod. Blockers: none.
+
+
+## 2026-06-15 — BLOCK 20: credibility signals (verified-only) — branch feat/credibility
+
+=== BLOCK 20 NOTE ===
+Additive credibility, off main; NO Move republish, NO logic/core touched. Iron rule: only claims VERIFIED true in this run.
+STEP 1 — verify-first results:
+  • Formal verification: ran sui-prover v1.5.3 in this session against contracts/memory_specs → `verified_all`, 0 failed; 19 ✅ verification checks across 6 spec functions (memory::{new,add_entry,remove_entry,grant,revoke} + memory_policy::seal_approve). "19/19" = 19 verification checks (NOT 19 specs). Judge cmd: `cd contracts/memory_specs && sui-prover`.
+  • CI: workflow exists but latest runs RED — Move-tests job PASSES, web LLM-failover job FAILS → overall red → NO build badge.
+  • LICENSE: present, Apache-2.0 (not MIT; no add needed) → license badge OK.
+  • Repo: PUBLIC → GitHub link OK.
+  • SlowMist: NO evidence in repo → omitted from SECURITY.md (can't verify; user can re-add if they actually did that review).
+STEP 2 — implemented (verified only):
+  A. Landing (apps/web/app/page.tsx, BuiltOnStrip): additive trust line under "Built on" — "Open source · Verifiable on-chain · Formally verified · Sui Prover 19/19", each linked (GitHub repo / Suiscan v3 package 0x0c79… / /docs/security). Layout unchanged.
+  B. README badges: REMOVED the red CI badge (rule: build badge only if passing; failing on the web test, Move core passes — recommend fixing that test to restore it) and ADDED a formally-verified badge (sui-prover 19/19 → SECURITY.md). Kept Apache-2.0 + Sui-testnet badges (pointed the testnet badge at the v3 package). Footer "Built on" → "Sui · Walrus · Seal · Enoki".
+  C. SECURITY.md (new): honest — "formally verified with the Sui Prover (19/19 checks, 6 specs)", per-spec table, reproduce cmd; EXPLICIT "Lethe has NOT undergone a third-party security audit"; lists what FV covers AND what it does NOT (off-chain app/LLM/Walrus-publisher/Seal-committee); independent audit = pre-mainnet roadmap. NO external-audit wording, NO SlowMist.
+STEP 3 — MVR (read-only, NOT implemented): registering creates a separate SuiNS-namespaced name→package metadata record; does NOT modify/republish the deployed package → safe on that constraint. BUT needs a SuiNS name + mvr CLI/SDK + several txs + source-verify flow, for modest judge visibility. Verdict: DEFER to roadmap.
+RECHECK: tsc clean · build green · landing 0 overflow + 0 console errors at 1280 & 390 · 3 trust links resolve · main untouched (work on feat/credibility). Files: apps/web/app/page.tsx, README.md, SECURITY.md, docs/PROGRESS.md, design/screens/prod/credibility-line.png.
+=== END NOTE ===

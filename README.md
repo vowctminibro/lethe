@@ -1,8 +1,8 @@
 # Lethe — Memory you own
 
-[![CI](https://github.com/vowctminibro/lethe/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/vowctminibro/lethe/actions/workflows/ci.yml)
+[![Formally verified — sui-prover 19/19](https://img.shields.io/badge/sui--prover-19%2F19%20checks-2ea44f)](SECURITY.md)
 [![License: Apache-2.0](https://img.shields.io/github/license/vowctminibro/lethe)](LICENSE)
-[![Sui testnet](https://img.shields.io/badge/Sui-testnet-298DFF)](https://suiscan.xyz/testnet/object/0x06b5c99940b5de954b2b37cd1198f421921986eabd57b35fe3fd4cc39169ba95)
+[![Sui testnet](https://img.shields.io/badge/Sui-testnet-298DFF)](https://suiscan.xyz/testnet/object/0x0c79fd944a51153e4d668a4f53a280fe5d0ab6d4db0a572a2f85c11ac5fc2f6c)
 
 > Named after the river of forgetting. Built so nothing is.
 
@@ -116,6 +116,6 @@ Sui Move (owned objects) · Walrus · Enoki (zkLogin + sponsored transactions) �
 
 Built solo. Live on testnet today.
 
-Built on Sui · Stored on Walrus
+Built on Sui · Walrus · Seal · Enoki
 
 License: Apache-2.0
