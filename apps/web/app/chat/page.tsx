@@ -68,6 +68,10 @@ export default function ChatPage() {
   const [analyzing, setAnalyzing] = useState(false);
   const [rail, setRail] = useState<RailEntry[]>([]);
   const [railLoading, setRailLoading] = useState(false);
+  // True once the vault has been read at least once — distinct from "not
+  // loading" (which is also the pre-load state). The onboarding gate waits on
+  // this so a returning user never flashes the overlay before memories arrive.
+  const [railLoaded, setRailLoaded] = useState(false);
   const [vaultId, setVaultId] = useState<string | null>(null);
   const [walletInput, setWalletInput] = useState("");
   const [walletOpen, setWalletOpen] = useState(false);
@@ -130,8 +134,9 @@ export default function ChatPage() {
   const onboardDecidedRef = useRef(false);
   useEffect(() => {
     if (onboardDecidedRef.current) return;
-    // For a signed-in user, wait until we know their vault state.
-    if (account && railLoading) return;
+    // For a signed-in user, wait until the vault has actually been read once —
+    // not merely "not loading" (which is also the pre-load state).
+    if (account && !railLoaded) return;
     let seen = false;
     try {
       seen = window.sessionStorage.getItem("lethe-onboarding-seen") === "1";
@@ -139,7 +144,7 @@ export default function ChatPage() {
     const hasMemories = rail.some((r) => r.status === "confirmed");
     if (!seen && !hasMemories) setShowOnboarding(true);
     onboardDecidedRef.current = true;
-  }, [account, railLoading, rail]);
+  }, [account, railLoaded, rail]);
   const dismissOnboarding = useCallback(() => {
     setShowOnboarding(false);
     try {
@@ -219,6 +224,7 @@ export default function ChatPage() {
       setRail([]);
     } finally {
       setRailLoading(false);
+      setRailLoaded(true);
     }
   }, [account, memory, client, streamGreeting]);
 
