@@ -378,17 +378,18 @@ const PRICING_GLYPHS = {
 
 /**
  * "Built on" — the load-bearing Mysten stack Lethe genuinely uses (honest: no
- * payment/partner logos it doesn't). Sui + Walrus carry their official marks;
- * Seal + Enoki have no clean official glyph, so they get subtle in-brand
- * geometric marks — a padlock (Seal = encryption) and a key (Enoki = zkLogin
- * identity) — so all four read as one set. Every mark is grayscaled to the Fog
- * palette so no brand color shouts. Each links to the artifact it represents.
+ * payment/partner logos it doesn't). All four carry their real marks: Sui's
+ * droplet, Walrus's W, and the Seal mascot + Enoki monogram extracted from the
+ * official logos onto transparent backgrounds (their opaque brand cards would
+ * read as boxes here). Every mark is grayscaled to the Fog palette so no brand
+ * color shouts and all four read as one set. Each links to the artifact it
+ * represents.
  */
 const BUILT_ON: { name: string; mark: string | null; href: string }[] = [
   { name: "Sui", mark: "/partners/sui-droplet.svg", href: "https://suiscan.xyz/testnet/object/0x0c79fd944a51153e4d668a4f53a280fe5d0ab6d4db0a572a2f85c11ac5fc2f6c" },
   { name: "Walrus", mark: "/partners/walrus-monogram.svg", href: "https://aggregator.walrus-testnet.walrus.space/v1/blobs/GbB45iJxmH5F8Si_78GG_macC6WeLS64jXjx7x852Eg" },
-  { name: "Seal", mark: "/partners/seal-lock.svg", href: "/docs/security" },
-  { name: "Enoki", mark: "/partners/enoki-key.svg", href: "/docs/concepts" },
+  { name: "Seal", mark: "/partners/seal.png", href: "/docs/security" },
+  { name: "Enoki", mark: "/partners/enoki.png", href: "/docs/concepts" },
 ];
 
 function BuiltOnStrip() {
