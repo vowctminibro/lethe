@@ -1433,3 +1433,13 @@ Result: ✅ ALL 6 STEPS PASS.
 Suiscan: grant tx https://suiscan.xyz/testnet/tx/2zNSYKCdwB49Wu7x7WAWGvhZftwRZ71qXdv1PfSRjSpT · revoke tx https://suiscan.xyz/testnet/tx/9Kw6267v562gZmLQZxowmCSHNUF5PboDGLuLyzEKpRHb · vault https://suiscan.xyz/testnet/object/0x0d65da620e5447f6a85b051bf1f9a2c5ed26c2efc184a60c77dc7cc5b7bae34f
 Note: vault has 24 entries; broker returned 23 (one entry not server-decryptable — expected for mixed Seal/legacy blobs; the 200/403 GATE is what's asserted). The grant/revoke pattern has NO bug on chain → feat/connect-agent-ux is de-risked for merge (user's call).
 === END REPORT ===
+## 2026-06-15 — BLOCK 19: "connect an agent" UX on /memory (branch feat/connect-agent-ux)
+
+=== BLOCK 19 NOTE ===
+TIER A only — additive UI on /memory, reuses existing grant()/revoke() + the shipped agent-broker; VERIFIED CORE UNTOUCHED (no Move/Seal/proofs). Makes the grant → agent-reads → revoke loop visible + judge-verifiable on the page.
+File touched: apps/web/app/memory/page.tsx ONLY (+ this note + 3 flow screenshots).
+- "Connect an agent" card (already had grant input + per-agent revoke): added (1) toast with a live Suiscan **tx** link on every grant AND revoke (captures the returned digest), (2) a "verify authorized vector ↗" link → the vault **object** on Suiscan (judge clicks to see the on-chain authorized[] live), (3) per-agent address link fixed to Suiscan **/account/** (was /object/), (4) an **empty state** ("No agents connected yet — paste an address above and Grant…"), (5) "Connected agents · N" header.
+- State: after grant/revoke we setNonce → reload getOwnedMemory from chain (on-chain refresh, not optimistic-only). Pulse stays controlled on the map node (excluded from this list to avoid double-control); noted in the empty state.
+Recheck: tsc clean · build green · full loop driven via DEMO_MOCK — empty → grant → agent appears (account link) + verify-vector link (→vault object) + toast tx link → revoke → back to empty. All 3 Suiscan link kinds resolve (/tx/<digest>, /account/<addr>, /object/<vaultId>). Pulse + money-shot untouched (no Pulse files changed). Screenshots: design/screens/prod/connect-agent-{empty,granted,revoked}.png.
+On the branch as a fallback-safe addition; verified core remains submittable on main at all times. Real on-chain grant/revoke needs the OAuth sign-in seam (same as every block) — DEMO_MOCK covers the loop + link wiring.
+=== END NOTE ===

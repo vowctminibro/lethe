@@ -25,6 +25,7 @@ import { PULSE_APP_ADDRESS } from "@/src/lib/pulse";
 const AGG = process.env.NEXT_PUBLIC_WALRUS_AGGREGATOR_URL;
 const blobUrl = (id: string) => `${AGG}/v1/blobs/${id}`;
 const objUrl = (id: string) => `https://suiscan.xyz/testnet/object/${id}`;
+const acctUrl = (a: string) => `https://suiscan.xyz/testnet/account/${a}`;
 const short = (s: string) => (s.length > 16 ? `${s.slice(0, 10)}…${s.slice(-6)}` : s);
 
 export default function MemoryPage() {
@@ -69,9 +70,14 @@ export default function MemoryPage() {
     setAccessError(null);
     setAccessBusy("grant");
     try {
-      await memory.grant(app);
+      const { digest } = await memory.grant(app);
       setAppAddr("");
       setNonce((n) => n + 1); // reload authorized list from chain
+      setToast({
+        text: `Granted ${short(app)} — now in your authorized list, on-chain.`,
+        href: `https://suiscan.xyz/testnet/tx/${digest}`,
+      });
+      setTimeout(() => setToast(null), 8000);
     } catch (e) {
       setAccessError(e instanceof Error ? e.message : "grant failed");
     } finally {
@@ -84,8 +90,13 @@ export default function MemoryPage() {
     setAccessError(null);
     setAccessBusy(app);
     try {
-      await memory.revoke(app);
+      const { digest } = await memory.revoke(app);
       setNonce((n) => n + 1);
+      setToast({
+        text: `Revoked ${short(app)} — removed from authorized. It can no longer recall.`,
+        href: `https://suiscan.xyz/testnet/tx/${digest}`,
+      });
+      setTimeout(() => setToast(null), 8000);
     } catch (e) {
       setAccessError(e instanceof Error ? e.message : "revoke failed");
     } finally {
@@ -331,25 +342,62 @@ export default function MemoryPage() {
               <p className="mt-2 text-xs" style={{ color: "#C0564A" }}>{accessError}</p>
             )}
 
-            {chain && chain.authorized.filter((a) => a !== PULSE_APP_ADDRESS).length > 0 && (
-              <ul className="mt-3 flex flex-col gap-2">
-                {chain.authorized.filter((a) => a !== PULSE_APP_ADDRESS).map((app) => (
-                  <li key={app} className="flex items-center justify-between gap-3 text-sm">
-                    <a href={objUrl(app)} target="_blank" rel="noreferrer" className="lethe-id underline break-all" style={{ color: "var(--text-dim)" }}>
-                      {short(app)} ↗
-                    </a>
-                    <button
-                      onClick={() => revoke(app)}
-                      disabled={accessBusy !== null}
-                      className="text-xs px-3 py-1 rounded border disabled:opacity-50 shrink-0"
-                      style={{ borderColor: "var(--accent-h)", color: "var(--accent-h)" }}
-                    >
-                      {accessBusy === app ? "Revoking…" : "Revoke = forget"}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
+            {(() => {
+              const agents = chain ? chain.authorized.filter((a) => a !== PULSE_APP_ADDRESS) : [];
+              return (
+                <div className="mt-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="lethe-id uppercase" style={{ color: "var(--text-dim)" }}>
+                      Connected agents{agents.length > 0 ? ` · ${agents.length}` : ""}
+                    </span>
+                    {chain && (
+                      <a
+                        href={objUrl(chain.objectId)}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="lethe-id underline decoration-dotted underline-offset-2 hover:opacity-70 shrink-0"
+                        style={{ color: "var(--accent-h)" }}
+                        title="See the authorized vector live on your vault object"
+                      >
+                        verify authorized vector ↗
+                      </a>
+                    )}
+                  </div>
+
+                  {agents.length > 0 ? (
+                    <ul className="mt-2 flex flex-col gap-2">
+                      {agents.map((app) => (
+                        <li key={app} className="flex items-center justify-between gap-3 text-sm">
+                          <a
+                            href={acctUrl(app)}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="lethe-id underline break-all hover:opacity-70"
+                            style={{ color: "var(--text-dim)" }}
+                            title="Inspect this agent's address on Suiscan"
+                          >
+                            {short(app)} ↗
+                          </a>
+                          <button
+                            onClick={() => revoke(app)}
+                            disabled={accessBusy !== null}
+                            className="text-xs px-3 py-1 rounded border disabled:opacity-50 shrink-0"
+                            style={{ borderColor: "var(--accent-h)", color: "var(--accent-h)" }}
+                          >
+                            {accessBusy === app ? "Revoking…" : "Revoke = forget"}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="mt-2 text-xs" style={{ color: "var(--text-dim)" }}>
+                      No agents connected yet — paste an address above and Grant to connect your first one.
+                      Every grant/revoke is verifiable on Suiscan. (Pulse, the demo app, is controlled on the map above.)
+                    </p>
+                  )}
+                </div>
+              );
+            })()}
 
             <p className="mt-3 text-[11px]" style={{ color: "var(--text-dim)" }}>
               End-to-end encrypted with Seal threshold encryption — even Lethe's servers can't read your memories. Decryption requires on-chain policy approval; revoke a grant and it stops, live.
