@@ -1413,3 +1413,7 @@ CI's "web LLM-failover" job was RED — a STALE TEST, not a bug. It asserted the
 - failover cases re-pointed to the real hosts (api.groq.com / generativelanguage.googleapis.com / integrate.api.nvidia.com / api.minimax.io): groq 5xx/429/timeout → gemini → nim for complete() + streamComplete(), healthy-groq primary, all-down → readable error, includeMinimax backstop.
 Local: 8/8 green (CI-identical command). Awaiting green CI on the PR before merge.
 === END ===
+
+=== FIX failover-test — MERGE + DEPLOY (2026-06-15) ===
+PR #2 (fix/failover-test) green → merged into main (--no-ff, commit 1725ba8), CLEAN no conflicts (2 files). Pushed 33ea7a6..1725ba8. CI on MAIN verified GREEN (run 27556752216, sha 1725ba8): Move tests ✓ + Web LLM-failover ✓ (the previously-red job now passes). Deploy --prod → lethe-gold.vercel.app (dpl …a7lzzlewh, READY). PROD verify: 8/8 routes 200; money-shot path unchanged (/api/pulse/recall + /api/grant/recall still 403); 0 console errors at 1280 & 390. CI is now green on main — a real CI status badge could be added honestly if desired. (feat/connect-agent-ux still NOT merged — awaiting on-chain verify.)
+=== END ===
