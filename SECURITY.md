@@ -47,6 +47,24 @@ An independent audit is a **pre-mainnet roadmap item**, not something that has h
 - Move package (v3): [`0x0c79fd944a51153e4d668a4f53a280fe5d0ab6d4db0a572a2f85c11ac5fc2f6c`](https://suiscan.xyz/testnet/object/0x0c79fd944a51153e4d668a4f53a280fe5d0ab6d4db0a572a2f85c11ac5fc2f6c) on Sui testnet.
 - A vault's `authorized` vector (who can read) and `entries` (the blob refs) are public on Suiscan — grant/revoke change them in owner-only transactions you can inspect live.
 
+## Cross-app recall: what a granted agent reads — live vs. roadmap
+
+The precise, honest account of the connect-an-agent loop, so a Seal-savvy reviewer hits no surprises.
+
+**Live and verifiable now**
+
+- **Grant / revoke is an on-chain control plane.** Each grant and revoke is an owner-only Move transaction; a vault's `authorized` vector is public on Suiscan (real `tx` digests). Revoke → the broker returns `403` and the agent is blind.
+- **A granted agent reads through Lethe's grant-gated broker** (`apps/web/app/api/grant/recall`), which re-checks the on-chain `authorized` list on every read before returning anything.
+- **Seal encrypts client-side; the broker decrypts only what it legitimately can.** It serves the **server-readable legacy-AES** entries as text; **Seal blobs are returned flagged `sealed` (no plaintext)** — those decrypt only in the owner's own session.
+
+**What this means for the demo (stated plainly, not hidden)**
+
+- The "a granted agent reads real memory text, live" payoff is shown on a **demo vault seeded with legacy-AES entries** the broker can decrypt server-side (`apps/web/scripts/seed-demo-vault.mjs`). The on-chain grant→read→revoke around it is real; the readable text comes from the AES path, **not** from an agent independently decrypting Seal.
+- **Memory created in Seal mode is returned to a granted external agent as ciphertext (`sealed`)**, not plaintext. An external agent decrypting Seal content with its *own* key-server session — independent of the owner — is the **shared-registry policy (roadmap)**, not shipped today.
+- A reviewer who signs in with their own Google account starts with an **empty vault**; facts they then create in Seal mode are owner-session-decryptable. The live-**text** cross-app payoff is therefore demonstrated on the **pre-seeded demo account** (scripted / recorded), not on a fresh reviewer account.
+
+We do **not** claim that any agent can independently decrypt any user's memory. The on-chain policy *permits* an owner-or-granted reader; the *independent agent-side Seal session* is roadmap.
+
 ## Reporting a vulnerability
 
 Open a private report via the repository's GitHub Security advisories, or a GitHub issue at

@@ -313,11 +313,16 @@ export default function MemoryPage() {
 
         {/* ── App access — the open slot, made concrete ── */}
         {account && (
-          <section className="mt-5 lethe-hairline rounded p-4" style={{ background: "var(--bg-panel)" }}>
+          <section id="connect-agent" className="mt-5 lethe-hairline rounded p-4 scroll-mt-20" style={{ background: "var(--bg-panel)" }}>
             <h2 className="text-sm font-semibold" style={{ fontFamily: "var(--font-display)" }}>Connect an agent</h2>
             <p className="mt-1 text-xs" style={{ color: "var(--text-dim)" }}>
               Grant any app address read access, or revoke it. Revoke = forget: a revoked app can no longer
               recall anything you stored. Each change is a gasless, owner-only transaction on your vault.
+            </p>
+            <p className="mt-1.5 text-[11px] leading-relaxed" style={{ color: "var(--text-dim)", opacity: 0.8 }}>
+              A granted app reads through Lethe&rsquo;s grant-gated broker, server-enforced against this vault&rsquo;s
+              on-chain authorized list. Seal-encrypted entries decrypt only in your own session; an external agent
+              running its own Seal decrypt session is on the roadmap (shared-registry policy).
             </p>
 
             <div className="mt-3 flex gap-2">

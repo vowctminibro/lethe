@@ -586,7 +586,15 @@ export default function ChatPage() {
               </>
             )}
           </div>
-          <div className="flex items-center gap-4 shrink-0">
+          <div className="flex items-center gap-4 flex-wrap">
+            <Link
+              href="/memory#connect-agent"
+              className="lethe-id uppercase underline decoration-dotted underline-offset-2 hover:opacity-70 transition"
+              style={{ color: "var(--accent-strong)" }}
+              title="Grant or revoke an app's read access to your vault — on-chain"
+            >
+              Connect an agent →
+            </Link>
             <button
               onClick={() => (account ? setImportOpen(true) : undefined)}
               disabled={!account}
