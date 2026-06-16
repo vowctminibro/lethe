@@ -443,12 +443,12 @@ function BuiltOnStrip() {
  * tiers only — the developer SDK lives in its own callout below, not as a column.
  * Truthful capabilities: Free is live today; paid tiers are honestly "planned"
  * (the cards' tags + Coming-soon CTAs carry that, plus the "in preview" caption).
- * Pro is the recommended tier and carries the Coral accent + "Most popular" tag.
+ * Pro is the recommended tier and carries the Coral accent + "Recommended" tag.
  * Scrolls in its own box on mobile, never the page.
  */
 const PLAN_COLS: { name: string; price: string; tag?: string }[] = [
   { name: "Free", price: "$0" },
-  { name: "Pro", price: "$9/mo", tag: "Most popular" },
+  { name: "Pro", price: "$9/mo", tag: "Recommended" },
   { name: "Premium", price: "$19/mo" },
 ];
 const PLAN_PRO_IDX = 1;
