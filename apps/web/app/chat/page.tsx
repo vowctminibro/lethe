@@ -31,9 +31,15 @@ type Msg = {
   provider?: string;
   /** true while tokens are still arriving */
   streaming?: boolean;
+  /**
+   * Set only when the user's EXPLICIT model choice was unavailable and the chain
+   * gracefully answered with a different provider — surfaced as a subtle note so
+   * the silent substitution isn't a lie. { from, to } are display labels.
+   */
+  fellBack?: { from: string; to: string };
 };
 
-type ModelOption = { key: string; id: string; label: string; configured: boolean; isDefault: boolean };
+type ModelOption = { key: string; id: string; label: string; configured: boolean; isDefault: boolean; unavailable?: boolean };
 const MODEL_LS_KEY = "lethe-model";
 
 // Per-session LLM message cap (judge-proofing). ONLY chat sends count —
@@ -292,6 +298,7 @@ export default function ChatPage() {
       context = [...new Set([...context, ...digestRef.current])].slice(0, 12);
 
       // 2) Stream the reply token-by-token into a growing bubble.
+      const requested = model; // the explicit selection at send time
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -311,11 +318,23 @@ export default function ChatPage() {
         throw new Error((err as { error?: string })?.error ?? "chat failed");
       }
       const provider = res.headers.get("x-provider") ?? undefined;
-      // Failover is SILENT in the UI: if the preferred model was busy the chain
-      // already answered with the next one server-side (logged + in x-provider).
-      // The user just sees a normal reply + the tasteful `via <model>` line —
-      // no "unavailable" apology that reads like a malfunction in a demo.
-      setMsgs((m) => [...m, { role: "lethe", text: "", provider, streaming: true }]);
+      // Auto-failover stays SILENT (a busy model answered by the next one is
+      // fine). But when the user EXPLICITLY picked a model and a *different*
+      // provider answered, the substitution would be a lie — surface it as a
+      // subtle note, mark the picked model unavailable for the session, and move
+      // the selection to whatever actually answered. The chain itself is
+      // untouched; we only report what it did.
+      const answeredKey = provider ? provider.split("/")[0] : undefined;
+      const labelOf = (key: string) => models.find((x) => x.key === key)?.label ?? key;
+      const fellBack =
+        requested && answeredKey && answeredKey !== requested
+          ? { from: labelOf(requested), to: labelOf(answeredKey) }
+          : undefined;
+      if (fellBack && answeredKey) {
+        setModels((ms) => ms.map((x) => (x.key === requested ? { ...x, unavailable: true } : x)));
+        setModel(answeredKey);
+      }
+      setMsgs((m) => [...m, { role: "lethe", text: "", provider, streaming: true, fellBack }]);
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       let reply = "";
@@ -574,9 +593,9 @@ export default function ChatPage() {
                   aria-label="Model"
                 >
                   {models.map((m) => (
-                    <option key={m.key} value={m.key} disabled={!m.configured}>
+                    <option key={m.key} value={m.key} disabled={!m.configured || m.unavailable}>
                       {m.label}
-                      {m.configured ? "" : " — not configured"}
+                      {!m.configured ? " — not configured" : m.unavailable ? " · unavailable" : ""}
                     </option>
                   ))}
                 </select>
@@ -660,10 +679,16 @@ export default function ChatPage() {
                         <span className="inline-block w-[2px] h-[1em] ml-0.5 align-text-bottom animate-pulse" style={{ background: "var(--text-dim)" }} />
                       )}
                     </div>
-                    {m.provider && !m.streaming && (
-                      <div className="lethe-id mt-1.5" style={{ color: "var(--text-dim)" }} title="The model that actually produced this reply">
-                        via {m.provider}
+                    {m.fellBack && !m.streaming ? (
+                      <div className="lethe-id mt-1.5" style={{ color: "var(--text-dim)" }} title="Your selected model was unavailable; the chain answered with the next one — your memory is identical across models">
+                        {m.fellBack.from} unavailable — answered via {m.fellBack.to}
                       </div>
+                    ) : (
+                      m.provider && !m.streaming && (
+                        <div className="lethe-id mt-1.5" style={{ color: "var(--text-dim)" }} title="The model that actually produced this reply">
+                          via {m.provider}
+                        </div>
+                      )
                     )}
                   </div>
                 </div>
@@ -819,9 +844,9 @@ export default function ChatPage() {
                       aria-label="Model"
                     >
                       {models.map((m) => (
-                        <option key={m.key} value={m.key} disabled={!m.configured} style={{ color: "var(--text)" }}>
+                        <option key={m.key} value={m.key} disabled={!m.configured || m.unavailable} style={{ color: "var(--text)" }}>
                           {m.label.split(" · ")[0]}
-                          {m.configured ? "" : " — n/a"}
+                          {!m.configured ? " — n/a" : m.unavailable ? " · n/a" : ""}
                         </option>
                       ))}
                     </select>
