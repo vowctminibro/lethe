@@ -457,7 +457,7 @@ const PLAN_GROUPS: { group: string; rows: { label: string; cells: string[] }[] }
     group: "Memory",
     rows: [
       { label: "Memories stored", cells: ["100", "Unlimited", "Unlimited"] },
-      { label: "Recall history", cells: ["30 days", "Forever", "Forever"] },
+      { label: "Recall history", cells: ["30 days", "Unlimited", "Unlimited"] },
       { label: "Derive · recall", cells: ["✓", "✓", "✓"] },
       { label: "Verifiable export", cells: ["—", "✓", "✓"] },
     ],
