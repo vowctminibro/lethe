@@ -112,7 +112,7 @@ const GROWTH: GrowthPhase[] = [
       <>
         Mainnet (Q3–Q4 2026) —{" "}
         <a href="#pricing" className="lethe-link">Pro</a>{" "}
-        switches on and starts the burn waterfall.
+        switches on and starts funding WAL storage and renewals.
       </>
     ),
     revenue: (
@@ -993,34 +993,14 @@ export default function Home() {
           <div className="lethe-eyebrow">Proof of demand</div>
           <p className="mt-4 text-base md:text-lg leading-relaxed max-w-3xl" style={{ color: "var(--bg)" }}>
             Lethe&rsquo;s unit economics are denominated in WAL and SUI by design: every user
-            action is gas Lethe pays in SUI (sponsored), every memory is storage Lethe pays in
-            WAL.
+            action is sponsored Sui gas; every memory is a Walrus blob Lethe pays for. As users
+            grow, Lethe drives real, recurring WAL demand — storage plus renewals, for every
+            user, every epoch.
           </p>
-          <div className="mt-8 flex flex-col md:flex-row items-stretch gap-3">
-            {[
-              "Revenue covers costs",
-              "WAL storage & renewals for all users",
-              "Monthly WAL buy-and-burn — public address",
-            ].map((step, i) => (
-              <div key={step} className="flex flex-col md:flex-row md:items-center gap-3 md:flex-1">
-                <div
-                  className="rounded border px-4 py-3 lethe-body w-full"
-                  style={{ borderColor: "rgba(239,245,244,0.25)", color: "var(--bg)" }}
-                >
-                  {step}
-                </div>
-                {i < 2 && (
-                  <span className="lethe-id self-center shrink-0 rotate-90 md:rotate-0" style={{ color: "var(--accent-h)" }} aria-hidden="true">
-                    →
-                  </span>
-                )}
-              </div>
-            ))}
-          </div>
-          <p className="mt-8 lethe-body lethe-measure" style={{ color: "rgba(239,245,244,0.7)" }}>
-            Committed policy, executing from first revenue: revenue covers costs → funds WAL
-            storage and renewals for all users → the remainder goes to a monthly WAL
-            buy-and-burn via a public burn address — published, on-chain, verifiable by anyone.
+          <p className="mt-6 lethe-body lethe-measure" style={{ color: "rgba(239,245,244,0.7)" }}>
+            Revenue covers costs, funds storage and renewals for all users, and scales Walrus
+            consumption with adoption. Every Lethe user is a paying Walrus customer — verifiable
+            on-chain.
           </p>
         </div>
       </section>
