@@ -1,8 +1,8 @@
 # Lethe — Memory you own
 
 [![Formally verified — sui-prover 19/19](https://img.shields.io/badge/sui--prover-19%2F19%20checks-2ea44f)](SECURITY.md)
-[![License: Apache-2.0](https://img.shields.io/github/license/vowctminibro/lethe)](LICENSE)
-[![Sui testnet](https://img.shields.io/badge/Sui-testnet-298DFF)](https://suiscan.xyz/testnet/object/0x0c79fd944a51153e4d668a4f53a280fe5d0ab6d4db0a572a2f85c11ac5fc2f6c)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg?logo=apache&logoColor=white)](LICENSE)
+[![Sui testnet](https://img.shields.io/badge/Sui-testnet-298DFF?logo=sui&logoColor=white)](https://suiscan.xyz/testnet/object/0x0c79fd944a51153e4d668a4f53a280fe5d0ab6d4db0a572a2f85c11ac5fc2f6c)
 
 > Named after the river of forgetting. Built so nothing is.
 
@@ -40,7 +40,7 @@ Docs live in-app at [/docs](https://lethe-gold.vercel.app/docs) (concepts, SDK, 
 
 - **Every memory is an encrypted blob on Walrus** — fetchable from any aggregator, so storage is verifiable, not a claim.
 - **On-chain `BlobRef`s live in an owned Sui object** — your vault is [`memory::Memory`](contracts/memory/sources/memory.move), package [`0x0c79fd944a51153e4d668a4f53a280fe5d0ab6d4db0a572a2f85c11ac5fc2f6c`](https://suiscan.xyz/testnet/object/0x0c79fd944a51153e4d668a4f53a280fe5d0ab6d4db0a572a2f85c11ac5fc2f6c) on Sui testnet (v3, upgraded in place — existing vaults from [v1](https://suiscan.xyz/testnet/object/0x9dcc482cd7fb5d7fa2a0cf90c7dc1e6efec6f40e817e352c61ed0f63951c1331) keep working). The chain holds the index and the access list; Walrus holds the data.
-- **End-to-end encrypted with Seal threshold encryption:** even Lethe's servers can't read your memories — encryption happens in your browser, and decryption requires on-chain policy approval (`memory_policy::seal_approve`: vault owner or an app with an active grant) from a decentralized committee of key servers. Revoke a grant and the key servers stop approving — live. (A legacy `manual` provider mode — server-side AES — remains as a fallback flag and still decrypts pre-Seal entries.)
+- **End-to-end encrypted with Seal threshold encryption:** in Seal mode, facts are encrypted in your browser and a Seal blob is released only on on-chain policy approval (`memory_policy::seal_approve`: the vault owner, or an app with an active grant) by a decentralized committee of key servers — so even Lethe's servers can't read a *Seal* blob, and revoking a grant makes the key servers stop approving, live. **How a granted agent reads today:** through Lethe's server-side, grant-gated broker (`/api/grant/recall`), which re-checks the same on-chain `authorized` list on every read and decrypts the server-readable (legacy `manual`/AES) entries it can — **Seal blobs come back flagged `sealed`, plaintext only for the owner's own session.** Letting an external agent run *its own* Seal decrypt session directly against the key servers is the **shared-registry policy (roadmap)**, not shipped today. (The legacy `manual` AES mode also still decrypts pre-Seal entries.)
 - **MemWal:** integrated days after MemWal launched; blocked by the published-SDK (`@mysten/memwal@0.0.2`) vs relayer (≥0.0.4) version gap — documented honestly in [BLOCKERS.md](docs/BLOCKERS.md) (B16). A provider abstraction keeps us one adapter away from adopting `@mysten/memwal` the day it publishes.
 
 ### Memory economics
