@@ -771,7 +771,7 @@ export default function Home() {
 
             <p className="mt-8 text-base max-w-md leading-relaxed" style={{ color: "var(--text)", fontWeight: 450 }}>
               User-owned memory for AI agents — stored on Walrus, anchored on Sui, portable
-              across every app.
+              across apps.
             </p>
 
             <div className="mt-9">
@@ -829,8 +829,8 @@ export default function Home() {
           <div>
             {[
               {
-                k: "Memories renew forever",
-                v: "Archives pay once; memories renew every epoch — recurring demand per user.",
+                k: "Memories renew, archives don't",
+                v: "Archives pay once; a memory layer is designed to renew every epoch — recurring WAL demand per user.",
               },
               {
                 k: "Highest value per byte",

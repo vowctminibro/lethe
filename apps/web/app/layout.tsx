@@ -29,7 +29,7 @@ const plexMono = IBM_Plex_Mono({
 
 const TITLE = "Lethe — Memory you own";
 const DESCRIPTION =
-  "Lethe is user-owned memory for AI agents — stored on Walrus, anchored on Sui, portable across every app.";
+  "Lethe is user-owned memory for AI agents — stored on Walrus, anchored on Sui, portable across apps.";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://lethe-gold.vercel.app"),
