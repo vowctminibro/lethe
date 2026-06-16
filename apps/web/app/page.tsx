@@ -738,6 +738,89 @@ function StatBar() {
   );
 }
 
+/**
+ * Demand loop — the economics flywheel as a 4-node cycle (NOT a waterfall):
+ * use → Walrus blob → recurring renewal demand → revenue → back to use.
+ * Lives inside the dark Proof-of-Demand panel, so colors are the inverted set
+ * (Fog text on Ink, Coral accents, light hairlines). Hairline/monogram only —
+ * no emoji, no clip-art. Desktop = horizontal loop; mobile = vertical stack.
+ */
+const LOOP_GLYPHS = {
+  chat: (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.25} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 5 h16 v10 h-9 l-4 3 v-3 H4 Z" />
+      <path d="M8 9 h8 M8 12 h5" />
+    </svg>
+  ),
+  store: (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.25} strokeLinecap="round" strokeLinejoin="round">
+      <ellipse cx="12" cy="6" rx="7" ry="2.5" />
+      <path d="M5 6 v12 c0 1.4 3.1 2.5 7 2.5 s7 -1.1 7 -2.5 V6" />
+      <path d="M5 12 c0 1.4 3.1 2.5 7 2.5 s7 -1.1 7 -2.5" />
+    </svg>
+  ),
+  renew: (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.25} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20 12 a8 8 0 1 1 -2.4 -5.7" />
+      <path d="M20 3.5 V7 h-3.5" />
+    </svg>
+  ),
+  revenue: (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.25} strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M12 7 V17 M9.5 9.5 h3.2 a1.6 1.6 0 0 1 0 3.2 H10 a1.6 1.6 0 0 0 0 3.2 h3.5" />
+    </svg>
+  ),
+};
+
+function DemandLoop() {
+  const HAIR = "rgba(239,245,244,0.22)";
+  const NODES = [
+    { n: "01", glyph: LOOP_GLYPHS.chat, k: "User chats & remembers", sub: null as string | null },
+    { n: "02", glyph: LOOP_GLYPHS.store, k: "Memory = Walrus blob", sub: "WAL · sponsored gas on Sui" },
+    { n: "03", glyph: LOOP_GLYPHS.renew, k: "Renews every epoch", sub: "recurring WAL demand" },
+    { n: "04", glyph: LOOP_GLYPHS.revenue, k: "Revenue covers cost", sub: "+ funds renewals" },
+  ];
+  return (
+    <div className="mt-10" aria-hidden="true">
+      {/* nodes — horizontal loop on desktop, vertical stack on mobile */}
+      <div className="flex flex-col md:flex-row items-stretch gap-3 md:gap-2">
+        {NODES.map((nd, i) => (
+          <div key={nd.n} className="flex flex-col md:flex-row md:items-center gap-3 md:gap-2 md:flex-1">
+            <div
+              className="rounded border p-4 w-full md:flex-1 flex items-center md:flex-col md:text-center gap-3 md:gap-2"
+              style={{ borderColor: HAIR }}
+            >
+              <span className="shrink-0" style={{ color: "var(--accent-h)" }}>{nd.glyph}</span>
+              <span>
+                <span className="lethe-id block" style={{ color: "var(--accent-h)" }}>{nd.n}</span>
+                <span className="lethe-body block" style={{ color: "var(--bg)" }}>{nd.k}</span>
+                {nd.sub && (
+                  <span className="lethe-id block mt-1" style={{ color: "rgba(239,245,244,0.55)" }}>{nd.sub}</span>
+                )}
+              </span>
+            </div>
+            {i < 3 && (
+              <span className="self-center shrink-0 rotate-90 md:rotate-0 lethe-id" style={{ color: "var(--accent-strong)" }}>
+                →
+              </span>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* loop-back band — closes 04 → 01, the recurring flywheel */}
+      <div className="mt-3 flex items-center gap-3">
+        <span className="shrink-0 text-lg leading-none" style={{ color: "var(--accent-strong)" }}>↺</span>
+        <span className="flex-1 border-t border-dashed" style={{ borderColor: "var(--accent-strong)", opacity: 0.5 }} />
+        <span className="lethe-id text-center" style={{ color: "var(--accent-h)" }}>loops back — recurring, every user, every epoch</span>
+        <span className="flex-1 border-t border-dashed" style={{ borderColor: "var(--accent-strong)", opacity: 0.5 }} />
+        <span className="shrink-0 text-lg leading-none" style={{ color: "var(--accent-strong)" }}>↺</span>
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
   return (
     <main className="min-h-screen flex flex-col" style={{ background: "var(--bg)", color: "var(--text)" }}>
@@ -999,8 +1082,13 @@ export default function Home() {
           </p>
           <p className="mt-6 lethe-body lethe-measure" style={{ color: "rgba(239,245,244,0.7)" }}>
             Revenue covers costs, funds storage and renewals for all users, and scales Walrus
-            consumption with adoption. Every Lethe user is a paying Walrus customer — verifiable
-            on-chain.
+            consumption with adoption.
+          </p>
+
+          <DemandLoop />
+
+          <p className="mt-8 text-center text-base md:text-lg" style={{ fontFamily: "var(--font-display)", fontWeight: 500, color: "var(--bg)" }}>
+            Every Lethe user = a paying Walrus customer · verifiable on-chain
           </p>
         </div>
       </section>
