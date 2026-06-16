@@ -68,17 +68,21 @@ export interface AvailableModel {
 }
 
 /**
- * The PUBLIC selector catalog — free-tier models only. MiniMax is a paid
- * plan and stays server-side (fallback chain + import-extract); it is never
- * publicly selectable or default. NIM's Kimi K2 reached end-of-life
- * (410 — probed 2026-06-13), so the NIM slot is labeled by what it actually
- * serves. Unconfigured entries still list (the chain answers via fallback,
- * the UI notes it); the default is the first CONFIGURED entry unless
- * NEXT_PUBLIC_DEFAULT_MODEL overrides.
+ * The PUBLIC selector catalog — free-tier models the dropdown offers. This is a
+ * SUBSET of the failover chain (see providers()): a provider can stay in the
+ * chain as a fallback without being user-selectable.
+ *
+ * Gemini is intentionally NOT listed: its prod key is currently failing
+ * (invalid/quota), so offering it would surface a model that never answers as
+ * itself — better to show only Groq + NVIDIA NIM, which work 100%. Gemini STAYS
+ * in the failover chain (providers()) so it resumes automatically if the key is
+ * restored; only the selector hides it. MiniMax is paid and stays server-side.
+ * NIM's Kimi K2 reached EOL (410 — probed 2026-06-13), so the NIM slot is
+ * labeled by what it actually serves. Default = first CONFIGURED entry unless
+ * NEXT_PUBLIC_DEFAULT_MODEL overrides (→ Groq).
  */
 const FREE_CATALOG: { key: string; id: string; label: string }[] = [
   { key: "groq", id: "groq/llama-3.3-70b-versatile", label: "Llama 3.3 70B · Groq" },
-  { key: "gemini", id: "gemini/gemini-2.0-flash", label: "Gemini 2.0 Flash · Google" },
   { key: "nvidia-nim", id: "nvidia-nim/meta/llama-3.3-70b-instruct", label: "Llama 3.3 70B · NVIDIA NIM" },
 ];
 
