@@ -1090,7 +1090,7 @@ export default function Home() {
           className="mt-12 text-center italic mx-auto max-w-2xl"
           style={{ fontFamily: "var(--font-display)", fontSize: "1.25rem", lineHeight: 1.45, color: "var(--text)" }}
         >
-          The inner ring is the biggest one — and it already shipped, solo. The rings
+          The inner ring is the biggest one — and it already shipped. The rings
           ahead are smaller.
         </p>
       </section>

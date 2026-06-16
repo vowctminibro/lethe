@@ -114,7 +114,7 @@ Sui Move (owned objects) · Walrus · Enoki (zkLogin + sponsored transactions) �
 - **Q3–Q4 2026** — mainnet; Seal-gated selective sharing (share one memory, not the vault); shared-registry policy so granted apps can run their own decrypt sessions.
 - **MemWal adapter** ships the day `@mysten/memwal` ≥0.0.4 publishes.
 
-Built solo. Live on testnet today.
+Built in 5 weeks. Live on testnet today.
 
 Built on Sui · Walrus · Seal · Enoki
 

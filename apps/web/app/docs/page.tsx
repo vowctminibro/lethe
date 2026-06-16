@@ -11,7 +11,7 @@ export default function DocsOverview() {
       </p>
       <p className="dim">
         Live on Sui testnet today at{" "}
-        <a href="https://lethe-gold.vercel.app">lethe-gold.vercel.app</a>. Built solo for Sui
+        <a href="https://lethe-gold.vercel.app">lethe-gold.vercel.app</a>. Built for Sui
         Overflow 2026, Walrus track.
       </p>
 
