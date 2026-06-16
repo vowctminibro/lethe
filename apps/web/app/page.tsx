@@ -366,7 +366,7 @@ const PRICING_GLYPHS = {
       <path d="M15 6 L20 12 L15 18" />
     </svg>
   ),
-  // ascending bars — "more quota" (Plus)
+  // ascending bars — "more quota" (Premium)
   bars: (
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.25} strokeLinecap="round" strokeLinejoin="round">
       <path d="M5 19 L5 14" />
@@ -439,44 +439,52 @@ function BuiltOnStrip() {
 }
 
 /**
- * Within-Lethe plan matrix (Venice "Compare Features" pattern). Truthful
- * capabilities only — Free is live today; paid tiers are honestly "planned"
- * (the cards' tags + Coming-soon CTAs carry that). Pro column gets the Coral
- * accent. Scrolls in its own box on mobile, never the page.
+ * Within-Lethe plan matrix (Venice "Compare Features" pattern). Three consumer
+ * tiers only — the developer SDK lives in its own callout below, not as a column.
+ * Truthful capabilities: Free is live today; paid tiers are honestly "planned"
+ * (the cards' tags + Coming-soon CTAs carry that, plus the "in preview" caption).
+ * Pro is the recommended tier and carries the Coral accent + "Most popular" tag.
+ * Scrolls in its own box on mobile, never the page.
  */
-const PLAN_COLS = ["Free", "Pro", "Plus", "SDK"];
+const PLAN_COLS: { name: string; price: string; tag?: string }[] = [
+  { name: "Free", price: "$0" },
+  { name: "Pro", price: "$9/mo", tag: "Most popular" },
+  { name: "Premium", price: "$19/mo" },
+];
 const PLAN_PRO_IDX = 1;
 const PLAN_GROUPS: { group: string; rows: { label: string; cells: string[] }[] }[] = [
   {
-    group: "Models",
+    group: "Memory",
     rows: [
-      { label: "Free models · daily limits", cells: ["✓", "✓", "✓", "—"] },
-      { label: "Premium models", cells: ["—", "✓", "✓", "—"] },
-      { label: "Bring your own keys", cells: ["—", "✓", "✓", "—"] },
-      { label: "Switch model mid-chat", cells: ["✓", "✓", "✓", "—"] },
+      { label: "Memories stored", cells: ["100", "Unlimited", "Unlimited"] },
+      { label: "Recall history", cells: ["30 days", "Forever", "Forever"] },
+      { label: "Derive · recall", cells: ["✓", "✓", "✓"] },
+      { label: "Verifiable export", cells: ["—", "✓", "✓"] },
     ],
   },
   {
-    group: "Memory",
+    group: "Agents & portability",
     rows: [
-      { label: "Derive · recall · export", cells: ["✓", "✓", "✓", "✓"] },
-      { label: "Grant / revoke on-chain", cells: ["✓", "✓", "✓", "✓"] },
-      { label: "Credits / month", cells: ["—", "900", "More", "Usage"] },
-      { label: "Early access", cells: ["—", "—", "✓", "—"] },
+      { label: "Connected agents", cells: ["1", "10", "Unlimited"] },
+      { label: "Grant / revoke on-chain", cells: ["✓", "✓", "✓"] },
+      { label: "Portable across apps", cells: ["✓", "✓", "✓"] },
     ],
   },
   {
     group: "Privacy",
     rows: [
-      { label: "Seal end-to-end encryption", cells: ["✓", "✓", "✓", "✓"] },
-      { label: "Formally verified (19/19)", cells: ["✓", "✓", "✓", "✓"] },
+      { label: "Seal end-to-end encryption", cells: ["✓", "✓", "✓"] },
+      { label: "Formally verified (19/19)", cells: ["✓", "✓", "✓"] },
     ],
   },
   {
-    group: "Portability",
+    group: "Models",
     rows: [
-      { label: "Portable across apps", cells: ["✓", "✓", "✓", "✓"] },
-      { label: "Continue with Lethe (SDK)", cells: ["—", "—", "—", "✓"] },
+      { label: "Free models · daily limits", cells: ["✓", "✓", "✓"] },
+      { label: "Switch model mid-chat", cells: ["✓", "✓", "✓"] },
+      { label: "Premium models", cells: ["—", "Add-on", "✓"] },
+      { label: "Bring your own keys", cells: ["—", "✓", "✓"] },
+      { label: "Early access", cells: ["—", "—", "✓"] },
     ],
   },
 ];
@@ -492,8 +500,11 @@ function PlanCompare() {
   return (
     <div className="mt-14">
       <div className="lethe-eyebrow text-center">Compare features</div>
+      <p className="mt-2 text-center lethe-id uppercase" style={{ color: "var(--text-dim)" }}>
+        Pricing in preview · validating with early users
+      </p>
       <div className="mt-6 overflow-x-auto lethe-rise" data-reveal>
-        <table className="w-full border-collapse" style={{ minWidth: 640 }}>
+        <table className="w-full border-collapse" style={{ minWidth: 520 }}>
           <thead>
             <tr>
               <th className="text-left p-3" />
@@ -501,8 +512,8 @@ function PlanCompare() {
                 const pro = i === PLAN_PRO_IDX;
                 return (
                   <th
-                    key={c}
-                    className="lethe-id uppercase text-center p-3"
+                    key={c.name}
+                    className="text-center p-3 align-bottom"
                     style={{
                       color: pro ? "var(--accent-strong)" : "var(--text)",
                       background: pro ? CORAL_BG : "transparent",
@@ -510,7 +521,11 @@ function PlanCompare() {
                       borderBottom: "1px solid var(--border)",
                     }}
                   >
-                    {c}
+                    {c.tag && (
+                      <div className="lethe-id uppercase" style={{ color: "var(--accent-strong)" }}>{c.tag}</div>
+                    )}
+                    <div className="lethe-id uppercase mt-1">{c.name}</div>
+                    <div className="text-base mt-0.5" style={{ fontFamily: "var(--font-display)", fontWeight: 600 }}>{c.price}</div>
                   </th>
                 );
               })}
@@ -521,7 +536,7 @@ function PlanCompare() {
               <tr key={`g-${g.group}`}>
                 <td className="lethe-id uppercase pt-6 pb-2 px-3" style={{ color: "var(--accent-h)" }}>{g.group}</td>
                 {PLAN_COLS.map((c, i) => (
-                  <td key={`${g.group}-${c}`} style={{ background: i === PLAN_PRO_IDX ? CORAL_BG : "transparent" }} />
+                  <td key={`${g.group}-${c.name}`} style={{ background: i === PLAN_PRO_IDX ? CORAL_BG : "transparent" }} />
                 ))}
               </tr>,
               ...g.rows.map((r) => (
@@ -547,6 +562,57 @@ function PlanCompare() {
             ])}
           </tbody>
         </table>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Developer SDK — its own callout, not a consumer column. "Continue with Lethe"
+ * lets any app embed verifiable, user-owned memory; priced per memory operation.
+ */
+function SdkCallout() {
+  const FEATURES = [
+    "Derive · recall · export",
+    "Grant · revoke",
+    "Portable across apps",
+    "Seal end-to-end encryption",
+    "Formally verified (19/19)",
+    "Continue with Lethe handoff",
+  ];
+  return (
+    <div
+      className="mt-14 rounded border p-6 md:p-8 lethe-rise"
+      data-reveal
+      style={{ borderColor: "var(--border)", background: "var(--bg)" }}
+    >
+      <div className="flex items-start gap-3">
+        <div className="mt-0.5 shrink-0" style={{ color: "var(--accent-strong)" }} aria-hidden="true">
+          {PRICING_GLYPHS.bracket}
+        </div>
+        <div className="flex-1">
+          <div className="lethe-id uppercase" style={{ color: "var(--accent-h)" }}>Build on Lethe — for developers</div>
+          <p className="mt-2 lethe-body" style={{ color: "var(--text)" }}>
+            Embed verifiable, user-owned memory in your own agent or app. Grant/revoke on-chain,
+            Seal-encrypted, formally verified.
+          </p>
+          <p className="mt-2 lethe-body" style={{ color: "var(--accent-strong)", fontWeight: 600 }}>
+            Usage-based · pay per memory operation
+          </p>
+          <ul className="mt-4 flex flex-wrap gap-x-3 gap-y-2 lethe-id uppercase" style={{ color: "var(--text-dim)" }}>
+            {FEATURES.flatMap((f, i) => [
+              ...(i > 0 ? [<li key={`sep-${i}`} aria-hidden="true">·</li>] : []),
+              <li key={f}>{f}</li>,
+            ])}
+          </ul>
+          <Link
+            href="/docs/sdk"
+            className="mt-6 inline-flex items-center justify-center rounded border px-4 py-2.5 lethe-id uppercase transition hover:opacity-80"
+            style={{ borderColor: "var(--accent-strong)", color: "var(--accent-strong)" }}
+          >
+            Read the docs →
+          </Link>
+        </div>
       </div>
     </div>
   );
@@ -808,7 +874,7 @@ export default function Home() {
         >
           &ldquo;Your memory is free forever. We charge for the intelligence on top.&rdquo;
         </p>
-        <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 items-stretch">
+        <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 items-stretch">
           {[
             {
               k: "Free",
@@ -826,8 +892,8 @@ export default function Home() {
               k: "Pro",
               tag: "planned",
               price: "$9/mo",
-              v: "Premium models, higher limits, 900 credits.",
-              credit: "Credits are simple: 1 credit = 1¢.",
+              v: "Premium models, higher limits, unlimited memory.",
+              credit: null as string | null,
               byok: "Bring your own model keys — your memory plane stays the same.",
               recommended: true,
               live: false,
@@ -835,28 +901,16 @@ export default function Home() {
               cta: { label: "Coming soon", href: "", disabled: true },
             },
             {
-              k: "Plus",
+              k: "Premium",
               tag: "planned",
-              price: "$29/mo",
-              v: "Everything in Pro, more quota, early access.",
+              price: "$19/mo",
+              v: "Everything in Pro, premium models included, early access.",
               credit: null as string | null,
               byok: null as string | null,
               recommended: false,
               live: false,
               glyph: PRICING_GLYPHS.bars,
               cta: { label: "Coming soon", href: "", disabled: true },
-            },
-            {
-              k: "SDK for apps",
-              tag: "pilot pricing",
-              price: "Usage-based",
-              v: "Continue with Lethe — warm-start your users with memory they already own.",
-              credit: null as string | null,
-              byok: null as string | null,
-              recommended: false,
-              live: false,
-              glyph: PRICING_GLYPHS.bracket,
-              cta: { label: "Read the docs", href: "/docs/sdk", disabled: false },
             },
           ].map((t, i) => (
             <div
@@ -920,6 +974,9 @@ export default function Home() {
 
         {/* within-Lethe plan matrix */}
         <PlanCompare />
+
+        {/* developer SDK — separate callout, not a consumer tier */}
+        <SdkCallout />
 
         {/* model-future line — models come and go; the memory is permanent */}
         <p className="mt-8 text-center lethe-body mx-auto max-w-2xl" style={{ color: "var(--text-muted)" }}>
