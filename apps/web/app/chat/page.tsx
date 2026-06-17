@@ -364,7 +364,12 @@ export default function ChatPage() {
         });
         if (ex.ok) {
           const { facts } = (await ex.json()) as { facts: { text: string; kind: string }[] };
-          await Promise.all(facts.map((f) => persistFact(f)));
+          // Persist SEQUENTIALLY — each add_entry mutates the same Memory vault
+          // (owned object, version-locked). Firing them in parallel made
+          // concurrent add_entry txs reference the same stale vault version, so
+          // the loser(s) failed with Enoki 400 (object version conflict). One
+          // at a time → each commit bumps the version before the next builds.
+          for (const f of facts) await persistFact(f);
         }
       } catch {
         /* extraction is best-effort; the conversation already succeeded */
