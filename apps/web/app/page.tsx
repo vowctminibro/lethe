@@ -627,7 +627,7 @@ const COMPARE: { cols: string[]; rows: { axis: string; cells: string[] }[] } = {
   cols: ["ChatGPT memory", "Mem0", "Lethe"],
   rows: [
     { axis: "Who owns the memory", cells: ["The app", "The app", "You — an on-chain object"] },
-    { axis: "Privacy", cells: ["Policy", "Policy", "Cryptographic (Seal, proven)"] },
+    { axis: "Privacy", cells: ["Policy", "Policy", "Cryptographic (Seal)"] },
     { axis: "Portable across apps", cells: ["No", "SDK (vendor cloud)", "Yes — grant/revoke on-chain"] },
     { axis: "Leave with your data", cells: ["Limited", "Export", "Export, one click"] },
     { axis: "Model lock-in", cells: ["Tied to the platform", "Vendor cloud", "Switch models, memory follows"] },
@@ -1069,6 +1069,31 @@ export default function Home() {
 
       {/* ── How Lethe is different — factual comparison ── */}
       <ComparisonTable />
+
+      {/* ── Own it — condensed positioning (Portability + on-chain) ── */}
+      <section className="max-w-5xl mx-auto w-full px-6 lethe-section" style={{ paddingTop: 0 }}>
+        <div className="lethe-eyebrow">Why on-chain</div>
+        <h2 className="lethe-section-head">Memory you own, not memory an app stores</h2>
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-10 lethe-rise" data-reveal>
+          <div>
+            <div className="text-lg" style={{ fontFamily: "var(--font-display)", fontWeight: 600 }}>Portable by grant</div>
+            <p className="mt-1.5 lethe-body lethe-measure" style={{ color: "var(--text)" }}>
+              Your memory is a Sui object, and access is a grant you issue to an agent&rsquo;s address —
+              and revoke the same way, on-chain and verifiable. It doesn&rsquo;t live in any one app&rsquo;s
+              database, so it isn&rsquo;t trapped there. Pulse reads it only while it holds a grant;
+              revoke and Pulse forgets.
+            </p>
+          </div>
+          <div>
+            <div className="text-lg" style={{ fontFamily: "var(--font-display)", fontWeight: 600 }}>Enforced, not promised</div>
+            <p className="mt-1.5 lethe-body lethe-measure" style={{ color: "var(--text)" }}>
+              Ownership is an object you hold; access is a transaction anyone can verify. These
+              aren&rsquo;t policy commitments a company can quietly change — they&rsquo;re properties of where
+              the memory lives.
+            </p>
+          </div>
+        </div>
+      </section>
 
       {/* ── Proof of Demand — the page’s single DARK inverted panel ── */}
       <section className="max-w-6xl mx-auto w-full px-6 lethe-section" style={{ paddingTop: 0 }}>

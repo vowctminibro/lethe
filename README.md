@@ -38,9 +38,15 @@ Docs live in-app at [/docs](https://lethe-gold.vercel.app/docs) (concepts, SDK, 
 
 ## Why Walrus is load-bearing (not decorative)
 
-- **Every memory is an encrypted blob on Walrus** — fetchable from any aggregator, so storage is verifiable, not a claim.
-- **On-chain `BlobRef`s live in an owned Sui object** — your vault is [`memory::Memory`](contracts/memory/sources/memory.move), package [`0x0c79fd944a51153e4d668a4f53a280fe5d0ab6d4db0a572a2f85c11ac5fc2f6c`](https://suiscan.xyz/testnet/object/0x0c79fd944a51153e4d668a4f53a280fe5d0ab6d4db0a572a2f85c11ac5fc2f6c) on Sui testnet (v3, upgraded in place — existing vaults from [v1](https://suiscan.xyz/testnet/object/0x9dcc482cd7fb5d7fa2a0cf90c7dc1e6efec6f40e817e352c61ed0f63951c1331) keep working). The chain holds the index and the access list; Walrus holds the data.
-- **End-to-end encrypted with Seal threshold encryption:** in Seal mode, facts are encrypted in your browser and a Seal blob is released only on on-chain policy approval (`memory_policy::seal_approve`: the vault owner, or an app with an active grant) by a decentralized committee of key servers — so even Lethe's servers can't read a *Seal* blob, and revoking a grant makes the key servers stop approving, live. **How a granted agent reads today:** through Lethe's server-side, grant-gated broker (`/api/grant/recall`), which re-checks the same on-chain `authorized` list on every read and decrypts the server-readable (legacy `manual`/AES) entries it can — **Seal blobs come back flagged `sealed`, plaintext only for the owner's own session.** Letting an external agent run *its own* Seal decrypt session directly against the key servers is the **shared-registry policy (roadmap)**, not shipped today. (The legacy `manual` AES mode also still decrypts pre-Seal entries.)
+Lethe stores each user's memory as encrypted blobs on Walrus, while the ownership record and access grants live as objects on Sui — your vault is [`memory::Memory`](contracts/memory/sources/memory.move), package [`0x0c79fd944a51153e4d668a4f53a280fe5d0ab6d4db0a572a2f85c11ac5fc2f6c`](https://suiscan.xyz/testnet/object/0x0c79fd944a51153e4d668a4f53a280fe5d0ab6d4db0a572a2f85c11ac5fc2f6c) on Sui testnet (v3, upgraded in place — [v1](https://suiscan.xyz/testnet/object/0x9dcc482cd7fb5d7fa2a0cf90c7dc1e6efec6f40e817e352c61ed0f63951c1331) vaults keep working). The split is deliberate and load-bearing:
+
+- **Walrus holds the content.** Each memory is an encrypted blob on Walrus, fetchable from any aggregator — so storage is verifiable, not a claim. Blobs are encrypted client-side in the browser before upload (Mysten Seal — see [Security](#security)), and Walrus is storage Lethe does not own. If Lethe disappears, the blobs — and the owner's access to them — don't.
+- **Sui holds the rights.** Who can read a memory is an on-chain object, not a row in our database. Granting an agent access and revoking it are real, gasless transactions anyone can verify on Suiscan. A centralized store can *log* access; it cannot *prove* revocation to a third party. That proof is the product.
+
+Swap Walrus for a database and the core claim collapses: the user stops owning the artifact, revocation drops from a verifiable on-chain fact to a policy promise, and portability loses the neutral substrate it points at.
+
+Storage lifetime is owner-controlled — blobs persist for the Walrus epochs the owner funds, so memory lasts exactly as long as the user keeps it alive, with no silent perpetual vendor custody (see [Memory economics](#memory-economics) below).
+
 - **MemWal:** integrated days after MemWal launched; blocked by the published-SDK (`@mysten/memwal@0.0.2`) vs relayer (≥0.0.4) version gap — documented honestly in [BLOCKERS.md](docs/BLOCKERS.md) (B16). A provider abstraction keeps us one adapter away from adopting `@mysten/memwal` the day it publishes.
 
 ### Memory economics
@@ -49,6 +55,18 @@ Docs live in-app at [/docs](https://lethe-gold.vercel.app/docs) (concepts, SDK, 
 - **We know the cost model:** Walrus prices storage at a fixed [$0.023/GB/month](https://docs.wal.app/docs/system-overview/storage-costs); erasure coding is ~5× the raw size, and for sub-10MB blobs the fixed per-blob metadata dominates — exactly the shape of a memory fact.
 - **Designed mitigation (mainnet, designed — not yet built):** batch facts via Walrus Quilt — per-patch IDs preserve individual recall while amortizing the per-blob overhead, so a lifetime of memories costs effectively pennies per month at $0.023/GB.
 - **Ownership economics (roadmap framing):** the long-term model is vault-funded renewal — your WAL, your memory, your call to extend or let it expire.
+
+## Portability
+
+A Lethe memory is a user-owned object on Sui, and access to it is a grant the owner issues to an agent's address. Any application can be authorized to read a user's memory by receiving a grant, and authorization is revoked the same way — on-chain, verifiable, owner-controlled. The memory does not live inside any one app's database, so it is not trapped there.
+
+Pulse, our companion agent, is the reference consumer: it can read a user's memory only while it holds an active grant to its address, which is why revoking that grant on-chain makes Pulse lose access — the *revoke = forget* moment shown in the demo. Pulse demonstrates the authorized read path end to end; the same on-chain grant is what would let additional agents read the same memory object without copying or re-teaching it. Opening Lethe memory to third-party agents is the near-term **roadmap** — the primitive that makes it possible (owner-issued, revocable, on-chain grants) already works today.
+
+## Why on-chain memory
+
+Most AI memory is a feature of one product: the app owns it, privacy is a policy you trust, and leaving means losing your context. Lethe treats memory as something you own rather than something an app stores about you.
+
+That difference is only real if it's enforced, not promised. Ownership is an on-chain object you hold. Access is a grant you issue and revoke as a transaction anyone can verify. Portability is the ability to point any authorized agent at the same memory. None of these are policy commitments a company can quietly change — they are properties of where the memory lives. For users who care about owning their context across an AI landscape that increasingly locks it in, that is the wedge.
 
 ## Architecture
 
@@ -88,6 +106,8 @@ cd contracts/memory_specs && sui-prover
 ## Security
 
 - **Formally verified** — 19/19 sui-prover checks on the vault's invariants (section above; reproduce: `cd contracts/memory_specs && sui-prover`).
+- **Encryption & access are enforced, not promised.** Memory is encrypted client-side in the browser with [Seal](https://seal-docs.wal.app) threshold encryption (Mysten infrastructure) before it reaches Walrus; in Seal mode Lethe's server relays only ciphertext and never sees plaintext or key material. Decryption is gated on-chain — the Seal key-server committee releases a key only after `memory_policy::seal_approve` clears for the caller (the vault owner, or an address holding an active grant), so revoking a grant on-chain removes read access and the change is publicly verifiable on Suiscan. A legacy AES-256-GCM server-side path remains only to read pre-Seal entries.
+- **The inference boundary — what we don't claim.** When a granted agent uses a memory, the content is decrypted to pass into a model, and at that moment the plaintext is visible to the inference provider — exactly as with any AI product today. Lethe's guarantee is ownership, access control, and verifiable revocation, not hiding content from the model running inference. Confidential inference (TEE) is on the **roadmap**; we'd rather state the boundary precisely than overclaim it.
 - **Dependency licenses audited** — every third-party production dependency is MIT / Apache-2.0 / BSD / ISC; no copyleft, no unknowns.
 - **Independent audit pre-mainnet** — shortlist from Sui Foundation audit-partner firms.
 
